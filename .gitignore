@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.user
+*.suo
+Storage/MemberDocuments/*
+!Storage/MemberDocuments/.gitkeep
+wwwroot/uploads/*
+!wwwroot/uploads/.gitkeep
+appsettings.Production.json

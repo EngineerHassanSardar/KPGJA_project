@@ -1,0 +1,63 @@
+@model MembershipApplication
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "Review Membership"; }
+<div class="d-flex justify-content-between align-items-center mb-4">
+<div><h2 class="section-title mb-1">Membership Application #@Model.Id</h2><p class="text-secondary mb-0">@Model.FullName — @Model.BusinessName</p></div>
+<a class="btn btn-outline-dark" href="/Admin/Members">Back to Members</a>
+</div>
+@if (TempData["Success"] is string success) { <div class="alert alert-success">@success</div> }
+<div class="row g-4">
+<div class="col-lg-8">
+<div class="soft-card p-4">
+<h5>Applicant / Business Details</h5>
+<div class="row g-3 mt-1">
+<div class="col-md-6"><div class="small text-muted">Full Name</div><div class="fw-semibold">@Model.FullName</div></div>
+<div class="col-md-6"><div class="small text-muted">Father / Husband</div><div class="fw-semibold">@Model.FatherHusbandName</div></div>
+<div class="col-md-6"><div class="small text-muted">CNIC</div><div class="fw-semibold">@Model.Cnic</div></div>
+<div class="col-md-6"><div class="small text-muted">Business</div><div class="fw-semibold">@Model.BusinessName</div></div>
+<div class="col-md-6"><div class="small text-muted">Designation</div><div class="fw-semibold">@Model.Designation</div></div>
+<div class="col-md-6"><div class="small text-muted">Nature</div><div class="fw-semibold">@Model.NatureOfBusiness</div></div>
+<div class="col-md-6"><div class="small text-muted">Mobile</div><div class="fw-semibold">@Model.MobileNo</div></div>
+<div class="col-md-6"><div class="small text-muted">Email</div><div class="fw-semibold">@Model.Email</div></div>
+<div class="col-md-6"><div class="small text-muted">City / District</div><div class="fw-semibold">@Model.CityDistrict</div></div>
+<div class="col-md-6"><div class="small text-muted">Membership</div><div class="fw-semibold">@Model.MembershipCategory</div></div>
+<div class="col-12"><div class="small text-muted">Address</div><div class="fw-semibold">@Model.BusinessAddress</div></div>
+<div class="col-12"><div class="small text-muted">Business Types</div><div class="fw-semibold">@Model.BusinessTypes</div></div>
+</div>
+</div>
+<div class="soft-card p-4 mt-4">
+<h5>Documents</h5>
+<div class="row g-2 mt-2">
+@foreach (var d in new[] {
+("CNIC","cnic",Model.CnicDocumentPath),("Passport Photo","photo",Model.PassportPhotoPath),
+("Business Registration","business",Model.BusinessRegistrationDocumentPath),("Fee Receipt","fee",Model.FeeReceiptPath),
+("Bank Deposit Slip","bank",Model.BankDepositSlipPath),("Recommendation","recommendation",Model.RecommendationDocumentPath)
+})
+{
+<div class="col-md-6">
+@if (!string.IsNullOrWhiteSpace(d.Item3))
+{ <a class="btn btn-outline-secondary btn-sm" target="_blank" href="/Admin/DownloadDocument/@Model.Id?type=@d.Item2"><i class="bi bi-file-earmark-arrow-down me-1"></i>@d.Item1</a> }
+else { <span class="text-muted small">@d.Item1: Not uploaded</span> }
+</div>
+}
+</div>
+</div>
+</div>
+<div class="col-lg-4">
+<div class="soft-card p-4">
+<h5>Admin Approval</h5>
+<form asp-action="Update" method="post">
+@Html.AntiForgeryToken()
+<input type="hidden" name="Id" value="@Model.Id">
+<div class="mb-3"><label class="form-label">Status</label><select class="form-select" name="Status">
+@foreach (var status in new[] {"Pending Review","Approved for Payment","Payment Submitted","Payment Verified","Approved","Active Member","Rejected"})
+{<option value="@status" selected="@(Model.Status == status ? "selected" : null)">@status</option>}
+</select></div>
+<div class="mb-3"><label class="form-label">Membership No.</label><input class="form-control" name="MembershipNo" value="@Model.MembershipNo"></div>
+<div class="mb-3"><label class="form-label">Fee Received (PKR)</label><input class="form-control" type="number" step="0.01" name="FeeReceived" value="@Model.FeeReceived"></div>
+<div class="mb-3"><label class="form-label">Payment Reference</label><input class="form-control" name="PaymentReference" value="@Model.PaymentReference"></div>
+<div class="mb-3"><label class="form-label">Admin Remarks</label><textarea class="form-control" name="AdminRemarks" rows="4">@Model.AdminRemarks</textarea></div>
+<button class="btn btn-gold w-100"><i class="bi bi-check2-circle me-1"></i> Save Approval</button>
+</form>
+</div>
+</div>
+</div>

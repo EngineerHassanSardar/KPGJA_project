@@ -1,0 +1,1506 @@
+@{ ViewData["Title"] = "Home | Khyber Pakhtunkhwa Gems &amp; Jewellery Association"; }
+
+@section Styles {
+<style>
+
+      /* =========================================================
+   PRESIDENT'S MESSAGE
+========================================================= */
+
+.president-message {
+    background: #172033;
+    border-radius: 20px;
+    overflow: hidden;
+    color: #fff;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .08);
+}
+
+.president-photo {
+    height: 100%;
+    min-height: 340px;
+    background: #101827;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.president-photo img {
+    width: 100%;
+    height: 100%;
+    min-height: 340px;
+    object-fit: cover;
+    object-position: center;
+}
+
+.president-content {
+    padding: 40px 45px;
+}
+
+.president-content h3 {
+    font-family: "Playfair Display", serif;
+    font-size: 28px;
+    line-height: 1.35;
+    color: #fff;
+}
+
+.president-quote {
+    padding-left: 20px;
+    border-left: 3px solid #d6a84f;
+}
+
+.president-quote p {
+    color: rgba(255,255,255,.78);
+    font-size: 15px;
+    line-height: 1.8;
+    margin-bottom: 0;
+}
+
+.president-name h5 {
+    color: #fff;
+    font-weight: 700;
+}
+
+.president-name span {
+    color: #d6a84f;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
+        .committee-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+
+            .committee-card img {
+                width: 100%;
+                height: 340px;
+                object-fit: contain;
+                object-position: center;
+                background: #f3f4f6;
+                display: block;
+            }
+
+        .committee-info {
+            padding: 18px 20px;
+        }
+
+            .committee-info h5 {
+                margin-bottom: 5px;
+                font-weight: 700;
+            }
+
+            .committee-info span {
+                color: #d6a84f;
+                font-size: 13px;
+                font-weight: 600;
+            }
+@@media (max-width: 767px) {
+
+    .president-photo,
+    .president-photo img {
+        min-height: 280px;
+    }
+
+    .president-content {
+        padding: 30px 25px;
+    }
+
+    .president-content h3 {
+        font-size: 24px;
+    }
+
+}
+    
+</style>
+}
+
+<!-- =========================================================
+     TOP BAR
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+     HERO SLIDER
+========================================================= -->
+
+<section class="hero-section">
+
+    <div id="heroSlider"
+         class="carousel slide carousel-fade"
+         data-bs-ride="carousel"
+         data-bs-interval="6000">
+
+
+        <!-- Indicators -->
+
+        <div class="carousel-indicators">
+
+            <button type="button"
+                    data-bs-target="#heroSlider"
+                    data-bs-slide-to="0"
+                    class="active"
+                    aria-current="true"
+                    aria-label="Slide 1">
+            </button>
+
+            <button type="button"
+                    data-bs-target="#heroSlider"
+                    data-bs-slide-to="1"
+                    aria-label="Slide 2">
+            </button>
+
+            <button type="button"
+                    data-bs-target="#heroSlider"
+                    data-bs-slide-to="2"
+                    aria-label="Slide 3">
+            </button>
+
+        </div>
+
+
+        <div class="carousel-inner">
+
+
+            <!-- SLIDE 1 -->
+
+            <div class="carousel-item active hero-slide"
+                 style="background-image:url('/assets/img/slider/Slide.jpg');">
+
+                <div class="hero-overlay"></div>
+
+                <div class="container">
+
+                    <div class="hero-content">
+
+                        <span class="hero-kicker">
+                            KHYBER PAKHTUNKHWA · PAKISTAN
+                        </span>
+
+                        <h1>
+                            Connecting the
+                            <span>Gems & Jewellery</span>
+                            Industry
+                        </h1>
+
+                        <p>
+                            Building stronger connections, developing
+                            skills and creating new opportunities for
+                            the gems and jewellery sector of
+                            Khyber Pakhtunkhwa.
+                        </p>
+
+                        <div class="d-flex gap-3 flex-wrap">
+
+                            <a href="/Member/Register"
+                               class="btn btn-gold btn-lg">
+
+                                Become a Member
+
+                                <i class="bi bi-arrow-right ms-1"></i>
+
+                            </a>
+
+                            <a href="/Home/About"
+                               class="btn btn-outline-light btn-lg">
+
+                                Discover KPGJA
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SLIDE 2 -->
+
+            <div class="carousel-item hero-slide"
+                 style="background-image:url('/assets/img/slider/Slider1.jpg');">
+
+                <div class="hero-overlay"></div>
+
+                <div class="container">
+
+                    <div class="hero-content">
+
+                        <span class="hero-kicker">
+                            SKILLS · TRADE · OPPORTUNITY
+                        </span>
+
+                        <h1>
+                            From Local Craft
+                            <span>to Global Markets</span>
+                        </h1>
+
+                        <p>
+                            Supporting innovation, skills development,
+                            value addition, entrepreneurship and
+                            market access.
+                        </p>
+
+                        <div class="d-flex gap-3 flex-wrap">
+
+                            <a href="/Home/Industry"
+                               class="btn btn-gold btn-lg">
+
+                                Explore Industry
+
+                                <i class="bi bi-arrow-right ms-1"></i>
+
+                            </a>
+
+                            <a href="/Home/Events"
+                               class="btn btn-outline-light btn-lg">
+
+                                View Events
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- SLIDE 3 -->
+
+            <div class="carousel-item hero-slide"
+                 style="background-image:url('/assets/img/slider/Slider2.jpg');">
+
+                <div class="hero-overlay"></div>
+
+                <div class="container">
+
+                    <div class="hero-content">
+
+                        <span class="hero-kicker">
+                            COMMUNITY · INCLUSION · GROWTH
+                        </span>
+
+                        <h1>
+                            Empowering People,
+                            <span>Growing Communities</span>
+                        </h1>
+
+                        <p>
+                            Creating opportunities for businesses,
+                            entrepreneurs, skilled professionals
+                            and women across the sector.
+                        </p>
+
+                        <div class="d-flex gap-3 flex-wrap">
+
+                            <a href="/Home/Women"
+                               class="btn btn-gold btn-lg">
+
+                                Women Empowerment
+
+                                <i class="bi bi-arrow-right ms-1"></i>
+
+                            </a>
+
+                            <a href="/Home/Membership"
+                               class="btn btn-outline-light btn-lg">
+
+                                Membership
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Previous -->
+
+        <button class="carousel-control-prev"
+                type="button"
+                data-bs-target="#heroSlider"
+                data-bs-slide="prev">
+
+            <span class="carousel-control-prev-icon"></span>
+
+            <span class="visually-hidden">
+                Previous
+            </span>
+
+        </button>
+
+
+        <!-- Next -->
+
+        <button class="carousel-control-next"
+                type="button"
+                data-bs-target="#heroSlider"
+                data-bs-slide="next">
+
+            <span class="carousel-control-next-icon"></span>
+
+            <span class="visually-hidden">
+                Next
+            </span>
+
+        </button>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     INTRODUCTION
+========================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6">
+
+                <span class="section-kicker">
+                    ABOUT KPGJA
+                </span>
+
+                <h2 class="section-heading">
+                    A shared platform for a
+                    stronger industry.
+                </h2>
+
+                <p class="lead text-secondary">
+
+                    Khyber Pakhtunkhwa Gems & Jewellery Association
+                    brings together businesses, professionals,
+                    traders, manufacturers, designers and other
+                    stakeholders connected with the gems and
+                    jewellery sector.
+
+                </p>
+
+                <p class="text-secondary">
+
+                    The Association aims to support industry
+                    development, skills, employment, trade,
+                    value addition, entrepreneurship and
+                    sustainable growth.
+
+                </p>
+
+                <a href="/Home/About"
+                   class="btn btn-dark">
+
+                    Learn About KPGJA
+
+                    <i class="bi bi-arrow-right ms-1"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-lg-6">
+
+                <div class="intro-image-wrapper">
+
+                    <img src="/assets/img/about-home.jpg"
+                         alt="Gems and jewellery industry"
+                         class="img-fluid">
+
+                    <div class="intro-badge">
+
+                        <i class="bi bi-gem"></i>
+
+                        <span>
+                            Gems & Jewellery
+                            <small>
+                                Khyber Pakhtunkhwa
+                            </small>
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================================
+     PRESIDENT'S MESSAGE
+========================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <!-- Section Heading -->
+
+        <div class="text-center mb-4">
+
+            <span class="section-kicker">
+                LEADERSHIP
+            </span>
+
+            <h2 class="section-heading">
+                President's Message
+            </h2>
+
+            <p class="text-secondary mx-auto section-description">
+                A message from the President of the Khyber Pakhtunkhwa
+                Gems & Jewellery Association.
+            </p>
+
+        </div>
+
+
+        <!-- President Message Card -->
+
+        <div class="president-message">
+
+            <div class="row g-0 align-items-stretch">
+
+
+                <!-- PRESIDENT PHOTO -->
+
+                <div class="col-lg-4">
+
+                    <div class="president-photo">
+
+                        <img src="/assets/img/President.png"
+                             alt="Muhammad Salman Niazi, President KPGJA">
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRESIDENT MESSAGE -->
+
+                <div class="col-lg-8">
+
+                    <div class="president-content">
+
+                        <div class="mb-3">
+
+                            <i class="bi bi-quote"
+                               style="font-size: 32px; color:#d6a84f;">
+                            </i>
+
+                        </div>
+
+
+                        <h3 class="mb-3">
+                            Advancing the Gems & Jewellery
+                            Industry of Khyber Pakhtunkhwa
+                        </h3>
+
+
+                        <div class="president-quote">
+
+                            <p>
+                                The Khyber Pakhtunkhwa Gems & Jewellery
+                                Association is committed to bringing
+                                together businesses, skilled professionals,
+                                entrepreneurs and stakeholders to promote
+                                the sustainable development of our industry.
+                            </p>
+
+                            <p class="mt-3">
+                                Through collaboration, skills development,
+                                innovation, entrepreneurship and improved
+                                market opportunities, we seek to strengthen
+                                the gems and jewellery sector and create
+                                greater opportunities for businesses and
+                                communities across Khyber Pakhtunkhwa.
+                            </p>
+
+                        </div>
+
+
+                        <!-- SIGNATURE / NAME -->
+
+                        <div class="president-name mt-4">
+
+                            <h5 class="mb-1">
+                                Muhammad Salman Niazi
+                            </h5>
+
+                            <span>
+                                President
+                                <span class="mx-1">·</span>
+                                Khyber Pakhtunkhwa Gems & Jewellery Association
+                            </span>
+
+                        </div>
+
+
+                        <a href="/Home/Executive"
+                           class="btn btn-gold mt-4">
+
+                            Meet the Executive Committee
+
+                            <i class="bi bi-arrow-right ms-1"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- =========================================================
+     OBJECTIVES
+========================================================= -->
+
+<section class="objectives-section py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <span class="section-kicker">
+                OUR OBJECTIVES
+            </span>
+
+            <h2 class="section-heading">
+                Supporting industry development
+            </h2>
+
+            <p class="text-secondary mx-auto section-description">
+
+                KPGJA provides a platform for collaboration,
+                skills development, business growth and
+                opportunities across the sector.
+
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="objective-card">
+
+                    <div class="objective-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+
+                    <h4>
+                        Industry Development
+                    </h4>
+
+                    <p>
+                        Supporting professional growth,
+                        innovation and stronger industry
+                        standards.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="objective-card">
+
+                    <div class="objective-icon">
+                        <i class="bi bi-globe2"></i>
+                    </div>
+
+                    <h4>
+                        Trade & Export
+                    </h4>
+
+                    <p>
+                        Encouraging domestic and international
+                        market opportunities.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="objective-card">
+
+                    <div class="objective-icon">
+                        <i class="bi bi-mortarboard"></i>
+                    </div>
+
+                    <h4>
+                        Skills & Training
+                    </h4>
+
+                    <p>
+                        Supporting technical skills,
+                        training and value addition.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <div class="objective-card">
+
+                    <div class="objective-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+
+                    <h4>
+                        Women Empowerment
+                    </h4>
+
+                    <p>
+                        Encouraging participation,
+                        entrepreneurship and opportunities.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     MEMBERSHIP CTA
+========================================================= -->
+
+<section class="membership-section">
+
+    <div class="container">
+
+        <div class="membership-box">
+
+            <div class="row align-items-center g-4">
+
+                <div class="col-lg-8">
+
+                    <span class="section-kicker text-warning">
+                        MEMBERSHIP
+                    </span>
+
+                    <h2>
+                        Become part of the KPGJA community.
+                    </h2>
+
+                    <p>
+                        Register online, submit your membership
+                        application and follow your application
+                        status through the Member Portal.
+                    </p>
+
+                </div>
+
+                <div class="col-lg-4 text-lg-end">
+
+                    <a href="/Member/Register"
+                       class="btn btn-gold btn-lg">
+
+                        Apply for Membership
+
+                        <i class="bi bi-arrow-right ms-1"></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     INDUSTRY
+========================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="d-flex justify-content-between
+                    align-items-end flex-wrap gap-3 mb-4">
+
+            <div>
+
+                <span class="section-kicker">
+                    OUR INDUSTRY
+                </span>
+
+                <h2 class="section-heading mb-0">
+                    Explore the sector
+                </h2>
+
+            </div>
+
+            <a href="/Home/Industry"
+               class="btn btn-outline-dark">
+
+                View Industry
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <div class="col-6 col-lg">
+
+                <a href="/Home/Industry"
+                   class="industry-card text-decoration-none">
+
+                    <div class="industry-icon">
+                        <i class="bi bi-gem"></i>
+                    </div>
+
+                    <h5>
+                        Gemstones
+                    </h5>
+
+                    <p>
+                        Natural & precious stones
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-6 col-lg">
+
+                <a href="/Home/Industry"
+                   class="industry-card text-decoration-none">
+
+                    <div class="industry-icon">
+                        <i class="bi bi-award"></i>
+                    </div>
+
+                    <h5>
+                        Jewellery
+                    </h5>
+
+                    <p>
+                        Traditional & modern
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-6 col-lg">
+
+                <a href="/Home/Industry"
+                   class="industry-card text-decoration-none">
+
+                    <div class="industry-icon">
+                        <i class="bi bi-tools"></i>
+                    </div>
+
+                    <h5>
+                        Lapidary
+                    </h5>
+
+                    <p>
+                        Cutting & polishing
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-6 col-lg">
+
+                <a href="/Home/Industry"
+                   class="industry-card text-decoration-none">
+
+                    <div class="industry-icon">
+                        <i class="bi bi-shop"></i>
+                    </div>
+
+                    <h5>
+                        Manufacturing
+                    </h5>
+
+                    <p>
+                        Production & craftsmanship
+                    </p>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-6 col-lg">
+
+                <a href="/Home/Industry"
+                   class="industry-card text-decoration-none">
+
+                    <div class="industry-icon">
+                        <i class="bi bi-globe2"></i>
+                    </div>
+
+                    <h5>
+                        Trade & Export
+                    </h5>
+
+                    <p>
+                        Domestic & global markets
+                    </p>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     WOMEN EMPOWERMENT
+========================================================= -->
+
+<section class="women-section py-5">
+
+    <div class="container">
+
+        <div class="row align-items-center g-5">
+
+            <div class="col-lg-6 order-lg-2">
+
+                <img src="/assets/img/women.jpg"
+                     alt="Women empowerment initiatives"
+                     class="img-fluid rounded-4 shadow">
+
+            </div>
+
+
+            <div class="col-lg-6 order-lg-1">
+
+                <span class="section-kicker">
+                    WOMEN EMPOWERMENT
+                </span>
+
+                <h2 class="section-heading">
+                    Creating opportunities
+                    for women.
+                </h2>
+
+                <p class="text-secondary">
+
+                    KPGJA aims to provide space for women
+                    entrepreneurs, professionals, artisans
+                    and businesses to participate and grow
+                    within the gems and jewellery industry.
+
+                </p>
+
+
+                <div class="row g-3 mt-2">
+
+                    <div class="col-6">
+
+                        <div class="mini-feature">
+
+                            <i class="bi bi-lightbulb"></i>
+
+                            <strong>
+                                Training
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <div class="mini-feature">
+
+                            <i class="bi bi-briefcase"></i>
+
+                            <strong>
+                                Entrepreneurship
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <div class="mini-feature">
+
+                            <i class="bi bi-people"></i>
+
+                            <strong>
+                                Community
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-6">
+
+                        <div class="mini-feature">
+
+                            <i class="bi bi-bar-chart"></i>
+
+                            <strong>
+                                Opportunities
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <a href="/Home/Women"
+                   class="btn btn-dark mt-4">
+
+                    Women Empowerment
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     EXECUTIVE COMMITTEE
+========================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <span class="section-kicker">
+                LEADERSHIP
+            </span>
+
+            <h2 class="section-heading">
+                Executive Committee
+            </h2>
+
+            <p class="text-secondary">
+                Meet the leadership representing the Association.
+            </p>
+
+        </div>
+
+
+        <div class="row g-4">
+
+
+            <div class="col-md-4">
+
+                <div class="committee-card">
+
+                    <img src="/assets/img/President.png"
+                         alt="Executive Committee member">
+
+                    <div class="committee-info">
+
+                        <h5>
+                            Muhammad Salman Niazi
+
+                        </h5>
+
+                        <span>
+                            President
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="committee-card">
+
+                    <img src="/assets/img/VicePresident.jpeg"
+                         alt="Executive Committee member">
+
+                    <div class="committee-info">
+
+                        <h5>
+                           Salman Younas
+                        </h5>
+
+                        <span>
+                            Vice President
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="col-md-4">
+
+                <div class="committee-card">
+
+                    <img src="/assets/img/OfficeSecretary.jpeg"
+                         alt="Executive Committee member">
+
+                    <div class="committee-info">
+
+                        <h5>
+                           Tahseen Ullah
+                        </h5>
+
+                        <span>
+                            Office  Secretary
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="text-center mt-4">
+
+            <a href="/Home/Executive"
+               class="btn btn-outline-dark">
+
+                View Executive Committee
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     EVENTS & NEWS
+========================================================= -->
+
+<section class="news-events-section py-5">
+
+    <div class="container">
+
+        <div class="row g-5">
+
+
+            <!-- EVENTS -->
+
+            <div class="col-lg-6">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-4">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            EVENTS
+                        </span>
+
+                        <h2 class="section-heading mb-0">
+                            Events & Activities
+                        </h2>
+
+                    </div>
+
+                    <a href="/Home/Events"
+                       class="btn btn-sm btn-outline-dark">
+
+                        View All
+
+                    </a>
+
+                </div>
+
+
+                <div class="event-item">
+
+                    <div class="event-date">
+
+                        <strong>
+                            15
+                        </strong>
+
+                        <span>
+                            OCT
+                        </span>
+
+                    </div>
+
+                    <div>
+
+                        <h5>
+                            Gem & Jewellery Exhibition
+                        </h5>
+
+                        <p>
+                            Peshawar · Exhibition & Networking
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="event-item">
+
+                    <div class="event-date">
+
+                        <strong>
+                            24
+                        </strong>
+
+                        <span>
+                            OCT
+                        </span>
+
+                    </div>
+
+                    <div>
+
+                        <h5>
+                            Business Networking Summit
+                        </h5>
+
+                        <p>
+                            Peshawar · Industry stakeholders
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- NEWS -->
+
+            <div class="col-lg-6">
+
+                <div class="d-flex justify-content-between
+                            align-items-center mb-4">
+
+                    <div>
+
+                        <span class="section-kicker">
+                            NEWS
+                        </span>
+
+                        <h2 class="section-heading mb-0">
+                            Latest Updates
+                        </h2>
+
+                    </div>
+
+                    <a href="/Home/News"
+                       class="btn btn-sm btn-outline-dark">
+
+                        View All
+
+                    </a>
+
+                </div>
+
+
+                <article class="news-item">
+
+                    <div class="news-icon">
+                        <i class="bi bi-newspaper"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="small text-muted">
+                            Association News
+                        </span>
+
+                        <h5>
+                            KPGJA activities and industry updates
+                        </h5>
+
+                        <p>
+                            Latest announcements, initiatives
+                            and developments will be published here.
+                        </p>
+
+                    </div>
+
+                </article>
+
+
+                <article class="news-item">
+
+                    <div class="news-icon">
+                        <i class="bi bi-megaphone"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="small text-muted">
+                            Industry Update
+                        </span>
+
+                        <h5>
+                            New opportunities for industry members
+                        </h5>
+
+                        <p>
+                            Discover upcoming opportunities,
+                            programs and activities.
+                        </p>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     IMPORTANT LINKS
+========================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+        <div class="text-center mb-5">
+
+            <span class="section-kicker">
+                QUICK ACCESS
+            </span>
+
+            <h2 class="section-heading">
+                Important Links
+            </h2>
+
+        </div>
+
+
+        <div class="row g-3">
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <a href="/Member/Login"
+                   class="quick-link">
+
+                    <i class="bi bi-person-circle"></i>
+
+                    <span>
+                        Member Login
+                    </span>
+
+                    <i class="bi bi-arrow-right ms-auto"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <a href="/Member/Register"
+                   class="quick-link">
+
+                    <i class="bi bi-person-plus"></i>
+
+                    <span>
+                        Register as Member
+                    </span>
+
+                    <i class="bi bi-arrow-right ms-auto"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <a href="/Home/Events"
+                   class="quick-link">
+
+                    <i class="bi bi-calendar-event"></i>
+
+                    <span>
+                        Events
+                    </span>
+
+                    <i class="bi bi-arrow-right ms-auto"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="col-md-6 col-lg-3">
+
+                <a href="/Home/Contact"
+                   class="quick-link">
+
+                    <i class="bi bi-envelope"></i>
+
+                    <span>
+                        Contact KPGJA
+                    </span>
+
+                    <i class="bi bi-arrow-right ms-auto"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     CONTACT CTA
+========================================================= -->
+
+<section class="contact-cta py-5">
+
+    <div class="container">
+
+        <div class="row align-items-center g-4">
+
+            <div class="col-lg-8">
+
+                <span class="section-kicker text-warning">
+                    CONNECT WITH US
+                </span>
+
+                <h2>
+                    Have a question or want to
+                    become a member?
+                </h2>
+
+                <p>
+                    Contact the Khyber Pakhtunkhwa Gems &
+                    Jewellery Association for information,
+                    membership and industry-related matters.
+                </p>
+
+            </div>
+
+
+            <div class="col-lg-4 text-lg-end">
+
+                <a href="/Home/Contact"
+                   class="btn btn-gold btn-lg">
+
+                    Contact Us
+
+                    <i class="bi bi-arrow-right"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+
+
+
+<!-- Bootstrap JS -->
+
+
+
+<!-- Custom JS -->

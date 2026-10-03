@@ -1,0 +1,1985 @@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Member Registration"; }
+@section Styles { <style>
+
+        /* =====================================================
+           FORM SECTION
+        ===================================================== */
+
+        .registration-card {
+            background: #fff;
+            border: 1px solid #e9eaed;
+            border-radius: 20px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, .06);
+            overflow: hidden;
+        }
+
+
+        .registration-header {
+            background: #172033;
+            color: #fff;
+            padding: 28px 35px;
+        }
+
+
+        .registration-header h3 {
+            font-family: "Playfair Display", serif;
+            margin-bottom: 5px;
+        }
+
+
+        .registration-header p {
+            color: rgba(255,255,255,.70);
+            margin-bottom: 0;
+        }
+
+
+        .registration-body {
+            padding: 35px;
+        }
+
+
+        /* =====================================================
+           FORM SECTION TITLE
+        ===================================================== */
+
+        .form-section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            margin-bottom: 22px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e9eaed;
+        }
+
+
+        .form-section-title:first-child {
+            margin-top: 0;
+        }
+
+
+        .form-section-number {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 50%;
+            background: #f5f1e7;
+            color: #b88a2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+
+        .form-section-title h4 {
+            margin: 0;
+            color: #172033;
+            font-family: "Playfair Display", serif;
+        }
+
+
+        /* =====================================================
+           FORM LABELS
+        ===================================================== */
+
+        .form-label {
+            font-weight: 600;
+            color: #303746;
+            margin-bottom: 7px;
+        }
+
+
+        .form-control,
+        .form-select {
+            min-height: 48px;
+            border-color: #dfe2e7;
+            border-radius: 10px;
+        }
+
+
+        textarea.form-control {
+            min-height: 110px;
+        }
+
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #d6a84f;
+            box-shadow: 0 0 0 .2rem rgba(214,168,79,.12);
+        }
+
+
+        /* =====================================================
+           MEMBERSHIP CATEGORY
+        ===================================================== */
+
+        .membership-category-option {
+            height: 100%;
+            border: 1px solid #e1e4e8;
+            border-radius: 12px;
+            padding: 18px;
+            transition: .2s ease;
+        }
+
+
+        .membership-category-option:hover {
+            border-color: #d6a84f;
+            background: #fffdf8;
+        }
+
+
+        .membership-category-option .form-check-input {
+            margin-top: 5px;
+        }
+
+
+        .membership-category-option label {
+            cursor: pointer;
+            width: 100%;
+        }
+
+
+        .membership-category-name {
+            font-weight: 700;
+            color: #172033;
+        }
+
+
+        .membership-category-fee {
+            color: #b88a2d;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+
+        /* =====================================================
+           BUSINESS TYPES
+        ===================================================== */
+
+        .business-type-option {
+            border: 1px solid #e1e4e8;
+            border-radius: 10px;
+            padding: 13px 15px;
+            height: 100%;
+        }
+
+
+        .business-type-option label {
+            cursor: pointer;
+        }
+
+
+        /* =====================================================
+           DOCUMENT BOX
+        ===================================================== */
+
+        .document-box {
+            background: #f8f9fb;
+            border: 1px solid #e4e6ea;
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+
+        .document-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #e4e6ea;
+        }
+
+
+        .document-item:last-child {
+            border-bottom: 0;
+        }
+
+
+        .document-item label {
+            font-weight: 500;
+        }
+
+
+        /* =====================================================
+           DECLARATION
+        ===================================================== */
+
+        .declaration-box {
+            background: #f8f9fb;
+            border: 1px solid #e4e6ea;
+            border-radius: 14px;
+            padding: 25px;
+        }
+
+
+        .declaration-box p {
+            color: #5f6673;
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+
+        .declaration-box strong {
+            color: #172033;
+        }
+/* =====================================================
+           REQUIRED MARK
+        ===================================================== */
+
+        .required {
+            color: #dc3545;
+        }
+
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @@media (max-width: 767px) {
+
+            .registration-body {
+                padding: 22px;
+            }
+
+
+            .registration-header {
+                padding: 25px 22px;
+            }
+
+
+            .form-section-title h4 {
+                font-size: 20px;
+            }
+
+        }
+
+    </style> }
+<!-- =========================================================
+     TOP BAR
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+     PAGE HERO
+========================================================= -->
+
+<section class="page-hero">
+
+    <div class="container">
+
+        <span class="section-kicker text-warning">
+
+            JOIN KPGJA
+
+        </span>
+
+
+        <h1>
+            Member Registration
+        </h1>
+
+
+        <p class="lead text-white-50 mb-0">
+
+            Complete the membership application and submit
+            the required information and documents online.
+
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     REGISTRATION FORM
+========================================================= -->
+
+<section class="py-5">
+
+    <div class="container">
+
+
+        <div class="row justify-content-center">
+
+
+            <div class="col-xl-11">
+
+
+                <!-- MESSAGE -->
+
+                <div id="registerMessage"
+                     class="alert d-none">
+                </div>
+
+
+                <!-- REGISTRATION CARD -->
+
+                <div class="registration-card">
+
+
+                    <!-- HEADER -->
+
+                    <div class="registration-header">
+
+                        <h3>
+                            Membership Registration Form
+                        </h3>
+
+
+                        <p>
+                            Please complete this form carefully
+                            and provide the required documents.
+                        </p>
+
+                    </div>
+
+
+                    <!-- BODY -->
+
+                    <div class="registration-body">
+
+
+                        <form asp-action="Register" asp-controller="Member" method="post" id="membershipForm" enctype="multipart/form-data">
+@Html.AntiForgeryToken()
+<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+
+                            <!-- =================================================
+                                 1. APPLICANT / BUSINESS DETAILS
+                            ================================================== -->
+
+                            <div class="form-section-title">
+
+                                <span class="form-section-number">
+                                    01
+                                </span>
+
+
+                                <h4>
+                                    Applicant / Business Details
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row g-4">
+
+
+                                <!-- BUSINESS NAME -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Business / Firm Name
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="businessName"
+                                           class="form-control"
+                                           placeholder="Enter business or firm name"
+                                           required>
+
+                                </div>
+
+
+                                <!-- APPLICANT NAME -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Applicant Full Name
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="fullName"
+                                           class="form-control"
+                                           placeholder="Enter full name"
+                                           required>
+
+                                </div>
+
+
+                                <!-- FATHER / HUSBAND -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Father's / Husband's Name
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="fatherHusbandName"
+                                           class="form-control"
+                                           placeholder="Enter father's / husband's name"
+                                           required>
+
+                                </div>
+
+
+                                <!-- CNIC -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        CNIC Number
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="cnic"
+                                           class="form-control"
+                                           placeholder="XXXXX-XXXXXXX-X"
+                                           maxlength="15"
+                                           required>
+
+                                </div>
+
+
+                                <!-- DESIGNATION -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Designation / Title in Firm
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="designation"
+                                           class="form-control"
+                                           placeholder="e.g. Owner, Director, Partner">
+
+                                </div>
+
+
+                                <!-- YEARS IN BUSINESS -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Years in Gems & Jewellery Business
+
+                                    </label>
+
+
+                                    <input type="number"
+                                           name="yearsInBusiness"
+                                           class="form-control"
+                                           min="0"
+                                           placeholder="Enter number of years">
+
+                                </div>
+
+
+                                <!-- NATURE OF BUSINESS -->
+
+                                <div class="col-12">
+
+                                    <label class="form-label">
+
+                                        Nature of Business
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <textarea name="natureOfBusiness"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="Describe your gems and jewellery business activities"
+                                              required></textarea>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 2. CONTACT INFORMATION
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    02
+                                </span>
+
+
+                                <h4>
+                                    Contact Information
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row g-4">
+
+
+                                <!-- MOBILE -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Mobile Number
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="tel"
+                                           name="mobileNo"
+                                           class="form-control"
+                                           placeholder="03XX-XXXXXXX"
+                                           required>
+
+                                </div>
+
+
+                                <!-- LANDLINE -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Landline Number
+
+                                    </label>
+
+
+                                    <input type="tel"
+                                           name="landlineNo"
+                                           class="form-control"
+                                           placeholder="091-XXXXXXX">
+
+                                </div>
+
+
+                                <!-- EMAIL -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Email Address
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="email"
+                                           name="email"
+                                           class="form-control"
+                                           placeholder="example@email.com"
+                                           required>
+
+                                </div>
+
+
+                                <!-- WEBSITE -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Website
+                                        <span class="text-muted">(if any)</span>
+
+                                    </label>
+
+
+                                    <input type="url"
+                                           name="website"
+                                           class="form-control"
+                                           placeholder="https://example.com">
+
+                                </div>
+
+
+                                <!-- BUSINESS ADDRESS -->
+
+                                <div class="col-md-8">
+
+                                    <label class="form-label">
+
+                                        Business Address
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <textarea name="businessAddress"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="Enter complete business address"
+                                              required></textarea>
+
+                                </div>
+
+
+                                <!-- CITY -->
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+
+                                        City / District
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="cityDistrict"
+                                           class="form-control"
+                                           placeholder="e.g. Peshawar"
+                                           required>
+
+                                </div>
+
+
+                                <!-- POSTAL CODE -->
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+
+                                        Postal Code
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="postalCode"
+                                           class="form-control"
+                                           placeholder="Postal Code">
+
+                                </div>
+
+
+                                <!-- PASSWORD -->
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+
+                                        Password
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="password"
+                                           name="password"
+                                           class="form-control"
+                                           placeholder="Create password"
+                                           minlength="6"
+                                           required>
+
+                                </div>
+
+
+                                <!-- CONFIRM PASSWORD -->
+
+                                <div class="col-md-4">
+
+                                    <label class="form-label">
+
+                                        Confirm Password
+                                        <span class="required">*</span>
+
+                                    </label>
+
+
+                                    <input type="password"
+                                           name="confirmPassword"
+                                           class="form-control"
+                                           placeholder="Confirm password"
+                                           minlength="6"
+                                           required>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 3. MEMBERSHIP CATEGORY
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    03
+                                </span>
+
+
+                                <h4>
+                                    Category of Membership
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row g-3">
+
+
+                                <!-- ORDINARY -->
+
+                                <div class="col-md-4">
+
+                                    <div class="membership-category-option">
+
+                                        <div class="form-check">
+
+                                            <input class="form-check-input"
+                                                   type="radio"
+                                                   name="membershipCategory"
+                                                   id="ordinaryMember"
+                                                   value="Ordinary Member"
+                                                   required>
+
+
+                                            <label class="form-check-label"
+                                                   for="ordinaryMember">
+
+                                                <span class="membership-category-name">
+                                                    Ordinary Member
+                                                </span>
+
+                                                <br>
+
+                                                <span class="membership-category-fee">
+                                                    PKR 1,000
+                                                </span>
+
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- ASSOCIATE -->
+
+                                <div class="col-md-4">
+
+                                    <div class="membership-category-option">
+
+                                        <div class="form-check">
+
+                                            <input class="form-check-input"
+                                                   type="radio"
+                                                   name="membershipCategory"
+                                                   id="associateMember"
+                                                   value="Associate Member">
+
+
+                                            <label class="form-check-label"
+                                                   for="associateMember">
+
+                                                <span class="membership-category-name">
+                                                    Associate Member
+                                                </span>
+
+                                                <br>
+
+                                                <span class="membership-category-fee">
+                                                    PKR 2,500
+                                                </span>
+
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- HONORARY -->
+
+                                <div class="col-md-4">
+
+                                    <div class="membership-category-option">
+
+                                        <div class="form-check">
+
+                                            <input class="form-check-input"
+                                                   type="radio"
+                                                   name="membershipCategory"
+                                                   id="honoraryMember"
+                                                   value="Honorary Member">
+
+
+                                            <label class="form-check-label"
+                                                   for="honoraryMember">
+
+                                                <span class="membership-category-name">
+                                                    Honorary Member
+                                                </span>
+
+                                                <br>
+
+                                                <span class="membership-category-fee">
+                                                    PKR 3,500
+                                                </span>
+
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <p class="small text-secondary mt-3 mb-0">
+
+                                The membership fee structure is applicable
+                                for the time being and may be revised by
+                                the Association in the future.
+
+                            </p>
+
+
+                            <!-- BUSINESS TYPE -->
+
+                            <div class="mt-4">
+
+                                <label class="form-label">
+
+                                    Nature / Category of Business
+                                    <span class="required">*</span>
+
+                                </label>
+
+
+                                <div class="row g-3">
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="business-type-option">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="businessType"
+                                                       value="Trader / Dealer"
+                                                       id="trader">
+
+                                                <label class="form-check-label"
+                                                       for="trader">
+
+                                                    Trader / Dealer
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="business-type-option">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="businessType"
+                                                       value="Miner"
+                                                       id="miner">
+
+                                                <label class="form-check-label"
+                                                       for="miner">
+
+                                                    Miner
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="business-type-option">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="businessType"
+                                                       value="Cutter / Polisher (Lapidary)"
+                                                       id="lapidary">
+
+                                                <label class="form-check-label"
+                                                       for="lapidary">
+
+                                                    Cutter / Polisher (Lapidary)
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="business-type-option">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="businessType"
+                                                       value="Jeweller"
+                                                       id="jeweller">
+
+                                                <label class="form-check-label"
+                                                       for="jeweller">
+
+                                                    Jeweller
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="business-type-option">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="businessType"
+                                                       value="Manufacturer"
+                                                       id="manufacturer">
+
+                                                <label class="form-check-label"
+                                                       for="manufacturer">
+
+                                                    Manufacturer
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-md-4">
+
+                                        <div class="business-type-option">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="businessType"
+                                                       value="Exporter"
+                                                       id="exporter">
+
+                                                <label class="form-check-label"
+                                                       for="exporter">
+
+                                                    Exporter
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 4. BUSINESS REGISTRATION DETAILS
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    04
+                                </span>
+
+
+                                <h4>
+                                    Business Registration Details
+                                </h4>
+
+                            </div>
+
+
+                            <div class="row g-4">
+
+
+                                <!-- NTN -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        NTN / STRN
+                                        <span class="text-muted">
+                                            (if applicable)
+                                        </span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="ntnStrn"
+                                           class="form-control"
+                                           placeholder="Enter NTN / STRN">
+
+                                </div>
+
+
+                                <!-- MINING LICENCE -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Mining / Trading Licence No.
+                                        <span class="text-muted">
+                                            (if applicable)
+                                        </span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="licenceNo"
+                                           class="form-control"
+                                           placeholder="Enter licence number">
+
+                                </div>
+
+
+                                <!-- CHAMBER -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        Chamber / Association Membership
+                                        <span class="text-muted">
+                                            (if any)
+                                        </span>
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="associationMembership"
+                                           class="form-control"
+                                           placeholder="Enter chamber / association name">
+
+                                </div>
+
+
+                                <!-- KP REGISTRATION -->
+
+                                <div class="col-md-6">
+
+                                    <label class="form-label">
+
+                                        KP Registration No.
+
+                                    </label>
+
+
+                                    <input type="text"
+                                           name="kpRegistrationNo"
+                                           class="form-control"
+                                           placeholder="Enter KP registration number">
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 5. DOCUMENTS ENCLOSED
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    05
+                                </span>
+
+
+                                <h4>
+                                    Documents Enclosed
+                                </h4>
+
+                            </div>
+
+
+                            <div class="document-box">
+
+
+                                <!-- CNIC -->
+
+                                <div class="document-item">
+
+                                    <div class="row align-items-center g-3">
+
+                                        <div class="col-lg-5">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="documentsEnclosed"
+                                                       value="CNIC"
+                                                       id="docCnic"
+                                                       required>
+
+                                                <label class="form-check-label"
+                                                       for="docCnic">
+
+                                                    Copy of CNIC
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="col-lg-7">
+
+                                            <input type="file"
+                                                   name="cnicDocument"
+                                                   class="form-control"
+                                                   accept=".pdf,.jpg,.jpeg,.png">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PHOTO -->
+
+                                <div class="document-item">
+
+                                    <div class="row align-items-center g-3">
+
+                                        <div class="col-lg-5">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="documentsEnclosed"
+                                                       value="Passport-size Photograph"
+                                                       id="docPhoto">
+
+                                                <label class="form-check-label"
+                                                       for="docPhoto">
+
+                                                    Passport-size Photograph
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="col-lg-7">
+
+                                            <input type="file"
+                                                   name="passportPhoto"
+                                                   class="form-control"
+                                                   accept=".jpg,.jpeg,.png">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- BUSINESS REGISTRATION -->
+
+                                <div class="document-item">
+
+                                    <div class="row align-items-center g-3">
+
+                                        <div class="col-lg-5">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="documentsEnclosed"
+                                                       value="Business Registration / Licence"
+                                                       id="docBusiness">
+
+                                                <label class="form-check-label"
+                                                       for="docBusiness">
+
+                                                    Business Registration / Licence
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="col-lg-7">
+
+                                            <input type="file"
+                                                   name="businessRegistrationDocument"
+                                                   class="form-control"
+                                                   accept=".pdf,.jpg,.jpeg,.png">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- MEMBERSHIP FEE RECEIPT -->
+
+                                <div class="document-item">
+
+                                    <div class="row align-items-center g-3">
+
+                                        <div class="col-lg-5">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="documentsEnclosed"
+                                                       value="Membership Fee Receipt"
+                                                       id="docFeeReceipt">
+
+                                                <label class="form-check-label"
+                                                       for="docFeeReceipt">
+
+                                                    Membership Fee Receipt
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="col-lg-7">
+
+                                            <input type="file"
+                                                   name="feeReceipt"
+                                                   class="form-control"
+                                                   accept=".pdf,.jpg,.jpeg,.png">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- BANK SLIP -->
+
+                                <div class="document-item">
+
+                                    <div class="row align-items-center g-3">
+
+                                        <div class="col-lg-5">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="documentsEnclosed"
+                                                       value="Bank Deposit Slip"
+                                                       id="docBankSlip">
+
+                                                <label class="form-check-label"
+                                                       for="docBankSlip">
+
+                                                    Bank Deposit Slip
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="col-lg-7">
+
+                                            <input type="file"
+                                                   name="bankDepositSlip"
+                                                   class="form-control"
+                                                   accept=".pdf,.jpg,.jpeg,.png">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- RECOMMENDATION -->
+
+                                <div class="document-item">
+
+                                    <div class="row align-items-center g-3">
+
+                                        <div class="col-lg-5">
+
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="documentsEnclosed"
+                                                       value="Recommendation of Existing Member"
+                                                       id="docRecommendation">
+
+                                                <label class="form-check-label"
+                                                       for="docRecommendation">
+
+                                                    Recommendation of an Existing Member
+                                                    <span class="text-muted">
+                                                        (if required)
+                                                    </span>
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="col-lg-7">
+
+                                            <input type="file"
+                                                   name="recommendationDocument"
+                                                   class="form-control"
+                                                   accept=".pdf,.jpg,.jpeg,.png">
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 6. DECLARATION
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    06
+                                </span>
+
+
+                                <h4>
+                                    Declaration
+                                </h4>
+
+                            </div>
+
+
+                            <div class="declaration-box">
+
+
+                                <p>
+
+                                    I hereby declare that the information
+                                    provided above is true and correct to
+                                    the best of my knowledge. I agree to
+                                    abide by the Constitution, rules, and
+                                    code of conduct of the KP Gems &
+                                    Jewellery Association, and understand
+                                    that any false statement may lead to
+                                    rejection or cancellation of membership.
+
+                                </p>
+
+
+                                <div class="form-check mt-4">
+
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="declarationAgreement"
+                                           name="declarationAgreement"
+                                           required>
+
+
+                                    <label class="form-check-label"
+                                           for="declarationAgreement">
+
+                                        I have read and agree to the above
+                                        declaration.
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 7. NON-REFUNDABLE FEE
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    07
+                                </span>
+
+
+                                <h4>
+                                    Non-Refundable Membership Fee
+                                </h4>
+
+                            </div>
+
+
+                            <div class="declaration-box">
+
+
+                                <p>
+
+                                    I understand and agree that once the
+                                    membership fee / amount has been paid,
+                                    the amount shall be non-refundable under
+                                    any circumstances, including withdrawal
+                                    of the application, change of mind,
+                                    rejection, cancellation, or
+                                    discontinuation of membership, subject
+                                    to the Association's applicable rules
+                                    and decisions.
+
+                                </p>
+
+
+                                <div class="form-check mt-4">
+
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="feeAgreement"
+                                           name="feeAgreement"
+                                           required>
+
+
+                                    <label class="form-check-label"
+                                           for="feeAgreement">
+
+                                        I understand and agree to the
+                                        non-refundable membership fee terms.
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 8. DECLARATION & UNDERTAKING
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    08
+                                </span>
+
+
+                                <h4>
+                                    Declaration & Undertaking
+                                </h4>
+
+                            </div>
+
+
+                            <div class="declaration-box">
+
+
+                                <p>
+
+                                    I hereby declare and affirm that I am
+                                    applying for membership of the KP Gems &
+                                    Jewellery Association under the
+                                    membership category selected by me in
+                                    this form.
+
+                                </p>
+
+
+                                <p>
+
+                                    I undertake to abide by the Constitution,
+                                    rules, regulations, policies and code of
+                                    conduct of the Association, as amended
+                                    from time to time, and I shall not
+                                    knowingly act against the interests,
+                                    rules or lawful decisions of the
+                                    Association.
+
+                                </p>
+
+
+                                <p>
+
+                                    I further undertake that I shall conduct
+                                    myself in accordance with the rules and
+                                    objectives of the Association and shall
+                                    not engage in any activity that violates
+                                    the Association's Constitution, rules,
+                                    code of conduct or applicable law.
+
+                                </p>
+
+
+                                <p class="mb-0">
+
+                                    I understand that violation of these
+                                    undertakings may result in disciplinary
+                                    action, including suspension or
+                                    cancellation of membership, in accordance
+                                    with the Association's applicable
+                                    procedures.
+
+                                </p>
+
+
+                                <div class="form-check mt-4">
+
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="undertakingAgreement"
+                                           name="undertakingAgreement"
+                                           required>
+
+
+                                    <label class="form-check-label"
+                                           for="undertakingAgreement">
+
+                                        I have read, understood and agree
+                                        to the above undertaking.
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 9. AUTHENTICITY OF DOCUMENTS
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    09
+                                </span>
+
+
+                                <h4>
+                                    Authenticity of Documents & Information
+                                </h4>
+
+                            </div>
+
+
+                            <div class="declaration-box">
+
+
+                                <p>
+
+                                    I hereby declare that all information
+                                    provided in this membership application
+                                    is true, accurate and complete to the
+                                    best of my knowledge.
+
+                                </p>
+
+
+                                <p>
+
+                                    I further declare that all documents,
+                                    certificates, licences, identification
+                                    documents and other records submitted,
+                                    uploaded or attached with this
+                                    application are genuine, valid and
+                                    lawfully belong to me / my business,
+                                    as applicable.
+
+                                </p>
+
+
+                                <p>
+
+                                    Where a copy or scanned copy is
+                                    submitted, I confirm that it is a true
+                                    and accurate copy of the original
+                                    document and has not been forged,
+                                    altered or misrepresented.
+
+                                </p>
+
+
+                                <p class="mb-0">
+
+                                    I understand that if any information
+                                    or document is found to be false,
+                                    forged, altered or misleading, the
+                                    Association may reject my application
+                                    or take appropriate action regarding
+                                    my membership in accordance with
+                                    its rules.
+
+                                </p>
+
+
+                                <div class="form-check mt-4">
+
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="authenticityAgreement"
+                                           name="authenticityAgreement"
+                                           required>
+
+
+                                    <label class="form-check-label"
+                                           for="authenticityAgreement">
+
+                                        I confirm the authenticity of the
+                                        information and documents submitted.
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 10. FINAL CONFIRMATION
+                            ================================================== -->
+
+                            <div class="form-section-title mt-5">
+
+                                <span class="form-section-number">
+                                    10
+                                </span>
+
+
+                                <h4>
+                                    Applicant's Final Confirmation
+                                </h4>
+
+                            </div>
+
+
+                            <div class="declaration-box">
+
+
+                                <p>
+
+                                    By submitting this application, I confirm
+                                    that I have read, understood and accepted
+                                    the above declaration, undertaking, fee
+                                    terms and document-authenticity
+                                    requirements, and I voluntarily submit
+                                    this application for membership.
+
+                                </p>
+
+
+                                <div class="row g-4 mt-1">
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+
+                                            Applicant Full Name
+
+                                        </label>
+
+
+                                        <input type="text"
+                                               name="confirmationFullName"
+                                               class="form-control"
+                                               placeholder="Enter full name"
+                                               required>
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+
+                                            CNIC Number
+
+                                        </label>
+
+
+                                        <input type="text"
+                                               name="confirmationCnic"
+                                               class="form-control"
+                                               placeholder="XXXXX-XXXXXXX-X"
+                                               required>
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+
+                                            Signature
+
+                                        </label>
+
+
+                                        <input type="text"
+                                               name="signature"
+                                               class="form-control"
+                                               placeholder="Type your full name as signature"
+                                               required>
+
+                                    </div>
+
+                                </div>
+
+
+                                <div class="form-check mt-4">
+
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           id="finalConfirmation"
+                                           name="finalConfirmation"
+                                           required>
+
+
+                                    <label class="form-check-label"
+                                           for="finalConfirmation">
+
+                                        I confirm that all information provided
+                                        in this application is correct and
+                                        complete.
+
+                                        <span class="required">
+                                            *
+                                        </span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+                        
+
+
+                            <!-- =================================================
+                                 SUBMISSION NOTE
+                            ================================================== -->
+
+                            <div class="alert alert-warning mt-5">
+
+                                <div class="d-flex gap-3">
+
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+
+
+                                    <div>
+
+                                        <strong>
+                                            Important:
+                                        </strong>
+
+
+                                        Submission of this application does
+                                        not automatically guarantee membership.
+                                        The application will be reviewed and
+                                        processed by the Association according
+                                        to its membership requirements.
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================================
+                                 SUBMIT
+                            ================================================== -->
+
+                            <div class="d-flex flex-wrap
+                                        justify-content-between
+                                        align-items-center
+                                        gap-3 mt-4">
+
+
+                                <a href="/Member/Login"
+                                   class="btn btn-outline-secondary btn-lg">
+
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>
+
+                                    Already a Member? Login
+
+                                </a>
+
+
+                                <button type="submit"
+                                        class="btn btn-gold btn-lg">
+
+                                    <i class="bi bi-send me-1"></i>
+
+                                    Submit Membership Application
+
+                                </button>
+
+                            </div>
+
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+     BOOTSTRAP JS
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+     SITE JS
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+     FORM VALIDATION
+========================================================= -->
+@section Scripts {
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const category = document.querySelectorAll('input[name="membershipCategory"]');
+    const fee = document.getElementById("membershipFee");
+    const fees = {
+        "Ordinary Member": "PKR 1,000",
+        "Associate Member": "PKR 2,500",
+        "Honorary Member": "PKR 3,500"
+    };
+    category.forEach(x => x.addEventListener("change", () => {
+        if (fee) fee.textContent = fees[x.value] || "—";
+    }));
+});
+</script>
+}

@@ -1,0 +1,638 @@
+@{
+    ViewData["Title"] = "Industry | KPGJA";
+}
+
+@section Styles {
+    <style>
+        /* =========================================================
+           INDUSTRY PAGE
+        ========================================================= */
+
+        .industry-intro {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        /* =========================================================
+           INDUSTRY CARDS
+        ========================================================= */
+
+        .industry-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 22px;
+            height: 100%;
+            min-height: 380px;
+            background: #172033;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, .08);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+
+        .industry-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, .14);
+        }
+
+        .industry-card img {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+            transition: transform .6s ease;
+        }
+
+        .industry-card:hover img {
+            transform: scale(1.08);
+        }
+
+        .industry-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(
+                    to top,
+                    rgba(10, 16, 30, .97) 0%,
+                    rgba(10, 16, 30, .78) 38%,
+                    rgba(10, 16, 30, .25) 72%,
+                    rgba(10, 16, 30, .05) 100%
+                );
+            z-index: 1;
+        }
+
+        .industry-number {
+            position: absolute;
+            z-index: 3;
+            top: 20px;
+            right: 20px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(23, 32, 51, .82);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid rgba(255,255,255,.2);
+            backdrop-filter: blur(8px);
+        }
+
+        .industry-content {
+            position: absolute;
+            z-index: 2;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 30px;
+            color: #fff;
+        }
+
+        .industry-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 15px;
+            background: rgba(214, 168, 79, .16);
+            border: 1px solid rgba(214, 168, 79, .35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #f1c76a;
+            margin-bottom: 17px;
+            backdrop-filter: blur(8px);
+        }
+
+        .industry-content h4 {
+            font-family: "Playfair Display", serif;
+            font-size: 25px;
+            line-height: 1.25;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .industry-content p {
+            color: rgba(255,255,255,.76);
+            margin-bottom: 0;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        /* =========================================================
+           SECTOR INTRO STRIP
+        ========================================================= */
+
+        .sector-strip {
+            background: #f7f5ef;
+            border-radius: 20px;
+            padding: 28px 30px;
+            margin-top: 45px;
+        }
+
+        .sector-strip-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sector-strip-icon {
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+            border-radius: 12px;
+            background: #fff;
+            color: #b88a2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            box-shadow: 0 5px 15px rgba(0,0,0,.06);
+        }
+
+        .sector-strip h6 {
+            margin: 0;
+            color: #172033;
+            font-weight: 700;
+        }
+
+        .sector-strip span {
+            display: block;
+            color: #777d89;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        /* =========================================================
+           VALUE CHAIN
+        ========================================================= */
+
+        .value-chain-box {
+            background: #fff;
+            border-radius: 22px;
+            padding: 38px;
+            border: 1px solid #e9eaed;
+            box-shadow: 0 10px 30px rgba(0,0,0,.04);
+        }
+
+        .value-chain-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .value-chain-icon {
+            flex: 0 0 auto;
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            background: #f5f1e7;
+            color: #b88a2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .value-chain-item h6 {
+            margin-bottom: 5px;
+            color: #172033;
+            font-weight: 700;
+        }
+
+        .value-chain-item p {
+            margin-bottom: 0;
+            color: #6c7280;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* =========================================================
+           DARK HIGHLIGHT
+        ========================================================= */
+
+        .industry-highlight {
+            background:
+                radial-gradient(
+                    circle at 90% 10%,
+                    rgba(214,168,79,.16),
+                    transparent 35%
+                ),
+                #172033;
+            border-radius: 24px;
+            padding: 50px;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .industry-highlight h2 {
+            font-family: "Playfair Display", serif;
+            font-size: 32px;
+        }
+
+        .industry-highlight p {
+            color: rgba(255,255,255,.72);
+            line-height: 1.8;
+        }
+
+        .industry-highlight-icon {
+            width: 85px;
+            height: 85px;
+            border-radius: 22px;
+            background: rgba(214,168,79,.12);
+            border: 1px solid rgba(214,168,79,.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #d6a84f;
+            font-size: 38px;
+            margin-left: auto;
+        }
+
+        /* =========================================================
+           CTA
+        ========================================================= */
+
+        .industry-cta {
+            background: #f7f5ef;
+            border-radius: 24px;
+            padding: 50px 30px;
+        }
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @@media (max-width: 991px) {
+
+            .industry-card,
+            .industry-card img {
+                min-height: 350px;
+                height: 350px;
+            }
+
+            .industry-highlight {
+                padding: 38px;
+            }
+
+            .industry-highlight-icon {
+                margin-left: 0;
+            }
+        }
+
+        @@media (max-width: 767px) {
+
+            .industry-card,
+            .industry-card img {
+                min-height: 320px;
+                height: 320px;
+            }
+
+            .industry-content {
+                padding: 24px;
+            }
+
+            .industry-content h4 {
+                font-size: 22px;
+            }
+
+            .industry-highlight {
+                padding: 30px 25px;
+            }
+
+            .industry-highlight h2 {
+                font-size: 26px;
+            }
+
+            .value-chain-box {
+                padding: 25px;
+            }
+
+            .sector-strip {
+                padding: 22px;
+            }
+        }
+    </style>
+}
+
+<!-- =========================================================
+     HERO
+========================================================= -->
+
+<section class="page-hero">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-8">
+
+                <span class="section-kicker text-warning">
+                    KPGJA INDUSTRY
+                </span>
+
+                <h1>
+                    Gems & Jewellery Industry
+                </h1>
+
+                <p class="lead text-white-50 mt-3 mb-0">
+                    Discover the key sectors shaping the gems and
+                    jewellery industry of Khyber Pakhtunkhwa.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<main>
+
+    <!-- =========================================================
+         INTRODUCTION
+    ========================================================= -->
+
+    <section class="py-5">
+
+        <div class="container">
+
+            <div class="industry-intro text-center">
+
+                <span class="section-kicker">
+                    OUR INDUSTRY
+                </span>
+
+                <h2 class="section-heading mt-2">
+                    Four key areas of the KPGJA industry
+                </h2>
+
+                <p class="section-description mt-3">
+                    The Khyber Pakhtunkhwa gems and jewellery sector
+                    represents a diverse ecosystem covering mining,
+                    gemstone processing, jewellery and emerging
+                    digital commerce opportunities.
+                </p>
+
+            </div>
+
+
+            <!-- =================================================
+                 FOUR INDUSTRIES
+            ================================================== -->
+
+            <div class="row g-4 mt-4">
+
+                <!-- 01 -->
+                <div class="col-md-6">
+
+                    <div class="industry-card">
+
+                        <img src="~/assets/img/industry/ecommerce.png"
+                             alt="Gems and Jewellery E-Commerce Industry"
+                             loading="lazy">
+
+                        <div class="industry-number">
+                            01
+                        </div>
+
+                        <div class="industry-content">
+
+                           
+                            <h4>
+                                Gems & Jewellery E-Commerce Industry
+                            </h4>
+
+                            <p>
+                                Digital platforms, online stores and
+                                e-commerce businesses connecting gems
+                                and jewellery products with customers
+                                in local and international markets.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 02 -->
+                <div class="col-md-6">
+
+                    <div class="industry-card">
+
+                        <img src="~/assets/img/industry/lapidary.png"
+                             alt="Gemstone Lapidary Industry"
+                             loading="lazy">
+
+                        <div class="industry-number">
+                            02
+                        </div>
+
+                        <div class="industry-content">
+
+                          
+                            <h4>
+                                Gemstone Lapidary Industry
+                            </h4>
+
+                            <p>
+                                Cutting, shaping, polishing and finishing
+                                gemstones to improve their quality,
+                                appearance and commercial value.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 03 -->
+                <div class="col-md-6">
+
+                    <div class="industry-card">
+
+                        <img src="~/assets/img/industry/mines.png"
+                             alt="Mines Industry"
+                             loading="lazy">
+
+                        <div class="industry-number">
+                            03
+                        </div>
+
+                        <div class="industry-content">
+
+                         
+                            <h4>
+                                Mines Industry
+                            </h4>
+
+                            <p>
+                                Mining, extraction and sourcing of
+                                gemstones and mineral resources from
+                                mineral-rich areas of the region.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- 04 -->
+                <div class="col-md-6">
+
+                    <div class="industry-card">
+
+                        <img src="~/assets/img/industry/jewellery.png"
+                             alt="Jewellery Industry"
+                             loading="lazy">
+
+                     
+                        <div class="industry-content">
+
+                            <div class="industry-icon">
+                                <i class="bi bi-stars"></i>
+                            </div>
+
+                            <h4>
+                                Jewellery Industry
+                            </h4>
+
+                            <p>
+                                Jewellery businesses, craftsmen, designers,
+                                manufacturers and retailers working with
+                                gold, silver, gemstones and contemporary
+                                jewellery.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+   
+
+    <!-- =========================================================
+         KPGJA HIGHLIGHT
+    ========================================================== -->
+
+    <section class="py-5">
+
+        <div class="container">
+
+            <div class="industry-highlight">
+
+                <div class="row align-items-center g-4">
+
+                    <div class="col-lg-8">
+
+                        <span class="section-kicker text-warning">
+                            KPGJA INDUSTRY NETWORK
+                        </span>
+
+                        <h2 class="mt-2">
+                            Connecting the gems & jewellery community
+                        </h2>
+
+                        <p class="mt-3 mb-0">
+                            KPGJA provides a platform for businesses,
+                            professionals, entrepreneurs and stakeholders
+                            across the gems and jewellery ecosystem to
+                            connect, collaborate and explore opportunities.
+                        </p>
+
+                    </div>
+
+
+                    <div class="col-lg-4">
+
+                        <div class="industry-highlight-icon">
+                            <i class="bi bi-gem"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         CTA
+    ========================================================== -->
+
+    <section class="pb-5">
+
+        <div class="container">
+
+            <div class="industry-cta text-center">
+
+                <span class="section-kicker">
+                    JOIN THE COMMUNITY
+                </span>
+
+                <h2 class="section-heading mt-2">
+                    Are you part of the gems & jewellery industry?
+                </h2>
+
+                <p class="section-description mx-auto mt-3"
+                   style="max-width:700px;">
+
+                    Register with KPGJA to create your digital member
+                    profile and become part of the wider gems and
+                    jewellery business community.
+
+                </p>
+
+
+                <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+
+                    <a asp-controller="Member"
+                       asp-action="Register"
+                       class="btn btn-gold btn-lg">
+
+                        <i class="bi bi-person-plus me-1"></i>
+                        Become a Member
+
+                    </a>
+
+
+                    <a asp-controller="Home"
+                       asp-action="Contact"
+                       class="btn btn-navy btn-lg">
+
+                        <i class="bi bi-envelope me-1"></i>
+                        Contact KPGJA
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>

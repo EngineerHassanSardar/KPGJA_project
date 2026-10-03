@@ -1,0 +1,822 @@
+@{ ViewData["Title"] = "Contact Us | KPGJA"; }
+
+@section Styles {
+<style>
+
+        .contact-intro {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+
+        .contact-card {
+            background: #fff;
+            border: 1px solid #e9eaed;
+            border-radius: 20px;
+            padding: 28px;
+            height: 100%;
+            transition: .25s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 35px rgba(0,0,0,.07);
+        }
+
+        .contact-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 15px;
+            background: #f5f1e7;
+            color: #b88a2d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            margin-bottom: 18px;
+        }
+
+        .contact-card h5 {
+            font-family: "Playfair Display", serif;
+            color: #172033;
+            margin-bottom: 12px;
+        }
+
+        .contact-card p {
+            color: #6c7280;
+            font-size: 14px;
+            line-height: 1.8;
+            margin-bottom: 0;
+        }
+
+        .contact-card a {
+            color: #172033;
+            text-decoration: none;
+        }
+
+        .contact-card a:hover {
+            color: #b88a2d;
+        }
+
+        .contact-main {
+            background: #fff;
+            border: 1px solid #e9eaed;
+            border-radius: 22px;
+            overflow: hidden;
+        }
+
+        .contact-form {
+            padding: 40px;
+        }
+
+        .contact-form h2 {
+            font-family: "Playfair Display", serif;
+            color: #172033;
+        }
+
+        .contact-form p {
+            color: #6c7280;
+        }
+
+        .form-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #172033;
+            margin-bottom: 7px;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border: 1px solid #dfe2e7;
+            padding: 12px 14px;
+            font-size: 14px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #b88a2d;
+            box-shadow: 0 0 0 .2rem rgba(184,138,45,.12);
+        }
+
+        .contact-side {
+            background: #172033;
+            color: #fff;
+            padding: 40px;
+            height: 100%;
+        }
+
+        .contact-side h3 {
+            font-family: "Playfair Display", serif;
+        }
+
+        .contact-side p {
+            color: rgba(255,255,255,.7);
+            line-height: 1.8;
+        }
+
+        .contact-side-item {
+            display: flex;
+            gap: 14px;
+            margin-top: 25px;
+        }
+
+        .contact-side-icon {
+            flex: 0 0 auto;
+            width: 42px;
+            height: 42px;
+            border-radius: 11px;
+            background: rgba(214,168,79,.12);
+            color: #d6a84f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .contact-side-item strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .contact-side-item span {
+            color: rgba(255,255,255,.68);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .map-wrapper {
+            background: #eef0f3;
+            border-radius: 22px;
+            min-height: 330px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .map-placeholder {
+            min-height: 330px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 30px;
+            background:
+                linear-gradient(rgba(23,32,51,.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(23,32,51,.06) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .map-placeholder-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #172033;
+            color: #d6a84f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            margin-bottom: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,.12);
+        }
+
+        .map-placeholder h4 {
+            font-family: "Playfair Display", serif;
+            color: #172033;
+        }
+
+        .map-placeholder p {
+            color: #6c7280;
+            margin-bottom: 18px;
+        }
+
+        .contact-cta {
+            background: #f7f5ef;
+            border-radius: 22px;
+            padding: 45px;
+        }
+
+        .contact-cta h2 {
+            font-family: "Playfair Display", serif;
+            color: #172033;
+        }
+
+        .contact-cta p {
+            color: #6c7280;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        @@media (max-width: 767px) {
+            .contact-form,
+            .contact-side {
+                padding: 30px;
+            }
+
+            .contact-cta {
+                padding: 30px;
+            }
+
+            .map-placeholder {
+                min-height: 280px;
+            }
+        }
+    
+</style>
+}
+
+<!-- TOP BAR -->
+
+
+
+<!-- HERO -->
+<section class="page-hero">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-8">
+
+                <span class="section-kicker text-warning">
+                    GET IN TOUCH
+                </span>
+
+                <h1>
+                    Contact KPGJA
+                </h1>
+
+                <p class="lead text-white-50 mt-3">
+                    Connect with the KPGJA team for membership,
+                    industry, events, programs and association inquiries.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<main>
+
+
+    <!-- INTRO -->
+    <section class="py-5">
+
+        <div class="container">
+
+            <div class="contact-intro text-center">
+
+                <span class="section-kicker">
+                    WE ARE HERE TO HELP
+                </span>
+
+                <h2 class="section-heading">
+                    Let's connect with the industry
+                </h2>
+
+                <p class="section-description">
+                    Whether you are interested in membership,
+                    business networking, industry activities,
+                    events or association information, contact
+                    KPGJA through the channels below.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CONTACT INFORMATION -->
+    <section class="pb-5">
+
+        <div class="container">
+
+            <div class="row g-4">
+
+
+                <!-- OFFICE -->
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="contact-card">
+
+                        <div class="contact-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+
+                        <h5>
+                            Head Office
+                        </h5>
+
+                        <p>
+                            Hamza Market, 1st Floor,
+                            Office # B13<br>
+                            Shah Qabool Street,
+                            Namak Mandi<br>
+                            Peshawar, Pakistan
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EMAIL -->
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="contact-card">
+
+                        <div class="contact-icon">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+
+                        <h5>
+                            Email
+                        </h5>
+
+                        <p>
+                            General inquiries and
+                            association communication.
+                            <br><br>
+
+                            <a href="mailto:info@kpgja.org">
+                                info@kpgja.org
+                            </a>
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PHONE -->
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="contact-card">
+
+                        <div class="contact-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+
+                        <h5>
+                            Phone
+                        </h5>
+
+                        <p>
+                            Contact the KPGJA office
+                            during official working hours.
+                            <br><br>
+
+                            <a href="tel:+92XXXXXXXXXX">
+                                +92 XXX XXXXXXX
+                            </a>
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OFFICE HOURS -->
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="contact-card">
+
+                        <div class="contact-icon">
+                            <i class="bi bi-clock"></i>
+                        </div>
+
+                        <h5>
+                            Office Hours
+                        </h5>
+
+                        <p>
+                            Monday – Friday<br>
+                            9:00 AM – 5:00 PM
+                            <br><br>
+                            Office timings may vary
+                            on public holidays.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FORM + CONTACT SIDE -->
+    <section class="py-5">
+
+        <div class="container">
+
+            <div class="contact-main">
+
+                <div class="row g-0">
+
+                    <!-- FORM -->
+                    <div class="col-lg-7">
+
+                        <div class="contact-form">
+
+                            <span class="section-kicker">
+                                SEND A MESSAGE
+                            </span>
+
+                            <h2 class="mt-2">
+                                Send us an inquiry
+                            </h2>
+
+                            <p class="mb-4">
+                                Complete the form and the KPGJA
+                                team can respond to your inquiry.
+                            </p>
+
+
+                            <form id="contactForm">
+
+                                <div class="row g-3">
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+                                            Full Name *
+                                        </label>
+
+                                        <input type="text"
+                                               name="name"
+                                               class="form-control"
+                                               placeholder="Enter your full name"
+                                               required>
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+                                            Email Address *
+                                        </label>
+
+                                        <input type="email"
+                                               name="email"
+                                               class="form-control"
+                                               placeholder="Enter your email"
+                                               required>
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+                                            Mobile Number
+                                        </label>
+
+                                        <input type="tel"
+                                               name="phone"
+                                               class="form-control"
+                                               placeholder="+92 XXX XXXXXXX">
+
+                                    </div>
+
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+                                            Inquiry Type
+                                        </label>
+
+                                        <select name="inquiryType"
+                                                class="form-select">
+
+                                            <option value="">
+                                                Select inquiry type
+                                            </option>
+
+                                            <option>
+                                                Membership
+                                            </option>
+
+                                            <option>
+                                                Industry
+                                            </option>
+
+                                            <option>
+                                                Events
+                                            </option>
+
+                                            <option>
+                                                Training
+                                            </option>
+
+                                            <option>
+                                                Women Empowerment
+                                            </option>
+
+                                            <option>
+                                                General Inquiry
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    <div class="col-12">
+
+                                        <label class="form-label">
+                                            Subject *
+                                        </label>
+
+                                        <input type="text"
+                                               name="subject"
+                                               class="form-control"
+                                               placeholder="Enter subject"
+                                               required>
+
+                                    </div>
+
+
+                                    <div class="col-12">
+
+                                        <label class="form-label">
+                                            Message *
+                                        </label>
+
+                                        <textarea name="message"
+                                                  class="form-control"
+                                                  rows="6"
+                                                  placeholder="Write your message..."
+                                                  required></textarea>
+
+                                    </div>
+
+
+                                    <div class="col-12">
+
+                                        <div id="contactMessage"
+                                             class="alert d-none"
+                                             role="alert">
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="col-12">
+
+                                        <button type="submit"
+                                                class="btn btn-gold btn-lg">
+
+                                            <i class="bi bi-send me-1"></i>
+                                            Send Message
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SIDE PANEL -->
+                    <div class="col-lg-5">
+
+                        <div class="contact-side">
+
+                            <span class="section-kicker text-warning">
+                                KPGJA OFFICE
+                            </span>
+
+                            <h3 class="mt-2">
+                                Connect with us
+                            </h3>
+
+                            <p class="mt-3">
+                                The KPGJA office serves as a point
+                                of contact for members, businesses,
+                                professionals and stakeholders
+                                associated with the gems and
+                                jewellery sector.
+                            </p>
+
+
+                            <div class="contact-side-item">
+
+                                <div class="contact-side-icon">
+                                    <i class="bi bi-geo-alt"></i>
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        Office Address
+                                    </strong>
+
+                                    <span>
+                                        Hamza Market, 1st Floor,
+                                        Office # B13,<br>
+                                        Shah Qabool Street,
+                                        Namak Mandi, Peshawar
+                                    </span>
+                                </div>
+
+                            </div>
+
+
+                            <div class="contact-side-item">
+
+                                <div class="contact-side-icon">
+                                    <i class="bi bi-envelope"></i>
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        Email
+                                    </strong>
+
+                                    <span>
+                                        info@kpgja.org
+                                    </span>
+                                </div>
+
+                            </div>
+
+
+                            <div class="contact-side-item">
+
+                                <div class="contact-side-icon">
+                                    <i class="bi bi-clock"></i>
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        Office Hours
+                                    </strong>
+
+                                    <span>
+                                        Monday – Friday<br>
+                                        9:00 AM – 5:00 PM
+                                    </span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- MAP -->
+    <section class="py-5">
+
+        <div class="container">
+
+            <div class="row align-items-center g-4">
+
+                <div class="col-lg-5">
+
+                    <span class="section-kicker">
+                        FIND US
+                    </span>
+
+                    <h2 class="section-heading">
+                        Visit the KPGJA office
+                    </h2>
+
+                    <p class="section-description">
+                        Our head office is located in Hamza Market,
+                        Namak Mandi, Peshawar — a major commercial
+                        centre associated with the gems and jewellery
+                        trade.
+                    </p>
+
+                    <a href="https://www.google.com/maps/search/?api=1&query=Hamza+Market+Namak+Mandi+Peshawar"
+                       target="_blank"
+                       rel="noopener"
+                       class="btn btn-navy">
+
+                        <i class="bi bi-map me-1"></i>
+                        Open in Google Maps
+
+                    </a>
+
+                </div>
+
+
+                <div class="col-lg-7">
+
+                    <div class="map-wrapper">
+
+                        <div class="map-placeholder">
+
+                            <div class="map-placeholder-icon">
+                                <i class="bi bi-geo-alt-fill"></i>
+                            </div>
+
+                            <h4>
+                                KPGJA Head Office
+                            </h4>
+
+                            <p>
+                                Hamza Market, Namak Mandi,
+                                Peshawar
+                            </p>
+
+                            <a href="https://www.google.com/maps/search/?api=1&query=Hamza+Market+Namak+Mandi+Peshawar"
+                               target="_blank"
+                               rel="noopener"
+                               class="btn btn-gold">
+
+                                Get Directions
+                                <i class="bi bi-arrow-up-right ms-1"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CTA -->
+    <section class="py-5">
+
+        <div class="container">
+
+            <div class="contact-cta text-center">
+
+                <span class="section-kicker">
+                    JOIN KPGJA
+                </span>
+
+                <h2 class="mt-2">
+                    Interested in becoming a member?
+                </h2>
+
+                <p class="mt-3 mb-4">
+                    Join the KPGJA community and connect with
+                    businesses, professionals and stakeholders
+                    across the gems and jewellery sector.
+                </p>
+
+                <div class="d-flex justify-content-center flex-wrap gap-3">
+
+                    <a href="/Member/Register"
+                       class="btn btn-gold btn-lg">
+
+                        <i class="bi bi-person-plus me-1"></i>
+                        Become a Member
+
+                    </a>
+
+                    <a href="/Member/Login"
+                       class="btn btn-navy btn-lg">
+
+                        <i class="bi bi-box-arrow-in-right me-1"></i>
+                        Member Login
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- FOOTER -->

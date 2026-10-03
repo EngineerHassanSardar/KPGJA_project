@@ -1,0 +1,34 @@
+@model AdminMemberListViewModel
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "Manage Members"; }
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div><h2 class="section-title mb-1">Membership Management</h2><p class="text-secondary mb-0">Review, approve and manage submitted applications.</p></div>
+</div>
+<form method="get" class="soft-card p-3 mt-3">
+<div class="row g-2">
+<div class="col-md-5"><input asp-for="Search" class="form-control" placeholder="Search member, business, email or CNIC"></div>
+<div class="col-md-3"><select asp-for="Status" class="form-select"><option>All Statuses</option><option>Pending Review</option><option>Approved for Payment</option><option>Payment Submitted</option><option>Payment Verified</option><option>Approved</option><option>Active Member</option><option>Rejected</option></select></div>
+<div class="col-md-2"><button class="btn btn-dark w-100">Search</button></div>
+</div>
+</form>
+<div class="soft-card p-0 mt-3 overflow-hidden">
+<div class="table-responsive">
+<table class="table table-hover align-middle mb-0">
+<thead class="table-light"><tr><th>Applicant</th><th>Business</th><th>Category</th><th>Fee</th><th>Status</th><th>Date</th><th></th></tr></thead>
+<tbody>
+@if (!Model.Members.Any())
+{ <tr><td colspan="7" class="text-center py-5 text-muted">No applications found.</td></tr> }
+@foreach (var m in Model.Members)
+{
+<tr>
+<td><strong>@m.FullName</strong><div class="small text-muted">@m.Cnic</div></td>
+<td>@m.BusinessName<div class="small text-muted">@m.Email</div></td>
+<td>@m.MembershipCategory</td>
+<td>PKR @m.MembershipFee.ToString("N0")</td>
+<td><span class="badge bg-secondary">@m.Status</span></td>
+<td>@m.ApplicationDate.ToLocalTime().ToString("dd MMM yyyy")</td>
+<td><a class="btn btn-sm btn-outline-dark" href="/Admin/Details/@m.Id">Review</a></td>
+</tr>
+}
+</tbody>
+</table>
+</div></div>
