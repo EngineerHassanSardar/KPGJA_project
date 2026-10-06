@@ -1,0 +1,72 @@
+﻿@{ Layout = "_AdminLayout"; ViewData["Title"] = "Users & Roles"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <p class="text-secondary mb-0">Manage system users and their roles.</p>
+    <button class="btn btn-gold btn-sm" onclick="alert('Invite user (preview only)')">
+        <i class="bi bi-person-plus me-1"></i> Invite User
+    </button>
+</div>
+
+<div class="admin-table-card">
+    <div class="table-responsive">
+        <table class="table admin-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="member-cell">
+                            <div class="member-avatar">A</div>
+                            <div><div class="member-name">Administrator</div><div class="member-sub">Super Admin</div></div>
+                        </div>
+                    </td>
+                    <td class="text-muted">admin@kpgja.com</td>
+                    <td><span class="badge bg-dark">Admin</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td class="text-muted">Just now</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-dark" style="border-radius:6px;"><i class="bi bi-pencil"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="member-cell">
+                            <div class="member-avatar">S</div>
+                            <div><div class="member-name">Sarah Iqbal</div><div class="member-sub">Editor</div></div>
+                        </div>
+                    </td>
+                    <td class="text-muted">sarah@kpgja.com</td>
+                    <td><span class="badge bg-info">Editor</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                    <td class="text-muted">2 hours ago</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-dark" style="border-radius:6px;"><i class="bi bi-pencil"></i></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="member-cell">
+                            <div class="member-avatar" style="background:#e5e7eb;color:#666;">R</div>
+                            <div><div class="member-name">Rafiq Ahmed</div><div class="member-sub">Reviewer</div></div>
+                        </div>
+                    </td>
+                    <td class="text-muted">rafiq@kpgja.com</td>
+                    <td><span class="badge bg-secondary">Reviewer</span></td>
+                    <td><span class="status-badge status-pending">Invited</span></td>
+                    <td class="text-muted">Never</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-dark" style="border-radius:6px;"><i class="bi bi-pencil"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

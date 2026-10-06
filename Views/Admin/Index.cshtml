@@ -1,26 +1,217 @@
-@{ Layout = "_AdminLayout"; ViewData["Title"] = "Admin Dashboard"; }
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
-    <div><h2 class="section-title mb-1">Administrative Dashboard</h2><p class="text-secondary mb-0">Manage KPGJA membership applications and approvals.</p></div>
-    <a class="btn btn-gold" href="/Admin/Members"><i class="bi bi-people me-1"></i> Manage Members</a>
-</div>
-@if (TempData["Success"] is string success) { <div class="alert alert-success">@success</div> }
-<div class="row g-3">
-@foreach (var item in new[] {
-    ("Total Applications", (object)ViewBag.TotalApplications, "bi-files"),
-    ("Pending Review", (object)ViewBag.Pending, "bi-hourglass-split"),
-    ("Approved for Payment", (object)ViewBag.ApprovedForPayment, "bi-credit-card"),
-    ("Approved / Active", (object)ViewBag.TotalMembers, "bi-person-check")
-})
-{
-    <div class="col-6 col-lg-3"><div class="soft-card p-4 h-100"><div class="text-secondary">@item.Item1</div><div class="display-6 fw-bold">@item.Item2</div><i class="bi @item.Item3 fs-4 text-secondary"></i></div></div>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Dashboard";
 }
-</div>
-<div class="soft-card p-4 mt-4">
-    <h5>Approval Workflow</h5>
-    <div class="row g-3 mt-1">
-        <div class="col-md-3"><strong>1. Application</strong><div class="small text-muted">Applicant submits documents.</div></div>
-        <div class="col-md-3"><strong>2. Review</strong><div class="small text-muted">Admin verifies information.</div></div>
-        <div class="col-md-3"><strong>3. Payment</strong><div class="small text-muted">Admin records payment.</div></div>
-        <div class="col-md-3"><strong>4. Approval</strong><div class="small text-muted">Admin assigns membership number.</div></div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon gold"><i class="bi bi-files"></i></div>
+            <div class="stat-label">Total Applications</div>
+            <div class="stat-value">@(ViewBag.TotalApplications ?? 0)</div>
+            <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i> +12% this month</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon blue"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-label">Pending Review</div>
+            <div class="stat-value">@(ViewBag.Pending ?? 0)</div>
+            <div class="stat-trend"><i class="bi bi-dash"></i> Needs attention</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon red"><i class="bi bi-credit-card"></i></div>
+            <div class="stat-label">Awaiting Payment</div>
+            <div class="stat-value">@(ViewBag.ApprovedForPayment ?? 0)</div>
+            <div class="stat-trend down"><i class="bi bi-arrow-down-short"></i> -3 from last week</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-icon success"><i class="bi bi-person-check"></i></div>
+            <div class="stat-label">Active Members</div>
+            <div class="stat-value">@(ViewBag.TotalMembers ?? 0)</div>
+            <div class="stat-trend up"><i class="bi bi-arrow-up-short"></i> +8% growth</div>
+        </div>
     </div>
 </div>
+
+<!-- Charts Row -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h5><i class="bi bi-bar-chart-line"></i> Applications per Month</h5>
+                <span class="chart-sub">Last 6 months</span>
+            </div>
+            <div class="chart-body">
+                <canvas id="applicationsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h5><i class="bi bi-pie-chart"></i> Status Distribution</h5>
+            </div>
+            <div class="chart-body">
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Workflow + Activity Row -->
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="soft-card p-4">
+            <div class="card-head">
+                <i class="bi bi-diagram-3"></i>
+                <h5>Approval Workflow</h5>
+            </div>
+            <div class="workflow-grid">
+                <div class="workflow-step">
+                    <div class="step-num">01</div>
+                    <h6>Application</h6>
+                    <p>Applicant submits documents.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">02</div>
+                    <h6>Verification</h6>
+                    <p>Admin reviews submitted info.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">03</div>
+                    <h6>Payment</h6>
+                    <p>Membership fee recorded.</p>
+                </div>
+                <div class="workflow-step">
+                    <div class="step-num">04</div>
+                    <h6>Approval</h6>
+                    <p>Membership number assigned.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="soft-card p-4 h-100">
+            <div class="card-head">
+                <i class="bi bi-activity"></i>
+                <h5>Recent Activity</h5>
+            </div>
+            <ul class="activity-feed">
+                <li class="activity-item">
+                    <div class="activity-icon green"><i class="bi bi-check2"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-main"><strong>Fatima Bibi</strong> was approved as Active Member</div>
+                        <span class="activity-time">2 hours ago</span>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon blue"><i class="bi bi-cash"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-main">Payment verified for <strong>Ayesha Tariq</strong></div>
+                        <span class="activity-time">5 hours ago</span>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon gold"><i class="bi bi-file-earmark-plus"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-main">New application from <strong>Ali Khan</strong></div>
+                        <span class="activity-time">1 day ago</span>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon red"><i class="bi bi-x-circle"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-main"><strong>Zubair Shah</strong>'s application was rejected</div>
+                        <span class="activity-time">2 days ago</span>
+                    </div>
+                </li>
+                <li class="activity-item">
+                    <div class="activity-icon blue"><i class="bi bi-envelope"></i></div>
+                    <div class="activity-text">
+                        <div class="activity-main">Fee receipt emailed to <strong>Hamza Ahmad</strong></div>
+                        <span class="activity-time">3 days ago</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    // ---- Applications Bar Chart ----
+    const barCtx = document.getElementById('applicationsChart');
+    new Chart(barCtx, {
+        type: 'bar',
+        data: {
+            labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            datasets: [{
+                label: 'Applications',
+                data: [12, 19, 15, 22, 18, 5],
+                backgroundColor: '#c49a4a',
+                hoverBackgroundColor: '#a98239',
+                borderRadius: 6,
+                barThickness: 28
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f1efe9', drawBorder: false },
+                    ticks: { font: { size: 10 }, color: '#999' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10 }, color: '#999' }
+                }
+            }
+        }
+    });
+
+    // ---- Status Donut Chart ----
+    const donutCtx = document.getElementById('statusChart');
+    new Chart(donutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'Approved', 'Awaiting Pay', 'Rejected'],
+            datasets: [{
+                data: [1, 1, 2, 1],
+                backgroundColor: ['#f2c14e', '#16a34a', '#2563eb', '#dc3545'],
+                borderWidth: 0,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        font: { size: 10 },
+                        color: '#666',
+                        boxWidth: 10,
+                        boxHeight: 10,
+                        padding: 10,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+</script>
+}

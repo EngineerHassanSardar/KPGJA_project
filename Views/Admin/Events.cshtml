@@ -1,0 +1,201 @@
+﻿@model List<KPGJA.Web.Models.EventItem>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Events";
+    bool showForm = ViewBag.ShowForm == true;
+    var current = ViewBag.CurrentEvent as KPGJA.Web.Models.EventItem ?? new KPGJA.Web.Models.EventItem();
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Content</div>
+        <h1>Events</h1>
+        <p>Manage exhibitions, workshops and networking events displayed on the public site.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/Events?showForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> New Event
+        </a>
+    </div>
+</div>
+
+<div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        <strong>Events Content</strong>
+        <p>Changes made here are reflected on the public <code>/Home/Events</code> page.</p>
+    </div>
+</div>
+
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-calendar-event"></i> All Events
+                <span class="count-badge">@(Model?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">Select an event to edit its complete information.</p>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-calendar-event"></i></div>
+            <h3>No events yet</h3>
+            <p>Click "New Event" to create your first event.</p>
+            <a href="/Admin/Events?showForm=true" class="btn-add">
+                <i class="bi bi-plus-lg"></i> Create First Event
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Title</th>
+                    <th style="width:200px;">Location</th>
+                    <th style="width:180px;" class="center">Date</th>
+                    <th style="width:100px;" class="center">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int n = 0; }
+                @foreach (var ev in Model.OrderByDescending(x => x.StartDate))
+                {
+                    n++;
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td>
+                            <div class="strong">@ev.Title</div>
+                            <div class="desc-cell" style="margin-top:2px;">@ev.Description</div>
+                        </td>
+                        <td class="text-muted"><i class="bi bi-geo-alt me-1"></i> @ev.Location</td>
+                        <td class="center text-muted">
+                            @ev.StartDate.ToString("dd MMM yyyy")
+                            @if (ev.EndDate.HasValue && ev.EndDate.Value != ev.StartDate)
+                            {
+                                <span> – @ev.EndDate.Value.ToString("dd MMM")</span>
+                            }
+                        </td>
+                        <td class="center">
+                            @if (ev.IsPublished)
+                            {
+                                <span class="pill active">Published</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Draft</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/Events?showForm=true&id=@ev.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/EventDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@ev.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this event?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@if (showForm)
+{
+    <form method="post" asp-action="EventSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@current.Id" />
+
+        <div class="list-card mt-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(current.Id > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(current.Id > 0 ? "Edit Event" : "New Event")
+                    </h2>
+                    <p class="list-card-sub">@(current.Id > 0 ? "Update the event details." : "Enter the event information below.")</p>
+                </div>
+                <a href="/Admin/Events" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Event Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@current.Title"
+                               placeholder="e.g. Gem & Jewellery Expo 2026" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Location <span class="text-danger">*</span></label>
+                        <input name="Location" class="form-control" value="@current.Location"
+                               placeholder="e.g. Peshawar Expo Center" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Description</label>
+                        <textarea name="Description" class="form-control" rows="3"
+                                  placeholder="Describe the event...">@current.Description</textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Start Date <span class="text-danger">*</span></label>
+                        <input name="StartDate" type="date" class="form-control"
+                               value="@((current.StartDate == default ? DateTime.Today : current.StartDate).ToString("yyyy-MM-dd"))" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">End Date <span class="text-muted">(optional)</span></label>
+                        <input name="EndDate" type="date" class="form-control"
+                               value="@(current.EndDate?.ToString("yyyy-MM-dd"))">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsPublished" class="form-check-input" type="checkbox" id="publishedSwitch"
+                                   value="true" @(current.Id == 0 || current.IsPublished ? "checked" : null)>
+                            <label class="form-check-label small" for="publishedSwitch">Publish immediately</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/Events" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(current.Id > 0 ? "Update Event" : "Create Event")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        @if (showForm)
+        {
+            <text>
+                const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
+                if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            </text>
+        }
+    </script>
+}

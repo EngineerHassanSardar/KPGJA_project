@@ -1,0 +1,248 @@
+﻿@model KPGJA.Web.Models.WomenEmpowermentContent
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Women Empowerment";
+    var features = ViewBag.Features as List<KPGJA.Web.Models.WomenFeature> ?? new();
+    var current = ViewBag.CurrentFeature as KPGJA.Web.Models.WomenFeature ?? new KPGJA.Web.Models.WomenFeature();
+    bool showForm = ViewBag.ShowForm == true;
+    bool showIntroForm = ViewBag.ShowIntroForm == true;
+    bool editMode = current.Id > 0;
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Content</div>
+        <h1>Women Empowerment</h1>
+        <p>Manage the Women Empowerment page intro, highlight and feature cards.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/Women?showIntroForm=true" class="btn-outline-brand">
+            <i class="bi bi-pencil"></i> Edit Intro
+        </a>
+        <a href="/Admin/Women?showForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Feature
+        </a>
+    </div>
+</div>
+
+<div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        <strong>Women Page</strong>
+        <p>Changes made here are reflected on the public <code>/Home/Women</code> page.</p>
+    </div>
+</div>
+
+@if (showIntroForm)
+{
+    <form method="post" asp-action="WomenSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@Model?.Id" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2><i class="bi bi-pencil-square"></i> Edit Page Intro</h2>
+                    <p class="list-card-sub">Top-of-page intro and highlight block.</p>
+                </div>
+                <a href="/Admin/Women" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Intro Title</label>
+                        <input name="IntroTitle" class="form-control" value="@Model?.IntroTitle">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Cover Image</label>
+                        <input type="file" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Intro Body</label>
+                        <textarea name="IntroBody" class="form-control" rows="3">@Model?.IntroBody</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Highlight Title</label>
+                        <input name="HighlightTitle" class="form-control" value="@Model?.HighlightTitle">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Highlight Body</label>
+                        <textarea name="HighlightBody" class="form-control" rows="3">@Model?.HighlightBody</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/Women" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> Save Intro
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-grid"></i> All Features
+                <span class="count-badge">@(features?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">Each feature appears as a card on the Women Empowerment page.</p>
+        </div>
+    </div>
+
+    @if (features == null || !features.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-grid"></i></div>
+            <h3>No features yet</h3>
+            <p>Click "Add Feature" to create your first feature card.</p>
+            <a href="/Admin/Women?showForm=true" class="btn-add">
+                <i class="bi bi-plus-lg"></i> Add First Feature
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:60px;">Icon</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                    <th class="center" style="width:80px;">Order</th>
+                    <th class="center" style="width:100px;">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int n = 0; }
+                @foreach (var f in features.OrderBy(x => x.DisplayOrder))
+                {
+                    n++;
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td><div class="thumb"><i class="bi @f.IconClass"></i></div></td>
+                        <td class="strong">@f.Title</td>
+                        <td class="desc-cell">@f.Body</td>
+                        <td class="center text-muted">@f.DisplayOrder</td>
+                        <td class="center">
+                            @if (f.IsActive)
+                            {
+                                <span class="pill active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/Women?showForm=true&id=@f.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/WomenFeatureDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@f.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this feature?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@if (showForm)
+{
+    <form method="post" asp-action="WomenFeatureSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@current.Id" />
+
+        <div class="list-card mt-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(editMode ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(editMode ? "Edit Feature" : "Add New Feature")
+                    </h2>
+                    <p class="list-card-sub">@(editMode ? "Update this feature card." : "Enter the feature information below.")</p>
+                </div>
+                <a href="/Admin/Women" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@current.Title"
+                               placeholder="e.g. Skill Training" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control"
+                               value="@(current.DisplayOrder == 0 ? (features.Count + 1) : current.DisplayOrder)" min="0">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3"
+                                  placeholder="Feature description...">@current.Body</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Icon</label>
+                        <input name="IconClass" class="form-control"
+                               value="@(string.IsNullOrEmpty(current.IconClass) ? "bi-star" : current.IconClass)"
+                               placeholder="bi-star">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" id="activeSwitch"
+                                   value="true" @(current.Id == 0 || current.IsActive ? "checked" : null)>
+                            <label class="form-check-label small" for="activeSwitch">Show on public site</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/Women" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(editMode ? "Update Feature" : "Save Feature")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        @if (showForm || showIntroForm)
+        {
+            <text>
+                const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
+                if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            </text>
+        }
+    </script>
+}

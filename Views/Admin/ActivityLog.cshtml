@@ -1,0 +1,41 @@
+﻿@{ Layout = "_AdminLayout"; ViewData["Title"] = "Activity Log"; }
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <p class="text-secondary mb-0">Audit trail of all actions performed in the admin panel.</p>
+</div>
+
+<div class="admin-table-card">
+    <div class="table-responsive">
+        <table class="table admin-table">
+            <thead>
+                <tr>
+                    <th>Actor</th>
+                    <th>Action</th>
+                    <th>Target</th>
+                    <th>IP Address</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in new[] {
+                    ("Administrator", "Approved application", "Fatima Bibi (#3)", "192.168.1.1", "2 hours ago"),
+                    ("Administrator", "Rejected application", "Zubair Shah (#4)", "192.168.1.1", "2 days ago"),
+                    ("Sarah Iqbal", "Published article", "Gem & Jewellery Expo 2026", "192.168.1.5", "3 days ago"),
+                    ("Administrator", "Updated settings", "Membership Fees", "192.168.1.1", "5 days ago"),
+                    ("Rafiq Ahmed", "Logged in", "—", "192.168.1.9", "1 week ago"),
+                    ("Administrator", "Created event", "Women Artisans Workshop", "192.168.1.1", "1 week ago"),
+                    ("Sarah Iqbal", "Edited article", "Export Compliance Guidelines", "192.168.1.5", "2 weeks ago")
+                })
+                {
+                    <tr>
+                        <td><div class="member-name">@log.Item1</div></td>
+                        <td>@log.Item2</td>
+                        <td class="text-muted">@log.Item3</td>
+                        <td class="text-muted"><code style="font-size:10.5px;">@log.Item4</code></td>
+                        <td class="text-muted">@log.Item5</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

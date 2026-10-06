@@ -1,0 +1,203 @@
+﻿@model List<KPGJA.Web.Models.IndustryArea>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Industry";
+    bool showForm = ViewBag.ShowForm == true;
+    var current = ViewBag.CurrentArea as KPGJA.Web.Models.IndustryArea ?? new KPGJA.Web.Models.IndustryArea();
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Content</div>
+        <h1>Industry Areas</h1>
+        <p>Add, edit and manage the key industry areas displayed on the public Industry page.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/Industry?showForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Area
+        </a>
+    </div>
+</div>
+
+<div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        <strong>Industry Content</strong>
+        <p>Changes made here are reflected on the public <code>/Home/Industry</code> page.</p>
+    </div>
+</div>
+
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-building"></i> All Industry Areas
+                <span class="count-badge">@(Model?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">Select an area to edit its complete information.</p>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-building"></i></div>
+            <h3>No industry areas yet</h3>
+            <p>Click "Add Area" to create your first area.</p>
+            <a href="/Admin/Industry?showForm=true" class="btn-add">
+                <i class="bi bi-plus-lg"></i> Add First Area
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:60px;">Icon</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th class="center" style="width:80px;">Order</th>
+                    <th class="center" style="width:100px;">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int n = 0; }
+                @foreach (var area in Model.OrderBy(a => a.DisplayOrder))
+                {
+                    n++;
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td><div class="thumb"><i class="bi @area.IconClass"></i></div></td>
+                        <td class="strong">@area.Title</td>
+                        <td class="desc-cell">@area.Description</td>
+                        <td class="center text-muted">@area.DisplayOrder</td>
+                        <td class="center">
+                            @if (area.IsActive)
+                            {
+                                <span class="pill active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/Industry?showForm=true&id=@area.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/IndustryDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@area.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this area? This cannot be undone.');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@if (showForm)
+{
+    <form method="post" asp-action="IndustrySave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@current.Id" />
+
+        <div class="list-card mt-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(current.Id > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(current.Id > 0 ? "Edit Industry Area" : "Add Industry Area")
+                    </h2>
+                    <p class="list-card-sub">@(current.Id > 0 ? "Update the details of this industry area." : "Enter the industry area information below.")</p>
+                </div>
+                <a href="/Admin/Industry" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@current.Title"
+                               placeholder="e.g. Mining & Extraction" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control"
+                               value="@(current.DisplayOrder == 0 ? 1 : current.DisplayOrder)" min="0">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Description</label>
+                        <textarea name="Description" class="form-control" rows="3"
+                                  placeholder="Short description shown on the public site...">@current.Description</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Icon (Bootstrap Icon class)</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <div class="icon-preview">
+                                <i class="bi @(string.IsNullOrEmpty(current.IconClass) ? "bi-gem" : current.IconClass)" id="iconPreview"></i>
+                            </div>
+                            <input name="IconClass" class="form-control" id="iconInput"
+                                   value="@(string.IsNullOrEmpty(current.IconClass) ? "bi-gem" : current.IconClass)"
+                                   placeholder="bi-gem">
+                        </div>
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" id="activeSwitch"
+                                   value="true" @(current.Id == 0 || current.IsActive ? "checked" : null)>
+                            <label class="form-check-label small" for="activeSwitch">Show on public site</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/Industry" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(current.Id > 0 ? "Update Area" : "Save Area")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        @if (showForm)
+        {
+            <text>
+                const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
+                if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            </text>
+        }
+
+        const iconInput = document.getElementById('iconInput');
+        const iconPreview = document.getElementById('iconPreview');
+        if (iconInput && iconPreview) {
+            iconInput.addEventListener('input', () => {
+                iconPreview.className = 'bi ' + iconInput.value;
+            });
+        }
+    </script>
+}

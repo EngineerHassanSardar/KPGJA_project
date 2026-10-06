@@ -1,0 +1,205 @@
+﻿@model List<KPGJA.Web.Models.NewsArticle>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "News & Updates";
+    bool showForm = ViewBag.ShowForm == true;
+    var current = ViewBag.CurrentArticle as KPGJA.Web.Models.NewsArticle ?? new KPGJA.Web.Models.NewsArticle();
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Content</div>
+        <h1>News &amp; Updates</h1>
+        <p>Manage news articles and announcements displayed on the public site.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/News?showForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> New Article
+        </a>
+    </div>
+</div>
+
+<div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        <strong>News Content</strong>
+        <p>Changes made here are reflected on the public <code>/Home/News</code> page.</p>
+    </div>
+</div>
+
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-newspaper"></i> All Articles
+                <span class="count-badge">@(Model?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">Select an article to edit its complete information.</p>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-newspaper"></i></div>
+            <h3>No articles yet</h3>
+            <p>Click "New Article" to create your first article.</p>
+            <a href="/Admin/News?showForm=true" class="btn-add">
+                <i class="bi bi-plus-lg"></i> Create First Article
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Title</th>
+                    <th style="width:160px;">Category</th>
+                    <th style="width:160px;">Author</th>
+                    <th style="width:130px;" class="center">Date</th>
+                    <th style="width:100px;" class="center">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int n = 0; }
+                @foreach (var article in Model.OrderByDescending(x => x.PublishedDate))
+                {
+                    n++;
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td>
+                            <div class="strong">@article.Title</div>
+                            <div class="desc-cell" style="margin-top:2px;">@article.Summary</div>
+                        </td>
+                        <td><span class="pill" style="background:#f1efe9;color:#5a5a5a;">@article.Category</span></td>
+                        <td class="text-muted">@article.Author</td>
+                        <td class="center text-muted">@article.PublishedDate.ToLocalTime().ToString("dd MMM yyyy")</td>
+                        <td class="center">
+                            @if (article.IsPublished)
+                            {
+                                <span class="pill active">Published</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Draft</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/News?showForm=true&id=@article.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/NewsDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@article.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this article?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@if (showForm)
+{
+    <form method="post" asp-action="NewsSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@current.Id" />
+
+        <div class="list-card mt-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(current.Id > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(current.Id > 0 ? "Edit Article" : "New Article")
+                    </h2>
+                    <p class="list-card-sub">@(current.Id > 0 ? "Update the article details." : "Enter the article information below.")</p>
+                </div>
+                <a href="/Admin/News" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@current.Title"
+                               placeholder="e.g. Gem Expo 2026 Announced" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Category</label>
+                        <select name="Category" class="form-select">
+                            @foreach (var cat in new[] { "Announcement", "Industry Update", "Press Release", "Women Empowerment", "Event" })
+                            {
+                                <option value="@cat" selected="@(current.Category == cat ? "selected" : null)">@cat</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Summary</label>
+                        <textarea name="Summary" class="form-control" rows="2"
+                                  placeholder="Short 1–2 line summary...">@current.Summary</textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Content <span class="text-danger">*</span></label>
+                        <textarea name="Content" class="form-control" rows="8"
+                                  placeholder="Write the full article content here...">@current.Content</textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Author</label>
+                        <input name="Author" class="form-control" value="@(string.IsNullOrEmpty(current.Author) ? "Admin" : current.Author)">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Publish Date</label>
+                        <input name="PublishedDate" type="date" class="form-control"
+                               value="@((current.PublishedDate == default ? DateTime.Today : current.PublishedDate).ToString("yyyy-MM-dd"))">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsPublished" class="form-check-input" type="checkbox" id="publishedSwitch"
+                                   value="true" @(current.Id == 0 || current.IsPublished ? "checked" : null)>
+                            <label class="form-check-label small" for="publishedSwitch">Publish immediately</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/News" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(current.Id > 0 ? "Update Article" : "Publish Article")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        @if (showForm)
+        {
+            <text>
+                const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
+                if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            </text>
+        }
+    </script>
+}

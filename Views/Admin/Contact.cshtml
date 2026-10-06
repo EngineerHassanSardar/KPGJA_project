@@ -1,0 +1,86 @@
+﻿@model List<KPGJA.Web.Models.ContactInquiry>
+@{ Layout = "_AdminLayout"; ViewData["Title"] = "Contact Inquiries"; }
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @success
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <p class="text-secondary mb-0">Messages sent from the public contact form.</p>
+    <div class="d-flex gap-2">
+        <span class="status-badge status-pending">@Model.Count(c => !c.IsRead) Unread</span>
+        <span class="status-badge status-active">@Model.Count(c => c.IsReplied) Replied</span>
+    </div>
+</div>
+
+<div class="admin-table-card">
+    <div class="table-responsive">
+        <table class="table admin-table">
+            <thead>
+                <tr>
+                    <th style="width:4%;"></th>
+                    <th>From</th>
+                    <th>Subject</th>
+                    <th>Received</th>
+                    <th>Status</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center py-5 text-muted">
+                        <i class="bi bi-envelope-open fs-1 d-block mb-2 opacity-25"></i>
+                        No inquiries yet.
+                    </td></tr>
+                }
+                else
+                {
+                    @foreach (var c in Model.OrderByDescending(x => x.SubmittedAt))
+                    {
+                        <tr style="@(!c.IsRead ? "background:#fffbf0;" : "")">
+                            <td>
+                                @if (!c.IsRead)
+                                {
+                                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c49a4a;"></span>
+                                }
+                            </td>
+                            <td>
+                                <div class="member-name">@c.FullName</div>
+                                <div class="member-sub">@c.Email</div>
+                            </td>
+                            <td>
+                                <div class="member-name">@c.Subject</div>
+                                <div class="member-sub">@(c.Message.Length > 60 ? c.Message.Substring(0, 60) + "..." : c.Message)</div>
+                            </td>
+                            <td class="text-muted">@c.SubmittedAt.ToLocalTime().ToString("dd MMM, HH:mm")</td>
+                            <td>
+                                @if (c.IsReplied)
+                                {
+                                    <span class="status-badge status-active">Replied</span>
+                                }
+                                else if (c.IsRead)
+                                {
+                                    <span class="status-badge status-approved-pay">Read</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-pending">Unread</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-dark" style="border-radius:6px;" href="/Admin/ContactDetail/@c.Id">
+                                    Open <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

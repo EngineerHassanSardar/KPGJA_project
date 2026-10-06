@@ -3,858 +3,10 @@
     ViewData["Title"] = "Member Dashboard";
     var app = ViewData["Application"] as MembershipApplication;
 }
-@section Styles { <style>
 
-        body {
-            background: #f6f7f9;
-        }
-
-        /* Portal Header */
-
-        .portal-header {
-            background: #ffffff;
-            border-bottom: 1px solid #e7e7e7;
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-        }
-
-        .portal-header .brand-logo {
-            width: 54px;
-            height: 54px;
-            object-fit: contain;
-        }
-
-        .portal-brand-title {
-            font-family: "Playfair Display", serif;
-            font-weight: 600;
-            color: #172033;
-            line-height: 1.15;
-        }
-
-        .portal-brand-short {
-            color: #b88a2d;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-
-        .portal-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: #172033;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        /* Portal Navigation */
-
-        .portal-nav {
-            background: #172033;
-        }
-
-        .portal-nav .nav-link {
-            color: rgba(255,255,255,.78);
-            padding: 13px 16px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .portal-nav .nav-link:hover,
-        .portal-nav .nav-link.active {
-            color: #ffffff;
-            background: rgba(255,255,255,.08);
-        }
-
-        .portal-nav .nav-link i {
-            color: #d6a84f;
-        }
-
-        /* Welcome */
-
-        .dashboard-welcome {
-            background: linear-gradient(135deg, #172033, #263650);
-            border-radius: 18px;
-            padding: 32px;
-            color: #ffffff;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dashboard-welcome::after {
-            content: "";
-            position: absolute;
-            width: 240px;
-            height: 240px;
-            right: -80px;
-            top: -100px;
-            border: 35px solid rgba(214,168,79,.12);
-            border-radius: 50%;
-        }
-
-        .dashboard-welcome h1 {
-            font-family: "Playfair Display", serif;
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .dashboard-welcome p {
-            color: rgba(255,255,255,.72);
-            margin-bottom: 0;
-        }
-
-        .member-id {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,.10);
-            border: 1px solid rgba(255,255,255,.15);
-            padding: 7px 12px;
-            border-radius: 30px;
-            font-size: 13px;
-            margin-top: 16px;
-        }
-
-        /* Summary Cards */
-
-        .dashboard-card {
-            background: #ffffff;
-            border: 1px solid #e9eaed;
-            border-radius: 16px;
-            padding: 22px;
-            height: 100%;
-            transition: .2s ease;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.06);
-        }
-
-        .dashboard-card-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            background: #f7f0df;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 21px;
-        }
-
-        .dashboard-card-label {
-            color: #777;
-            font-size: 13px;
-            margin-top: 15px;
-        }
-
-        .dashboard-card-value {
-            color: #172033;
-            font-size: 21px;
-            font-weight: 700;
-            margin-top: 3px;
-        }
-
-        /* Section */
-
-        .portal-section-title {
-            color: #172033;
-            font-size: 19px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .portal-section-subtitle {
-            color: #7b7f87;
-            font-size: 13px;
-        }
-
-        /* Status */
-
-        .portal-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 11px;
-            border-radius: 30px;
-            background: #fff4d8;
-            color: #946c16;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .portal-status.success {
-            background: #e7f6ed;
-            color: #267347;
-        }
-
-        .portal-status.info {
-            background: #e7f1fb;
-            color: #28618f;
-        }
-
-        /* Application Timeline */
-
-        .application-card {
-            background: #ffffff;
-            border: 1px solid #e9eaed;
-            border-radius: 16px;
-            padding: 25px;
-        }
-
-        .timeline {
-            display: flex;
-            align-items: flex-start;
-            position: relative;
-            margin-top: 28px;
-        }
-
-        .timeline::before {
-            content: "";
-            position: absolute;
-            top: 17px;
-            left: 8%;
-            right: 8%;
-            height: 2px;
-            background: #e5e6e8;
-        }
-
-        .timeline-step {
-            flex: 1;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .timeline-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 2px solid #d8dadd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            color: #999;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .timeline-step.done .timeline-circle {
-            background: #172033;
-            border-color: #172033;
-            color: #ffffff;
-        }
-
-        .timeline-step.current .timeline-circle {
-            background: #d6a84f;
-            border-color: #d6a84f;
-            color: #ffffff;
-            box-shadow: 0 0 0 5px rgba(214,168,79,.15);
-        }
-
-        .timeline-step small {
-            display: block;
-            color: #777;
-            font-size: 11px;
-            line-height: 1.3;
-        }
-
-        .timeline-step.done small,
-        .timeline-step.current small {
-            color: #172033;
-            font-weight: 600;
-        }
-
-        /* Feature Cards */
-
-        .feature-card {
-            background: #ffffff;
-            border: 1px solid #e9eaed;
-            border-radius: 16px;
-            padding: 22px;
-            height: 100%;
-            text-decoration: none;
-            display: block;
-            color: inherit;
-            transition: .2s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.06);
-            color: inherit;
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: #f7f0df;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .feature-card h6 {
-            font-weight: 700;
-            color: #172033;
-            margin-bottom: 6px;
-        }
-
-        .feature-card p {
-            font-size: 13px;
-            color: #777;
-            margin-bottom: 0;
-        }
-
-        /* Payment */
-
-        .payment-card {
-            background: linear-gradient(135deg, #172033, #263650);
-            border-radius: 16px;
-            padding: 26px;
-            color: #ffffff;
-            height: 100%;
-        }
-
-        .payment-card .amount {
-            font-family: "Playfair Display", serif;
-            font-size: 34px;
-            font-weight: 600;
-        }
-
-        .payment-card .muted {
-            color: rgba(255,255,255,.65);
-            font-size: 13px;
-        }
-
-        /* Notifications */
-
-        .notification-item {
-            display: flex;
-            gap: 14px;
-            padding: 15px 0;
-            border-bottom: 1px solid #eeeeee;
-        }
-
-        .notification-item:last-child {
-            border-bottom: 0;
-        }
-
-        .notification-icon {
-            width: 38px;
-            height: 38px;
-            flex: 0 0 38px;
-            border-radius: 10px;
-            background: #f7f0df;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .notification-item strong {
-            color: #172033;
-            font-size: 14px;
-        }
-
-        .notification-item p {
-            margin: 2px 0 0;
-            color: #777;
-            font-size: 12px;
-        }
-
-        /* Responsive */
-
-        @@media (max-width: 767.98px) {
-
-            .portal-brand-title {
-                font-size: 14px;
-            }
-
-            .portal-header .brand-logo {
-                width: 44px;
-                height: 44px;
-            }
-
-            .dashboard-welcome {
-                padding: 24px;
-            }
-
-            .dashboard-welcome h1 {
-                font-size: 25px;
-            }
-
-            .timeline {
-                display: block;
-            }
-
-            .timeline::before {
-                left: 17px;
-                top: 17px;
-                bottom: 17px;
-                width: 2px;
-                height: auto;
-                right: auto;
-            }
-
-            .timeline-step {
-                display: flex;
-                align-items: center;
-                text-align: left;
-                margin-bottom: 18px;
-            }
-
-            .timeline-circle {
-                flex: 0 0 36px;
-                margin: 0 14px 0 0;
-            }
-
-        }
-
-   }
-
-        body {
-            background: #f6f7f9;
-        }
-
-        /* Portal Header */
-
-        .portal-header {
-            background: #ffffff;
-            border-bottom: 1px solid #e7e7e7;
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-        }
-
-        .portal-header .brand-logo {
-            width: 54px;
-            height: 54px;
-            object-fit: contain;
-        }
-
-        .portal-brand-title {
-            font-family: \"Playfair Display\", serif;
-            font-weight: 600;
-            color: #172033;
-            line-height: 1.15;
-        }
-
-        .portal-brand-short {
-            color: #b88a2d;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 2px;
-        }
-
-        .portal-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .user-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: #172033;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-        }
-
-        /* Portal Navigation */
-
-        .portal-nav {
-            background: #172033;
-        }
-
-        .portal-nav .nav-link {
-            color: rgba(255,255,255,.78);
-            padding: 13px 16px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .portal-nav .nav-link:hover,
-        .portal-nav .nav-link.active {
-            color: #ffffff;
-            background: rgba(255,255,255,.08);
-        }
-
-        .portal-nav .nav-link i {
-            color: #d6a84f;
-        }
-
-        /* Welcome */
-
-        .dashboard-welcome {
-            background: linear-gradient(135deg, #172033, #263650);
-            border-radius: 18px;
-            padding: 32px;
-            color: #ffffff;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dashboard-welcome::after {
-            content: \"\";
-            position: absolute;
-            width: 240px;
-            height: 240px;
-            right: -80px;
-            top: -100px;
-            border: 35px solid rgba(214,168,79,.12);
-            border-radius: 50%;
-        }
-
-        .dashboard-welcome h1 {
-            font-family: \"Playfair Display\", serif;
-            font-size: 32px;
-            margin-bottom: 8px;
-        }
-
-        .dashboard-welcome p {
-            color: rgba(255,255,255,.72);
-            margin-bottom: 0;
-        }
-
-        .member-id {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,255,255,.10);
-            border: 1px solid rgba(255,255,255,.15);
-            padding: 7px 12px;
-            border-radius: 30px;
-            font-size: 13px;
-            margin-top: 16px;
-        }
-
-        /* Summary Cards */
-
-        .dashboard-card {
-            background: #ffffff;
-            border: 1px solid #e9eaed;
-            border-radius: 16px;
-            padding: 22px;
-            height: 100%;
-            transition: .2s ease;
-        }
-
-        .dashboard-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.06);
-        }
-
-        .dashboard-card-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            background: #f7f0df;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 21px;
-        }
-
-        .dashboard-card-label {
-            color: #777;
-            font-size: 13px;
-            margin-top: 15px;
-        }
-
-        .dashboard-card-value {
-            color: #172033;
-            font-size: 21px;
-            font-weight: 700;
-            margin-top: 3px;
-        }
-
-        /* Section */
-
-        .portal-section-title {
-            color: #172033;
-            font-size: 19px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .portal-section-subtitle {
-            color: #7b7f87;
-            font-size: 13px;
-        }
-
-        /* Status */
-
-        .portal-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 11px;
-            border-radius: 30px;
-            background: #fff4d8;
-            color: #946c16;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .portal-status.success {
-            background: #e7f6ed;
-            color: #267347;
-        }
-
-        .portal-status.info {
-            background: #e7f1fb;
-            color: #28618f;
-        }
-
-        /* Application Timeline */
-
-        .application-card {
-            background: #ffffff;
-            border: 1px solid #e9eaed;
-            border-radius: 16px;
-            padding: 25px;
-        }
-
-        .timeline {
-            display: flex;
-            align-items: flex-start;
-            position: relative;
-            margin-top: 28px;
-        }
-
-        .timeline::before {
-            content: \"\";
-            position: absolute;
-            top: 17px;
-            left: 8%;
-            right: 8%;
-            height: 2px;
-            background: #e5e6e8;
-        }
-
-        .timeline-step {
-            flex: 1;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .timeline-circle {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #ffffff;
-            border: 2px solid #d8dadd;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            color: #999;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .timeline-step.done .timeline-circle {
-            background: #172033;
-            border-color: #172033;
-            color: #ffffff;
-        }
-
-        .timeline-step.current .timeline-circle {
-            background: #d6a84f;
-            border-color: #d6a84f;
-            color: #ffffff;
-            box-shadow: 0 0 0 5px rgba(214,168,79,.15);
-        }
-
-        .timeline-step small {
-            display: block;
-            color: #777;
-            font-size: 11px;
-            line-height: 1.3;
-        }
-
-        .timeline-step.done small,
-        .timeline-step.current small {
-            color: #172033;
-            font-weight: 600;
-        }
-
-        /* Feature Cards */
-
-        .feature-card {
-            background: #ffffff;
-            border: 1px solid #e9eaed;
-            border-radius: 16px;
-            padding: 22px;
-            height: 100%;
-            text-decoration: none;
-            display: block;
-            color: inherit;
-            transition: .2s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,.06);
-            color: inherit;
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: #f7f0df;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 15px;
-        }
-
-        .feature-card h6 {
-            font-weight: 700;
-            color: #172033;
-            margin-bottom: 6px;
-        }
-
-        .feature-card p {
-            font-size: 13px;
-            color: #777;
-            margin-bottom: 0;
-        }
-
-        /* Payment */
-
-        .payment-card {
-            background: linear-gradient(135deg, #172033, #263650);
-            border-radius: 16px;
-            padding: 26px;
-            color: #ffffff;
-            height: 100%;
-        }
-
-        .payment-card .amount {
-            font-family: \"Playfair Display\", serif;
-            font-size: 34px;
-            font-weight: 600;
-        }
-
-        .payment-card .muted {
-            color: rgba(255,255,255,.65);
-            font-size: 13px;
-        }
-
-        /* Notifications */
-
-        .notification-item {
-            display: flex;
-            gap: 14px;
-            padding: 15px 0;
-            border-bottom: 1px solid #eeeeee;
-        }
-
-        .notification-item:last-child {
-            border-bottom: 0;
-        }
-
-        .notification-icon {
-            width: 38px;
-            height: 38px;
-            flex: 0 0 38px;
-            border-radius: 10px;
-            background: #f7f0df;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .notification-item strong {
-            color: #172033;
-            font-size: 14px;
-        }
-
-        .notification-item p {
-            margin: 2px 0 0;
-            color: #777;
-            font-size: 12px;
-        }
-
-        /* Responsive */
-
-        @@media (max-width: 767.98px) {
-
-            .portal-brand-title {
-                font-size: 14px;
-            }
-
-            .portal-header .brand-logo {
-                width: 44px;
-                height: 44px;
-            }
-
-            .dashboard-welcome {
-                padding: 24px;
-            }
-
-            .dashboard-welcome h1 {
-                font-size: 25px;
-            }
-
-            .timeline {
-                display: block;
-            }
-
-            .timeline::before {
-                left: 17px;
-                top: 17px;
-                bottom: 17px;
-                width: 2px;
-                height: auto;
-                right: auto;
-            }
-
-            .timeline-step {
-                display: flex;
-                align-items: center;
-                text-align: left;
-                margin-bottom: 18px;
-            }
-
-            .timeline-circle {
-                flex: 0 0 36px;
-                margin: 0 14px 0 0;
-            }
-
-        }
-
-    """)</style> }
 <div class="container py-5">
+
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
         <div>
             <span class="section-kicker">MEMBER PORTAL</span>
@@ -863,50 +15,172 @@
         </div>
         <form asp-action="Logout" method="post">
             @Html.AntiForgeryToken()
-            <button class="btn btn-outline-dark"><i class="bi bi-box-arrow-right me-1"></i> Logout</button>
+            <button class="btn btn-outline-dark">
+                <i class="bi bi-box-arrow-right me-1"></i> Logout
+            </button>
         </form>
     </div>
 
+    <!-- Flash message -->
     @if (TempData["Success"] is string success)
     {
         <div class="alert alert-success">@success</div>
     }
 
+    <!-- No Application -->
     @if (app == null)
     {
         <div class="alert alert-info">No membership application is linked to this account.</div>
     }
     else
     {
+        <!-- Welcome Banner -->
+        <div class="dashboard-welcome mb-4">
+            <span class="portal-status">
+                <i class="bi bi-hourglass-split"></i> @app.Status
+            </span>
+            <h1 class="mt-2">@app.BusinessName</h1>
+            <p>@app.MembershipCategory member application</p>
+            <div class="member-id">
+                <i class="bi bi-hash"></i> Application ID: @app.Id
+            </div>
+        </div>
+
         <div class="row g-4">
+
+            <!-- Application Info -->
             <div class="col-lg-8">
-                <div class="soft-card p-4">
-                    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
-                        <div>
-                            <div class="small text-uppercase text-muted">Application</div>
-                            <h4 class="mb-1">@app.BusinessName</h4>
-                            <div class="text-secondary">@app.MembershipCategory</div>
-                        </div>
-                        <span class="badge bg-dark px-3 py-2">@app.Status</span>
-                    </div>
+                <div class="application-card">
+                    <h5 class="portal-section-title">Application Details</h5>
+                    <p class="portal-section-subtitle mb-4">
+                        Submitted on @app.ApplicationDate.ToLocalTime().ToString("dd MMM yyyy")
+                    </p>
+
                     <div class="row g-3">
-                        <div class="col-md-6"><div class="small text-muted">Applicant</div><strong>@app.FullName</strong></div>
-                        <div class="col-md-6"><div class="small text-muted">Application Date</div><strong>@app.ApplicationDate.ToLocalTime().ToString("dd MMM yyyy")</strong></div>
-                        <div class="col-md-6"><div class="small text-muted">Membership Fee</div><strong>PKR @app.MembershipFee.ToString("N0")</strong></div>
-                        <div class="col-md-6"><div class="small text-muted">Membership No.</div><strong>@(app.MembershipNo ?? "Assigned after approval")</strong></div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">Applicant</div>
+                            <strong>@app.FullName</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">CNIC</div>
+                            <strong>@app.Cnic</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">Business Name</div>
+                            <strong>@app.BusinessName</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">Membership Category</div>
+                            <strong>@app.MembershipCategory</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">Membership Fee</div>
+                            <strong>PKR @app.MembershipFee.ToString("N0")</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">Membership No.</div>
+                            <strong>@(string.IsNullOrWhiteSpace(app.MembershipNo) ? "Pending assignment" : app.MembershipNo)</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">Email</div>
+                            <strong>@app.Email</strong>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="small text-muted">Mobile</div>
+                            <strong>@app.MobileNo</strong>
+                        </div>
                     </div>
+
                     @if (!string.IsNullOrWhiteSpace(app.AdminRemarks))
                     {
-                        <div class="alert alert-light border mt-4 mb-0"><strong>Admin Remarks:</strong><br>@app.AdminRemarks</div>
+                        <div class="alert alert-light border mt-4 mb-0">
+                            <strong>Admin Remarks:</strong><br>@app.AdminRemarks
+                        </div>
                     }
                 </div>
+
+                <!-- Timeline -->
+                <div class="application-card mt-4">
+                    <h5 class="portal-section-title">Application Progress</h5>
+                    <p class="portal-section-subtitle">Where your application stands right now</p>
+
+                    <div class="timeline">
+                        <div class="timeline-step done">
+                            <div class="timeline-circle"><i class="bi bi-check"></i></div>
+                            <small>Submitted</small>
+                        </div>
+                        <div class="timeline-step @(app.Status == "Pending Review" ? "current" : "done")">
+                            <div class="timeline-circle">2</div>
+                            <small>Under Review</small>
+                        </div>
+                        <div class="timeline-step @(app.Status.Contains("Payment") ? "current" : "")">
+                            <div class="timeline-circle">3</div>
+                            <small>Payment</small>
+                        </div>
+                        <div class="timeline-step @(app.Status == "Active Member" || app.Status == "Approved" ? "current" : "")">
+                            <div class="timeline-circle">4</div>
+                            <small>Approved</small>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Sidebar -->
             <div class="col-lg-4">
-                <div class="soft-card p-4 h-100">
-                    <h5>Application Process</h5>
-                    <div class="d-flex gap-3 mt-4"><i class="bi bi-check-circle-fill text-success"></i><div><strong>Application Submitted</strong><div class="small text-muted">Received by KPGJA</div></div></div>
-                    <div class="d-flex gap-3 mt-4"><i class="bi bi-clock-history text-warning"></i><div><strong>Administrative Review</strong><div class="small text-muted">Current status: @app.Status</div></div></div>
-                    <div class="d-flex gap-3 mt-4"><i class="bi bi-person-check text-secondary"></i><div><strong>Final Approval</strong><div class="small text-muted">Membership number is assigned by KPGJA admin.</div></div></div>
+
+                <!-- Status Info -->
+                <div class="dashboard-card mb-4">
+                    <div class="dashboard-card-icon"><i class="bi bi-info-circle"></i></div>
+                    <div class="dashboard-card-label">Current Status</div>
+                    <div class="dashboard-card-value">@app.Status</div>
+                </div>
+
+                <!-- Next Step -->
+                <div class="dashboard-card mb-4">
+                    <div class="dashboard-card-icon"><i class="bi bi-arrow-right-circle"></i></div>
+                    <div class="dashboard-card-label">Next Step</div>
+                    <div class="dashboard-card-value" style="font-size:14px;line-height:1.5;">
+                        @switch (app.Status)
+                        {
+                            case "Pending Review":
+                                @:Your application is being reviewed by KPGJA admin.
+                                break;
+                            case "Approved for Payment":
+                                @:Please submit your membership fee to proceed.
+                                break;
+                            case "Payment Submitted":
+                                @:Your payment is being verified.
+                                break;
+                            case "Payment Verified":
+                                @:Your payment has been verified. Awaiting final approval.
+                                break;
+                            case "Active Member":
+                                @:Welcome! Your membership is active.
+                                break;
+                            case "Approved":
+                                @:Your membership has been approved.
+                                break;
+                            case "Rejected":
+                                @:Your application was not approved. Contact KPGJA for details.
+                                break;
+                            default:
+                                @:Awaiting next steps from KPGJA.
+                                break;
+                        }
+                    </div>
+                </div>
+
+                <!-- Help -->
+                <div class="dashboard-card">
+                    <div class="dashboard-card-icon"><i class="bi bi-headset"></i></div>
+                    <div class="dashboard-card-label">Need Help?</div>
+                    <div class="dashboard-card-value" style="font-size:14px;line-height:1.5;">
+                        Contact KPGJA office:
+                        <div class="mt-2 small">
+                            <i class="bi bi-envelope me-1"></i> info@kpgja.com<br>
+                            <i class="bi bi-telephone me-1"></i> +92 91 1234567
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

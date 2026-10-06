@@ -34,7 +34,81 @@ public class MemberController : Controller
     [HttpGet]
     public IActionResult Register() => View(new RegisterViewModel());
 
-    
+    [AllowAnonymous]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register(RegisterViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View(model);
+
+        // ---------- 1. Create the user account ----------
+        var user = new ApplicationUser
+        {
+            UserName = model.Email,
+            Email = model.Email,
+            FullName = model.FullName,
+            PhoneNumber = model.MobileNo,
+            EmailConfirmed = true
+        };
+
+        var result = await _userManager.CreateAsync(user, model.Password);
+
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+                ModelState.AddModelError("", error.Description);
+            return View(model);
+        }
+
+        // ---------- 2. Save uploaded files ----------
+        var cnicPath = await SaveOptionalAsync(model.CnicDocument, "cnic");
+        var photoPath = await SaveOptionalAsync(model.PassportPhoto, "photo");
+        var businessPath = await SaveOptionalAsync(model.BusinessRegistrationDocument, "business");
+        var feeReceiptPath = await SaveOptionalAsync(model.FeeReceipt, "fee");
+        var bankSlipPath = await SaveOptionalAsync(model.BankDepositSlip, "bank");
+        var recommendPath = await SaveOptionalAsync(model.RecommendationDocument, "recommendation");
+
+        // ---------- 3. Create the MembershipApplication record ----------
+        // NOTE: This is temporary — only saves in-memory for now.
+        // Once we add DbContext + migrations in Phase 2, this will save to SQL Server.
+
+        var application = new MembershipApplication
+        {
+            FullName = model.FullName,
+            FatherHusbandName = model.FatherHusbandName,
+            Cnic = model.Cnic,
+            BusinessName = model.BusinessName,
+            Designation = model.Designation,
+            NatureOfBusiness = model.NatureOfBusiness,
+            MobileNo = model.MobileNo,
+            Email = model.Email,
+            CityDistrict = model.CityDistrict,
+            BusinessAddress = model.BusinessAddress,
+            MembershipCategory = model.MembershipCategory,
+            BusinessTypes = string.Join(", ", model.BusinessType),
+            MembershipFee = Fees.TryGetValue(model.MembershipCategory, out var fee) ? fee : 0m,
+            Status = "Pending Review",
+            ApplicationDate = DateTime.UtcNow,
+
+            // Document paths
+            CnicDocumentPath = cnicPath,
+            PassportPhotoPath = photoPath,
+            BusinessRegistrationDocumentPath = businessPath,
+            FeeReceiptPath = feeReceiptPath,
+            BankDepositSlipPath = bankSlipPath,
+            RecommendationDocumentPath = recommendPath
+        };
+
+        // ---------- 4. Sign the user in ----------
+        await _signInManager.SignInAsync(user, isPersistent: false);
+
+        // ---------- 5. Show success and redirect to Dashboard ----------
+        TempData["Success"] = $"Thank you {model.FullName}. Your application has been submitted.";
+        return RedirectToAction(nameof(Dashboard));
+    }
+
+
     [AllowAnonymous]
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)

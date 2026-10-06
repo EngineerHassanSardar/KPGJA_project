@@ -1,204 +1,108 @@
 @model LoginViewModel
 @{ ViewData["Title"] = "Member Login"; }
-@section Styles { <style></style> }
-<!-- TOP BAR -->
 
-
-
-<!-- PAGE HERO -->
 <section class="page-hero">
-
     <div class="container">
-
-        <span class="section-kicker text-warning">
-            MEMBER PORTAL
-        </span>
-
-        <h1>
-            Member Login
-        </h1>
-
-        <p class="lead text-white-50 mb-0">
-            Sign in to manage your KPGJA membership account.
-        </p>
-
+        <span class="section-kicker text-warning">MEMBER PORTAL</span>
+        <h1>Member Login</h1>
+        <p class="lead text-white-50 mb-0">Sign in to manage your KPGJA membership account.</p>
     </div>
-
 </section>
 
-
-<!-- LOGIN -->
 <section class="py-5">
-
     <div class="container">
-
         <div class="row justify-content-center">
-
             <div class="col-md-7 col-lg-5">
 
                 <div class="soft-card p-4 p-lg-5">
 
                     <div class="text-center mb-4">
-
                         <div class="objective-icon mx-auto mb-3">
                             <i class="bi bi-person-lock"></i>
                         </div>
-
-                        <span class="section-kicker">
-                            MEMBER PORTAL
-                        </span>
-
-                        <h2 class="section-heading">
-                            Sign In
-                        </h2>
-
+                        <span class="section-kicker">MEMBER PORTAL</span>
+                        <h2 class="section-heading">Sign In</h2>
                         <p class="section-description mb-0">
                             Enter your registered email or username and password.
                         </p>
-
                     </div>
 
-
-                    <div id="loginMessage"
-                         class="alert alert-danger d-none">
-                    </div>
-
-
-                    <form asp-action="Login" asp-controller="Member" method="post" id="loginForm">\n@Html.AntiForgeryToken()\n<div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <form asp-action="Login" asp-controller="Member" method="post" id="loginForm">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
                         <!-- EMAIL / USERNAME -->
                         <div class="mb-3">
-
-                            <label class="form-label">
-                                Email / Username
-                                <span class="text-danger">*</span>
-                            </label>
-
+                            <label class="form-label">Email / Username <span class="text-danger">*</span></label>
                             <div class="input-group">
-
-                                <span class="input-group-text">
-                                    <i class="bi bi-person"></i>
-                                </span>
-
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
                                 <input type="text"
-                                       asp-for="Username" name="Username"
+                                       asp-for="Username"
                                        class="form-control"
                                        placeholder="Enter email or username"
                                        autocomplete="username"
                                        required>
-
                             </div>
-
                         </div>
-
 
                         <!-- PASSWORD -->
                         <div class="mb-3">
-
-                            <label class="form-label">
-                                Password
-                                <span class="text-danger">*</span>
-                            </label>
-
+                            <label class="form-label">Password <span class="text-danger">*</span></label>
                             <div class="input-group">
-
-                                <span class="input-group-text">
-                                    <i class="bi bi-lock"></i>
-                                </span>
-
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                 <input type="password"
-                                       asp-for="Password" name="Password"
+                                       asp-for="Password"
                                        id="password"
                                        class="form-control"
                                        placeholder="Enter your password"
                                        autocomplete="current-password"
                                        required>
-
                                 <button type="button"
                                         class="btn btn-outline-secondary"
                                         id="togglePassword"
                                         aria-label="Show password">
-
                                     <i class="bi bi-eye"></i>
-
                                 </button>
-
                             </div>
-
                         </div>
-
 
                         <!-- LINKS -->
                         <div class="d-flex justify-content-between align-items-center mb-4">
-
-                            <a href="#"
-                               class="small text-decoration-none">
-
-                                Forgot Password?
-
-                            </a>
-
-                            <a href="/Member/Register"
-                               class="small text-decoration-none">
-
-                                Create Account
-
-                            </a>
-
+                            <a href="#" class="small text-decoration-none">Forgot Password?</a>
+                            <a href="/Member/Register" class="small text-decoration-none">Create Account</a>
                         </div>
 
-
                         <!-- LOGIN BUTTON -->
-                        <button type="submit"
-                                class="btn btn-gold btn-lg w-100">
-
+                        <button type="submit" class="btn btn-gold btn-lg w-100">
                             <i class="bi bi-box-arrow-in-right me-1"></i>
                             Login
-
                         </button>
-
                     </form>
 
-
                     <div class="text-center mt-4">
-
-                        <small class="text-muted">
-                            Don't have a KPGJA membership account?
-                        </small>
-
+                        <small class="text-muted">Don't have a KPGJA membership account?</small>
                         <br>
-
-                        <a href="/Member/Register"
-                           class="fw-semibold text-decoration-none">
-
+                        <a href="/Member/Register" class="fw-semibold text-decoration-none">
                             Register as a Member
-
                         </a>
-
                     </div>
 
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
 </section>
 
-
-<!-- FOOTER -->
 @section Scripts {
 <script>
-const togglePassword = document.getElementById("togglePassword");
-const password = document.getElementById("password");
-if (togglePassword && password) {
-    togglePassword.addEventListener("click", function () {
-        const isPassword = password.type === "password";
-        password.type = isPassword ? "text" : "password";
-        this.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
-    });
-}
+    const togglePassword = document.getElementById("togglePassword");
+    const password = document.getElementById("password");
+    if (togglePassword && password) {
+        togglePassword.addEventListener("click", function () {
+            const isPassword = password.type === "password";
+            password.type = isPassword ? "text" : "password";
+            this.innerHTML = isPassword ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+        });
+    }
 </script>
 }

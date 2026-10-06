@@ -1,0 +1,123 @@
+﻿@{ Layout = "_AdminLayout"; ViewData["Title"] = "Settings"; }
+
+@if (TempData["Success"] is string success)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @success
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Tabs -->
+<ul class="nav nav-pills mb-3" style="gap:6px;">
+    <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" href="#tab-general" style="font-size:11px;padding:6px 14px;border-radius:8px;">General</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#tab-membership" style="font-size:11px;padding:6px 14px;border-radius:8px;">Membership</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#tab-email" style="font-size:11px;padding:6px 14px;border-radius:8px;">Email</a></li>
+    <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#tab-appearance" style="font-size:11px;padding:6px 14px;border-radius:8px;">Appearance</a></li>
+</ul>
+
+<form method="post" asp-action="SettingsSave">
+    @Html.AntiForgeryToken()
+    <div class="tab-content">
+
+        <div class="tab-pane fade show active" id="tab-general">
+            <div class="soft-card p-4">
+                <h5 class="card-head-title"><i class="bi bi-gear"></i> General Settings</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Organization Name</label>
+                        <input class="form-control" value="Khyber Pakhtunkhwa Gems & Jewellery Association">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Short Code</label>
+                        <input class="form-control" value="KPGJA">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Email</label>
+                        <input class="form-control" value="info@kpgja.com">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Phone</label>
+                        <input class="form-control" value="+92 91 1234567">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Office Address</label>
+                        <input class="form-control" value="Hamza Market, Namak Mandi, Peshawar">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-membership">
+            <div class="soft-card p-4">
+                <h5 class="card-head-title"><i class="bi bi-people"></i> Membership Fees</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Ordinary Member (PKR)</label>
+                        <input type="number" class="form-control" value="1000">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Associate Member (PKR)</label>
+                        <input type="number" class="form-control" value="2500">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Honorary Member (PKR)</label>
+                        <input type="number" class="form-control" value="3500">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-email">
+            <div class="soft-card p-4">
+                <h5 class="card-head-title"><i class="bi bi-envelope"></i> Email Configuration</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">SMTP Host</label>
+                        <input class="form-control" placeholder="smtp.gmail.com">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Port</label>
+                        <input class="form-control" value="587">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Enable SSL</label>
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" checked>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Username</label>
+                        <input class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Password</label>
+                        <input type="password" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-appearance">
+            <div class="soft-card p-4">
+                <h5 class="card-head-title"><i class="bi bi-palette"></i> Appearance</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Primary Color</label>
+                        <input type="color" class="form-control form-control-color" value="#17352d">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Accent Color</label>
+                        <input type="color" class="form-control form-control-color" value="#c49a4a">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-end gap-2 mt-3">
+        <button type="submit" class="btn btn-gold px-3">
+            <i class="bi bi-check2 me-1"></i> Save Settings
+        </button>
+    </div>
+</form>

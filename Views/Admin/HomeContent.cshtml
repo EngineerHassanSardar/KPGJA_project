@@ -1,0 +1,535 @@
+﻿@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Home Content";
+    bool showSlideForm    = ViewBag.ShowSlideForm == true;
+    bool showObjectiveForm = ViewBag.ShowObjectiveForm == true;
+    bool showQuickLinkForm = ViewBag.ShowQuickLinkForm == true;
+    bool showCtaForm      = ViewBag.ShowCtaForm == true;
+
+    var slides = ViewBag.Slides as List<KPGJA.Web.Models.HeroSlide> ?? new();
+    var objectives = ViewBag.Objectives as List<KPGJA.Web.Models.HomeSection> ?? new();
+    var quickLinks = ViewBag.QuickLinks as List<KPGJA.Web.Models.HomeSection> ?? new();
+    var currentSlide = ViewBag.CurrentSlide as KPGJA.Web.Models.HeroSlide ?? new KPGJA.Web.Models.HeroSlide();
+    var currentObjective = ViewBag.CurrentObjective as KPGJA.Web.Models.HomeSection ?? new KPGJA.Web.Models.HomeSection();
+    var currentQuickLink = ViewBag.CurrentQuickLink as KPGJA.Web.Models.HomeSection ?? new KPGJA.Web.Models.HomeSection();
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- PAGE HEADER -->
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Content</div>
+        <h1>Home Content</h1>
+        <p>Manage the homepage hero slider, objectives, membership CTA and quick links.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/HomeContent?showCtaForm=true" class="btn-outline-brand">
+            <i class="bi bi-pencil"></i> Edit CTA
+        </a>
+        <a href="/Admin/HomeContent?showSlideForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Slide
+        </a>
+    </div>
+</div>
+
+<!-- INFO BANNER -->
+<div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        <strong>Homepage</strong>
+        <p>Changes made here are reflected on the public <code>/Home</code> page. Each section below (Women, Industry, News, Events, Contact) has its own editor.</p>
+    </div>
+</div>
+
+<!-- ========== 1. HERO SLIDER FORM ========== -->
+@if (showSlideForm)
+{
+    <form method="post" asp-action="HomeSlideSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@currentSlide.Id" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(currentSlide.Id > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(currentSlide.Id > 0 ? "Edit Slide" : "Add New Slide")
+                    </h2>
+                    <p class="list-card-sub">@(currentSlide.Id > 0 ? "Update the slider slide." : "Enter the slider slide information below.")</p>
+                </div>
+                <a href="/Admin/HomeContent" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@currentSlide.Title" placeholder="Slide title" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control"
+                               value="@(currentSlide.DisplayOrder == 0 ? (slides.Count + 1) : currentSlide.DisplayOrder)" min="0">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Subtitle</label>
+                        <input name="Subtitle" class="form-control" value="@currentSlide.Subtitle" placeholder="Short supporting line">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Text</label>
+                        <input name="CtaText" class="form-control" value="@currentSlide.CtaText" placeholder="Become a Member">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Link</label>
+                        <input name="CtaLink" class="form-control" value="@currentSlide.CtaLink" placeholder="/Member/Register">
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Background Image</label>
+                        <input type="file" name="ImageFile" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" value="true"
+                                   @(currentSlide.Id == 0 || currentSlide.IsActive ? "checked" : null)>
+                            <label class="form-check-label small">Show on homepage</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/HomeContent" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(currentSlide.Id > 0 ? "Update Slide" : "Save Slide")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<!-- HERO SLIDER TABLE -->
+<div class="list-card mb-3">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-images"></i> Hero Slider
+                <span class="count-badge">@(slides?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">The rotating banner at the top of the homepage.</p>
+        </div>
+        <a href="/Admin/HomeContent?showSlideForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Slide
+        </a>
+    </div>
+
+    @if (slides == null || !slides.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-images"></i></div>
+            <h3>No slides yet</h3>
+            <p>Click "Add Slide" to create your first hero slide.</p>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Title</th>
+                    <th style="width:200px;">Subtitle</th>
+                    <th style="width:160px;">CTA Button</th>
+                    <th class="center" style="width:80px;">Order</th>
+                    <th class="center" style="width:100px;">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int n = 0; }
+                @foreach (var sl in slides.OrderBy(x => x.DisplayOrder))
+                {
+                    n++;
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td>
+                            <div class="strong">@sl.Title</div>
+                            <div class="desc-cell" style="margin-top:2px;">@sl.Subtitle</div>
+                        </td>
+                        <td class="text-muted">@sl.Subtitle</td>
+                        <td class="text-muted"><span style="color:var(--kpgja-gold);font-weight:600;">@sl.CtaText</span></td>
+                        <td class="center text-muted">@sl.DisplayOrder</td>
+                        <td class="center">
+                            @if (sl.IsActive)
+                            {
+                                <span class="pill active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/HomeContent?showSlideForm=true&id=@sl.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/HomeSlideDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@sl.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this slide?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- ========== 2. OBJECTIVES ========== -->
+@if (showObjectiveForm)
+{
+    <form method="post" asp-action="HomeObjectiveSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@currentObjective.Id" />
+        <input type="hidden" name="SectionKey" value="objectives" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(currentObjective.Id > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(currentObjective.Id > 0 ? "Edit Objective" : "Add New Objective")
+                    </h2>
+                    <p class="list-card-sub">@(currentObjective.Id > 0 ? "Update this objective." : "Enter the objective information below.")</p>
+                </div>
+                <a href="/Admin/HomeContent" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@currentObjective.Title" placeholder="e.g. Promote Industry" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control"
+                               value="@(currentObjective.DisplayOrder == 0 ? (objectives.Count + 1) : currentObjective.DisplayOrder)" min="0">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3" placeholder="Short description...">@currentObjective.Body</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Icon</label>
+                        <input name="IconClass" class="form-control"
+                               value="@(string.IsNullOrEmpty(currentObjective.IconClass) ? "bi-bullseye" : currentObjective.IconClass)" placeholder="bi-bullseye">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" value="true"
+                                   @(currentObjective.Id == 0 || currentObjective.IsActive ? "checked" : null)>
+                            <label class="form-check-label small">Show on homepage</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/HomeContent" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(currentObjective.Id > 0 ? "Update Objective" : "Save Objective")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<div class="list-card mb-3">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-bullseye"></i> Objectives
+                <span class="count-badge">@(objectives?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">The objectives blocks shown on the homepage.</p>
+        </div>
+        <a href="/Admin/HomeContent?showObjectiveForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Objective
+        </a>
+    </div>
+
+    @if (objectives == null || !objectives.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-bullseye"></i></div>
+            <h3>No objectives yet</h3>
+            <p>Click "Add Objective" to create your first objective.</p>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:60px;">Icon</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                    <th class="center" style="width:80px;">Order</th>
+                    <th class="center" style="width:100px;">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int m = 0; }
+                @foreach (var obj in objectives.OrderBy(x => x.DisplayOrder))
+                {
+                    m++;
+                    <tr>
+                        <td class="row-num">@m</td>
+                        <td><div class="thumb"><i class="bi @obj.IconClass"></i></div></td>
+                        <td class="strong">@obj.Title</td>
+                        <td class="desc-cell">@obj.Body</td>
+                        <td class="center text-muted">@obj.DisplayOrder</td>
+                        <td class="center">
+                            @if (obj.IsActive)
+                            {
+                                <span class="pill active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/HomeContent?showObjectiveForm=true&id=@obj.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/HomeObjectiveDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@obj.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this objective?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- ========== 3. QUICK LINKS ========== -->
+@if (showQuickLinkForm)
+{
+    <form method="post" asp-action="HomeQuickLinkSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@currentQuickLink.Id" />
+        <input type="hidden" name="SectionKey" value="quicklinks" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(currentQuickLink.Id > 0 ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(currentQuickLink.Id > 0 ? "Edit Quick Link" : "Add New Quick Link")
+                    </h2>
+                    <p class="list-card-sub">@(currentQuickLink.Id > 0 ? "Update this quick link." : "Enter the quick link information below.")</p>
+                </div>
+                <a href="/Admin/HomeContent" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Label <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@currentQuickLink.Title" placeholder="e.g. Membership" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control"
+                               value="@(currentQuickLink.DisplayOrder == 0 ? (quickLinks.Count + 1) : currentQuickLink.DisplayOrder)" min="0">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Icon</label>
+                        <input name="IconClass" class="form-control"
+                               value="@(string.IsNullOrEmpty(currentQuickLink.IconClass) ? "bi-link-45deg" : currentQuickLink.IconClass)" placeholder="bi-link-45deg">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Link URL</label>
+                        <input name="Body" class="form-control" value="@currentQuickLink.Body" placeholder="/Member/Register">
+                    </div>
+                    <div class="col-12 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" value="true"
+                                   @(currentQuickLink.Id == 0 || currentQuickLink.IsActive ? "checked" : null)>
+                            <label class="form-check-label small">Show on homepage</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/HomeContent" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(currentQuickLink.Id > 0 ? "Update Link" : "Save Link")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<div class="list-card mb-3">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-link-45deg"></i> Quick Links
+                <span class="count-badge">@(quickLinks?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">Fast-access links shown in the homepage quick-links section.</p>
+        </div>
+        <a href="/Admin/HomeContent?showQuickLinkForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Quick Link
+        </a>
+    </div>
+
+    @if (quickLinks == null || !quickLinks.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-link-45deg"></i></div>
+            <h3>No quick links yet</h3>
+            <p>Click "Add Quick Link" to create your first link.</p>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:60px;">Icon</th>
+                    <th>Label</th>
+                    <th>URL</th>
+                    <th class="center" style="width:80px;">Order</th>
+                    <th class="center" style="width:100px;">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int k = 0; }
+                @foreach (var ql in quickLinks.OrderBy(x => x.DisplayOrder))
+                {
+                    k++;
+                    <tr>
+                        <td class="row-num">@k</td>
+                        <td><div class="thumb"><i class="bi @ql.IconClass"></i></div></td>
+                        <td class="strong">@ql.Title</td>
+                        <td class="desc-cell"><code>@ql.Body</code></td>
+                        <td class="center text-muted">@ql.DisplayOrder</td>
+                        <td class="center">
+                            @if (ql.IsActive)
+                            {
+                                <span class="pill active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/HomeContent?showQuickLinkForm=true&id=@ql.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/HomeQuickLinkDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@ql.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this quick link?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+<!-- ========== 4. MEMBERSHIP CTA (single-editor) ========== -->
+@if (showCtaForm)
+{
+    <form method="post" asp-action="HomeCtaSave">
+        @Html.AntiForgeryToken()
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2><i class="bi bi-pencil-square"></i> Edit Membership CTA Banner</h2>
+                    <p class="list-card-sub">The join-membership banner shown on the homepage.</p>
+                </div>
+                <a href="/Admin/HomeContent" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Heading</label>
+                        <input name="Heading" class="form-control" value="Become a Member Today">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Button Text</label>
+                        <input name="CtaText" class="form-control" value="Apply Now">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3">Join KP's leading network of gem and jewellery professionals.</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Link</label>
+                        <input name="CtaLink" class="form-control" value="/Member/Register">
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/HomeContent" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> Save CTA Banner
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        // Scroll to form if any is open
+        @if (showSlideForm || showObjectiveForm || showQuickLinkForm || showCtaForm)
+        {
+            <text>
+                const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
+                if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            </text>
+        }
+    </script>
+}

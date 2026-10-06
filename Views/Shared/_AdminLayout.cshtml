@@ -1,22 +1,168 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>@(ViewData["Title"] ?? "Admin") | KPGJA</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
-<link href="/assets/css/style.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@(ViewData["Title"] ?? "Admin") | KPGJA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="/assets/css/style.css?v=@DateTime.Now.Ticks" rel="stylesheet">
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-dark navbar-kpgja">
-<div class="container-fluid">
-<a class="navbar-brand fw-bold" href="/Admin"><i class="bi bi-speedometer2 me-2"></i>KPGJA Admin</a>
-<div class="d-flex gap-2">
-<a class="btn btn-outline-light btn-sm" href="/">View Website</a>
-<form asp-controller="Member" asp-action="Logout" method="post" class="d-inline">@Html.AntiForgeryToken()<button class="btn btn-outline-light btn-sm">Logout</button></form>
+<body class="admin-body">
+
+<div class="admin-wrapper">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside class="admin-sidebar" id="adminSidebar">
+        <div class="sidebar-brand">
+            <div class="brand-mark"><i class="bi bi-gem"></i></div>
+            <div>
+                <div class="brand-name">KPGJA</div>
+                <div class="brand-sub">Admin Console</div>
+            </div>
+        </div>
+<nav class="sidebar-nav">
+    <div class="nav-section-title">Overview</div>
+    <a href="/Admin" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")">
+        <i class="bi bi-grid-1x2"></i> <span>Dashboard</span>
+    </a>
+
+    <div class="nav-section-title mt-3">Membership</div>
+    <a href="/Admin/Members" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() is "Members" or "Details" ? "active" : "")">
+        <i class="bi bi-people"></i> <span>Applications</span>
+        <span class="badge-count">5</span>
+    </a>
+    <a href="/Admin/ApprovedMembers" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "ApprovedMembers" ? "active" : "")">
+        <i class="bi bi-patch-check"></i> <span>Approved Members</span>
+    </a>
+    <a href="/Admin/Payments" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Payments" ? "active" : "")">
+        <i class="bi bi-receipt"></i> <span>Payments</span>
+    </a>
+
+    <div class="nav-section-title mt-3">Content</div>
+    <a href="/Admin/HomeContent" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "HomeContent" ? "active" : "")">
+        <i class="bi bi-house"></i> <span>Home Content</span>
+    </a>
+    <a href="/Admin/About" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "About" ? "active" : "")">
+        <i class="bi bi-info-circle"></i> <span>About Us</span>
+    </a>
+    <a href="/Admin/Committee" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() is "Committee" or "CommitteeCreate" or "CommitteeEdit" ? "active" : "")">
+        <i class="bi bi-person-badge"></i> <span>Executive Committee</span>
+    </a>
+    <a href="/Admin/Women" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Women" ? "active" : "")">
+        <i class="bi bi-gender-female"></i> <span>Women Empowerment</span>
+    </a>
+    <a href="/Admin/Industry" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Industry" ? "active" : "")">
+        <i class="bi bi-building"></i> <span>Industry</span>
+    </a>
+    <a href="/Admin/Events" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() is "Events" or "EventCreate" or "EventEdit" ? "active" : "")">
+        <i class="bi bi-calendar-event"></i> <span>Events</span>
+    </a>
+    <a href="/Admin/News" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() is "News" or "NewsCreate" or "NewsEdit" ? "active" : "")">
+        <i class="bi bi-newspaper"></i> <span>News &amp; Updates</span>
+    </a>
+    <a href="/Admin/ContactContent" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "ContactContent" ? "active" : "")">
+        <i class="bi bi-envelope-paper"></i> <span>Contact Content</span>
+    </a>
+
+    <div class="nav-section-title mt-3">Communication</div>
+    <a href="/Admin/Contact" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() is "Contact" or "ContactDetail" ? "active" : "")">
+        <i class="bi bi-inbox"></i> <span>Contact Inquiries</span>
+        <span class="badge-count">2</span>
+    </a>
+
+    <div class="nav-section-title mt-3">System</div>
+    <a href="/Admin/Users" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")">
+        <i class="bi bi-shield-lock"></i> <span>Users &amp; Roles</span>
+    </a>
+    <a href="/Admin/Reports" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Reports" ? "active" : "")">
+        <i class="bi bi-graph-up"></i> <span>Reports</span>
+    </a>
+    <a href="/Admin/ActivityLog" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "ActivityLog" ? "active" : "")">
+        <i class="bi bi-clock-history"></i> <span>Activity Log</span>
+    </a>
+    <a href="/Admin/Settings" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")">
+        <i class="bi bi-sliders"></i> <span>Settings</span>
+    </a>
+    <a href="/Admin/Profile" class="sidebar-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Profile" ? "active" : "")">
+        <i class="bi bi-person-circle"></i> <span>My Profile</span>
+    </a>
+    <a href="/" class="sidebar-link" target="_blank">
+        <i class="bi bi-globe2"></i> <span>View Website</span>
+    </a>
+</nav>>
+        <div class="sidebar-footer">
+            <form asp-controller="Member" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button class="sidebar-link w-100 text-start border-0 bg-transparent text-danger">
+                    <i class="bi bi-box-arrow-right"></i> <span>Sign Out</span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="admin-main">
+
+        <!-- Topbar -->
+        <header class="admin-topbar">
+            <button class="btn btn-icon d-lg-none" id="sidebarToggle">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <div class="topbar-search">
+                <i class="bi bi-search"></i>
+                <input type="text" placeholder="Search members, applications...">
+            </div>
+
+            <div class="topbar-actions">
+                <button class="btn btn-icon"><i class="bi bi-bell"></i><span class="dot"></span></button>
+                <div class="topbar-user">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <div class="fw-semibold">Administrator</div>
+                        <div class="text-muted small">admin@kpgja.com</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div>
+                <div class="breadcrumb-line">
+                    <span>Admin</span> <i class="bi bi-chevron-right"></i> <span class="active">@ViewData["Title"]</span>
+                </div>
+                <h1 class="page-title">@ViewData["Title"]</h1>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="admin-content">
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- Backdrop for mobile -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 </div>
-</div>
-</nav>
-<div class="container-fluid py-4">@RenderBody()</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-</body></html>
+<script>
+    const sidebar = document.getElementById('adminSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
+    const toggle = document.getElementById('sidebarToggle');
+    if (toggle) toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        backdrop.classList.toggle('show');
+    });
+    if (backdrop) backdrop.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('show');
+    });
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,62 @@
+﻿@model List<KPGJA.Web.Models.MembershipApplication>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Approved Members";
+}
+
+<div class="admin-table-card">
+    <div class="table-responsive">
+        <table class="table admin-table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Business</th>
+                    <th>Membership No.</th>
+                    <th>Category</th>
+                    <th>Fee Paid</th>
+                    <th>Active Since</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr><td colspan="7" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox fs-1 d-block mb-2"></i> No approved members yet.
+                    </td></tr>
+                }
+                else
+                {
+                    @foreach (var m in Model)
+                    {
+                        var initials = string.Concat(
+                            m.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                                .Take(2).Select(s => s[0])
+                        ).ToUpper();
+                        <tr>
+                            <td>
+                                <div class="member-cell">
+                                    <div class="member-avatar">@initials</div>
+                                    <div>
+                                        <div class="member-name">@m.FullName</div>
+                                        <div class="member-sub">@m.Email</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>@m.BusinessName<div class="member-sub">@m.CityDistrict</div></td>
+                            <td><span class="fw-semibold">@m.MembershipNo</span></td>
+                            <td>@m.MembershipCategory</td>
+                            <td class="fw-semibold text-success">PKR @m.FeeReceived</td>
+                            <td class="text-muted">@m.ApplicationDate.ToLocalTime().ToString("dd MMM yyyy")</td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-dark" style="border-radius:8px;" href="/Admin/Details/@m.Id">
+                                    View <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

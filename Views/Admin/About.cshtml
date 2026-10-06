@@ -1,0 +1,255 @@
+﻿@model KPGJA.Web.Models.AboutContent
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "About Us";
+    var sections = ViewBag.Sections as List<KPGJA.Web.Models.AboutSection> ?? new();
+    var current = ViewBag.CurrentSection as KPGJA.Web.Models.AboutSection ?? new KPGJA.Web.Models.AboutSection();
+    bool showForm = ViewBag.ShowForm == true;
+    bool showHeaderForm = ViewBag.ShowHeaderForm == true;
+    bool editMode = current.Id > 0;
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- PAGE HEADER -->
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Content</div>
+        <h1>About Us</h1>
+        <p>Manage the About Us page header and content sections.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/About?showHeaderForm=true" class="btn-outline-brand">
+            <i class="bi bi-pencil"></i> Edit Header
+        </a>
+        <a href="/Admin/About?showForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Section
+        </a>
+    </div>
+</div>
+
+<!-- INFO BANNER -->
+<div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        <strong>About Page</strong>
+        <p>Changes made here are reflected on the public <code>/Home/About</code> page.</p>
+    </div>
+</div>
+
+<!-- ========== PAGE HEADER FORM ========== -->
+@if (showHeaderForm)
+{
+    <form method="post" asp-action="AboutSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@Model?.Id" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2><i class="bi bi-pencil-square"></i> Edit Page Header</h2>
+                    <p class="list-card-sub">Top-of-page title, mission and vision statements.</p>
+                </div>
+                <a href="/Admin/About" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Section Title</label>
+                        <input name="SectionTitle" class="form-control" value="@Model?.SectionTitle">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Section Image</label>
+                        <input type="file" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Mission Statement</label>
+                        <textarea name="MissionStatement" class="form-control" rows="3">@Model?.MissionStatement</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Vision Statement</label>
+                        <textarea name="VisionStatement" class="form-control" rows="3">@Model?.VisionStatement</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/About" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> Save Header
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<!-- ========== ADD/EDIT SECTION FORM ========== -->
+@if (showForm)
+{
+    <form method="post" asp-action="AboutSectionSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@current.Id" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2>
+                        <i class="bi @(editMode ? "bi-pencil-square" : "bi-plus-circle")"></i>
+                        @(editMode ? "Edit Section" : "Add New Section")
+                    </h2>
+                    <p class="list-card-sub">
+                        @(editMode
+                            ? "Update this section. Click Cancel to discard changes."
+                            : "Fill in the fields below and click Save to add the section.")
+                    </p>
+                </div>
+                <a href="/Admin/About" class="btn-cancel">
+                    <i class="bi bi-x-lg"></i> Cancel
+                </a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@current.Title"
+                               placeholder="e.g. Our Mission" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control"
+                               value="@(current.DisplayOrder == 0 ? (sections.Count + 1) : current.DisplayOrder)" min="0">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3"
+                                  placeholder="Section content...">@current.Body</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Icon</label>
+                        <input name="IconClass" class="form-control"
+                               value="@(string.IsNullOrEmpty(current.IconClass) ? "bi-info-circle" : current.IconClass)"
+                               placeholder="bi-info-circle">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" id="activeSwitch"
+                                   value="true" @(current.Id == 0 || current.IsActive ? "checked" : null)>
+                            <label class="form-check-label small" for="activeSwitch">Show on public site</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/About" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(editMode ? "Update Section" : "Save Section")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<!-- ========== SECTIONS TABLE ========== -->
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-list-ul"></i> All Sections
+                <span class="count-badge">@(sections?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">Each section appears as a block on the About page.</p>
+        </div>
+    </div>
+
+    @if (sections == null || !sections.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-list-ul"></i></div>
+            <h3>No content sections yet</h3>
+            <p>Click "Add Section" to create your first section.</p>
+            <a href="/Admin/About?showForm=true" class="btn-add">
+                <i class="bi bi-plus-lg"></i> Add First Section
+            </a>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:60px;">Icon</th>
+                    <th>Title</th>
+                    <th>Body</th>
+                    <th class="center" style="width:80px;">Order</th>
+                    <th class="center" style="width:100px;">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int n = 0;
+                }
+                @foreach (var sec in sections.OrderBy(x => x.DisplayOrder))
+                {
+                    n++;
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td><div class="thumb"><i class="bi @sec.IconClass"></i></div></td>
+                        <td class="strong">@sec.Title</td>
+                        <td class="desc-cell">@sec.Body</td>
+                        <td class="center text-muted">@sec.DisplayOrder</td>
+                        <td class="center">
+                            @if (sec.IsActive)
+                            {
+                                <span class="pill active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/About?showForm=true&id=@sec.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/AboutSectionDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@sec.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this section?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        @if (showForm || showHeaderForm)
+        {
+                <text>
+                        const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
+                        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                </text>
+        }
+    </script>
+}
