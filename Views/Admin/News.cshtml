@@ -1,9 +1,9 @@
-ï»¿@model List<KPGJA.Web.Models.NewsArticle>
+@model List<Entities.Entities.NewsArticle>
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "News & Updates";
     bool showForm = ViewBag.ShowForm == true;
-    var current = ViewBag.CurrentArticle as KPGJA.Web.Models.NewsArticle ?? new KPGJA.Web.Models.NewsArticle();
+    var current = ViewBag.CurrentArticle as Entities.Entities.NewsArticle ?? new Entities.Entities.NewsArticle();
 }
 
 @if (TempData["Success"] is string s)
@@ -51,7 +51,7 @@
         <div class="empty-state">
             <div class="empty-icon"><i class="bi bi-newspaper"></i></div>
             <h3>No articles yet</h3>
-            <p>Click "New Article" to create your first article.</p>
+            <p>Click "New Article" to create your first news article.</p>
             <a href="/Admin/News?showForm=true" class="btn-add">
                 <i class="bi bi-plus-lg"></i> Create First Article
             </a>
@@ -63,9 +63,9 @@
             <thead>
                 <tr>
                     <th style="width:40px;">#</th>
+                    <th style="width:70px;">Image</th>
                     <th>Title</th>
                     <th style="width:160px;">Category</th>
-                    <th style="width:160px;">Author</th>
                     <th style="width:130px;" class="center">Date</th>
                     <th style="width:100px;" class="center">Status</th>
                     <th class="right" style="width:120px;">Actions</th>
@@ -73,17 +73,33 @@
             </thead>
             <tbody>
                 @{ int n = 0; }
-                @foreach (var article in Model.OrderByDescending(x => x.PublishedDate))
+                @foreach (var article in Model.OrderByDescending(a => a.PublishedDate))
                 {
                     n++;
                     <tr>
                         <td class="row-num">@n</td>
                         <td>
-                            <div class="strong">@article.Title</div>
+                            @if (!string.IsNullOrEmpty(article.ImagePath))
+                            {
+                                <img src="@article.ImagePath" alt="cover"
+                                     style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #ecebe6;">
+                            }
+                            else
+                            {
+                                <div class="thumb"><i class="bi bi-image"></i></div>
+                            }
+                        </td>
+                        <td>
+                            <div class="strong">
+                                @if (article.IsFeatured)
+                                {
+                                    <i class="bi bi-star-fill me-1" style="color:var(--kpgja-gold);font-size:11px;" title="Featured"></i>
+                                }
+                                @article.Title
+                            </div>
                             <div class="desc-cell" style="margin-top:2px;">@article.Summary</div>
                         </td>
                         <td><span class="pill" style="background:#f1efe9;color:#5a5a5a;">@article.Category</span></td>
-                        <td class="text-muted">@article.Author</td>
                         <td class="center text-muted">@article.PublishedDate.ToLocalTime().ToString("dd MMM yyyy")</td>
                         <td class="center">
                             @if (article.IsPublished)
@@ -119,9 +135,10 @@
 
 @if (showForm)
 {
-    <form method="post" asp-action="NewsSave">
+    <form method="post" asp-action="NewsSave" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@current.Id" />
+        <input type="hidden" name="ImagePath" value="@current.ImagePath" />
 
         <div class="list-card mt-3" style="border:2px solid var(--kpgja-gold);">
             <div class="list-card-head">
@@ -147,36 +164,71 @@
                     <div class="col-md-4">
                         <label class="form-label small fw-semibold">Category</label>
                         <select name="Category" class="form-select">
-                            @foreach (var cat in new[] { "Announcement", "Industry Update", "Press Release", "Women Empowerment", "Event" })
+                            @foreach (var cat in new[] { "Announcement", "Industry Update", "Press Release", "Women Empowerment", "Event", "Program", "Membership" })
                             {
                                 <option value="@cat" selected="@(current.Category == cat ? "selected" : null)">@cat</option>
                             }
                         </select>
                     </div>
+
                     <div class="col-12">
                         <label class="form-label small fw-semibold">Summary</label>
                         <textarea name="Summary" class="form-control" rows="2"
-                                  placeholder="Short 1â€“2 line summary...">@current.Summary</textarea>
+                                  placeholder="Short 1–2 line summary...">@current.Summary</textarea>
                     </div>
+
                     <div class="col-12">
-                        <label class="form-label small fw-semibold">Content <span class="text-danger">*</span></label>
-                        <textarea name="Content" class="form-control" rows="8"
-                                  placeholder="Write the full article content here...">@current.Content</textarea>
+                        <label class="form-label small fw-semibold">Content</label>
+                        <textarea name="Content" class="form-control" rows="6"
+                                  placeholder="Full article content...">@current.Content</textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Cover Image</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(current.ImagePath))
+                            {
+                                <img src="@current.ImagePath" alt="Current cover"
+                                     style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #ecebe6;">
+                            }
+                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                        </div>
+                        <div class="small text-muted mt-1" style="font-size:10.5px;">Recommended 1200×630px, JPG or PNG.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Publish Date</label>
+                        <input name="PublishedDate" type="date" class="form-control"
+                               value="@((current.PublishedDate == default ? DateTime.Today : current.PublishedDate).ToString("yyyy-MM-dd"))">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Meta Label</label>
+                        <input name="MetaLabel" class="form-control" value="@current.MetaLabel"
+                               placeholder="e.g. Announcement">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Meta Icon</label>
+                        <input name="MetaIcon" class="form-control" value="@current.MetaIcon"
+                               placeholder="e.g. bi-megaphone">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-semibold">Author</label>
                         <input name="Author" class="form-control" value="@(string.IsNullOrEmpty(current.Author) ? "Admin" : current.Author)">
                     </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-semibold">Publish Date</label>
-                        <input name="PublishedDate" type="date" class="form-control"
-                               value="@((current.PublishedDate == default ? DateTime.Today : current.PublishedDate).ToString("yyyy-MM-dd"))">
-                    </div>
-                    <div class="col-md-4 d-flex align-items-end">
+
+                    <div class="col-md-6">
                         <div class="form-check form-switch">
-                            <input name="IsPublished" class="form-check-input" type="checkbox" id="publishedSwitch"
+                            <input name="IsFeatured" class="form-check-input" type="checkbox"
+                                   value="true" @(current.IsFeatured ? "checked" : null)>
+                            <label class="form-check-label small">Feature on top of News page</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input name="IsPublished" class="form-check-input" type="checkbox"
                                    value="true" @(current.Id == 0 || current.IsPublished ? "checked" : null)>
-                            <label class="form-check-label small" for="publishedSwitch">Publish immediately</label>
+                            <label class="form-check-label small">Publish immediately</label>
                         </div>
                     </div>
                 </div>

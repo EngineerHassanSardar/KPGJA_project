@@ -1,0 +1,211 @@
+﻿@model List<Entities.Entities.MembershipFee>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Membership Fees";
+    var fees = Model ?? new();
+    var current = ViewBag.CurrentFee as Entities.Entities.MembershipFee ?? new Entities.Entities.MembershipFee();
+    bool showForm = ViewBag.ShowForm == true;
+    bool editMode = current.Id > 0;
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show py-2">
+        <i class="bi bi-exclamation-triangle me-1"></i> @err
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- PAGE HEADER -->
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Membership</div>
+        <h1>Membership Fees</h1>
+        <p>Manage all membership categories and their fees.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/MembershipFees?showForm=true" class="btn-add">
+            <i class="bi bi-plus-lg"></i> Add Fee
+        </a>
+    </div>
+</div>
+
+<!-- INFO BANNER -->
+<div class="info-banner">
+    <i class="bi bi-info-circle-fill"></i>
+    <div>
+        <strong>Fee Structure</strong>
+        <p>These fees are used when members apply for membership.</p>
+    </div>
+</div>
+
+<!-- FORM -->
+@if (showForm)
+{
+    <form method="post" asp-action="MembershipFeeSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@current.Id" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2><i class="bi @(editMode ? "bi-pencil-square" : "bi-plus-circle")"></i> @(editMode ? "Edit Fee" : "Add Fee")</h2>
+                    <p class="list-card-sub">@(editMode ? "Update this fee." : "Enter a new membership fee.")</p>
+                </div>
+                <a href="/Admin/MembershipFees" class="btn-cancel"><i class="bi bi-x-lg"></i> Cancel</a>
+            </div>
+
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Code <span class="text-danger">*</span></label>
+                        <input name="Code" class="form-control" value="@current.Code" required
+                               placeholder="e.g. A" maxlength="100">
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label small fw-semibold">Category <span class="text-danger">*</span></label>
+                        <input name="Category" class="form-control" value="@current.Category" required
+                               placeholder="e.g. Ordinary Member" maxlength="200">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Fee Amount (PKR) <span class="text-danger">*</span></label>
+                        <input name="AdmissionFee" type="number" step="0.01" min="0" class="form-control"
+                               value="@current.AdmissionFee" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input name="DisplayOrder" type="number" class="form-control"
+                               value="@(current.DisplayOrder == 0 ? (fees.Count + 1) : current.DisplayOrder)">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Note</label>
+                        <input name="Note" class="form-control" value="@current.Note"
+                               placeholder="e.g. One-time admission fee" maxlength="200">
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Benefits (comma-separated)</label>
+                        <textarea name="Benefits" class="form-control" rows="2"
+                                  placeholder="Certificate, Digital card, Voting rights...">@current.Benefits</textarea>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" value="true"
+                                   @(current.Id == 0 || current.IsActive ? "checked" : null)>
+                            <label class="form-check-label small">Show on public site</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/MembershipFees" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> @(editMode ? "Update Fee" : "Save Fee")
+                </button>
+            </div>
+        </div>
+    </form>
+}
+
+<!-- TABLE -->
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-cash-stack"></i> All Fees
+                <span class="count-badge">@(fees.Count)</span>
+            </h2>
+            <p class="list-card-sub">All membership categories and their fees.</p>
+        </div>
+    </div>
+
+    @if (!fees.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-cash-stack"></i></div>
+            <h3>No fees yet</h3>
+            <p>Click "Add Fee" to create your first membership fee.</p>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th style="width:40px;">#</th>
+                    <th>Category</th>
+                    <th style="width:150px;">Fee (PKR)</th>
+                    <th>Benefits / Note</th>
+                    <th class="center" style="width:80px;">Order</th>
+                    <th class="center" style="width:100px;">Status</th>
+                    <th class="right" style="width:120px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int n = 0; }
+                @foreach (var fee in fees.OrderBy(f => f.DisplayOrder))
+                {
+                    n++;
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td class="strong">
+                            @fee.Category
+                            @if (!string.IsNullOrWhiteSpace(fee.Code))
+                            {
+                                <small class="text-muted">(@fee.Code)</small>
+                            }
+                        </td>
+                        <td><strong style="color:#d6a84f;">@fee.AdmissionFee.ToString("N0")</strong></td>
+                        <td class="desc-cell">
+                            @if (!string.IsNullOrWhiteSpace(fee.Benefits))
+                            {
+                                @fee.Benefits
+                            }
+                            @if (!string.IsNullOrWhiteSpace(fee.Note))
+                            {
+                                <br /><small class="text-muted">@fee.Note</small>
+                            }
+                        </td>
+                        <td class="center text-muted">@fee.DisplayOrder</td>
+                        <td class="center">
+                            @if (fee.IsActive)
+                            {
+                                <span class="pill active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="pill inactive">Inactive</span>
+                            }
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/MembershipFees?showForm=true&id=@fee.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" action="/Admin/MembershipFeeDelete" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@fee.Id" />
+                                    <button type="submit" class="icon-btn delete" title="Delete"
+                                            onclick="return confirm('Delete this fee?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

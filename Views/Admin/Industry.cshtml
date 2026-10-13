@@ -1,9 +1,9 @@
-﻿@model List<KPGJA.Web.Models.IndustryArea>
+﻿@model List<Entities.Entities.IndustryArea>
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Industry";
     bool showForm = ViewBag.ShowForm == true;
-    var current = ViewBag.CurrentArea as KPGJA.Web.Models.IndustryArea ?? new KPGJA.Web.Models.IndustryArea();
+    var current = ViewBag.CurrentArea as Entities.Entities.IndustryArea ?? new Entities.Entities.IndustryArea();
 }
 
 @if (TempData["Success"] is string s)
@@ -63,7 +63,7 @@
             <thead>
                 <tr>
                     <th style="width:40px;">#</th>
-                    <th style="width:60px;">Icon</th>
+     
                     <th>Title</th>
                     <th>Description</th>
                     <th class="center" style="width:80px;">Order</th>
@@ -78,7 +78,7 @@
                     n++;
                     <tr>
                         <td class="row-num">@n</td>
-                        <td><div class="thumb"><i class="bi @area.IconClass"></i></div></td>
+                       
                         <td class="strong">@area.Title</td>
                         <td class="desc-cell">@area.Description</td>
                         <td class="center text-muted">@area.DisplayOrder</td>
@@ -97,14 +97,14 @@
                                 <a href="/Admin/Industry?showForm=true&id=@area.Id" class="icon-btn edit" title="Edit">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-                                <form method="post" action="/Admin/IndustryDelete" style="display:inline;">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@area.Id" />
-                                    <button type="submit" class="icon-btn delete" title="Delete"
-                                            onclick="return confirm('Delete this area? This cannot be undone.');">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
+                               <form method="post" action="/Admin/IndustryDelete" style="display:inline;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@area.Id" />
+    <button type="submit" class="icon-btn delete" title="Delete"
+            onclick="return confirm('Delete this area?');">
+        <i class="bi bi-trash"></i>
+    </button>
+</form>
                             </div>
                         </td>
                     </tr>
@@ -116,9 +116,10 @@
 
 @if (showForm)
 {
-    <form method="post" asp-action="IndustrySave">
+    <form method="post" asp-action="IndustrySave" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@current.Id" />
+        <input type="hidden" name="ImagePath" value="@current.ImagePath" />
 
         <div class="list-card mt-3" style="border:2px solid var(--kpgja-gold);">
             <div class="list-card-head">
@@ -146,22 +147,30 @@
                         <input type="number" name="DisplayOrder" class="form-control"
                                value="@(current.DisplayOrder == 0 ? 1 : current.DisplayOrder)" min="0">
                     </div>
+
                     <div class="col-12">
                         <label class="form-label small fw-semibold">Description</label>
                         <textarea name="Description" class="form-control" rows="3"
                                   placeholder="Short description shown on the public site...">@current.Description</textarea>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Icon (Bootstrap Icon class)</label>
-                        <div class="d-flex gap-2 align-items-center">
-                            <div class="icon-preview">
-                                <i class="bi @(string.IsNullOrEmpty(current.IconClass) ? "bi-gem" : current.IconClass)" id="iconPreview"></i>
-                            </div>
-                            <input name="IconClass" class="form-control" id="iconInput"
-                                   value="@(string.IsNullOrEmpty(current.IconClass) ? "bi-gem" : current.IconClass)"
-                                   placeholder="bi-gem">
+
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Image</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(current.ImagePath))
+                            {
+                                <img src="@current.ImagePath" alt="Current image"
+                                     style="width:80px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #ecebe6;">
+                            }
+                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                        </div>
+                        <div class="small text-muted mt-1" style="font-size:10.5px;">
+                            Upload a JPG, PNG or WebP. Leave blank to keep existing.
                         </div>
                     </div>
+
+                   
+
                     <div class="col-md-6 d-flex align-items-end">
                         <div class="form-check form-switch">
                             <input name="IsActive" class="form-check-input" type="checkbox" id="activeSwitch"

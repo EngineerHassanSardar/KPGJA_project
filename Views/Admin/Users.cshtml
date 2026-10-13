@@ -1,72 +1,115 @@
-﻿@{ Layout = "_AdminLayout"; ViewData["Title"] = "Users & Roles"; }
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Users & Roles";
+  var users = ViewBag.Users as List<(Core.Data.ApplicationUser User, string Role)> ?? new();
+}
 
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <p class="text-secondary mb-0">Manage system users and their roles.</p>
-    <button class="btn btn-gold btn-sm" onclick="alert('Invite user (preview only)')">
-        <i class="bi bi-person-plus me-1"></i> Invite User
-    </button>
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show py-2">
+        <i class="bi bi-exclamation-triangle me-1"></i> @err
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">System</div>
+        <h1>Users &amp; Roles</h1>
+        <p>Manage system users and their roles.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/CreateUser" class="btn-add">
+            <i class="bi bi-person-plus"></i> Invite User
+        </a>
+    </div>
 </div>
 
-<div class="admin-table-card">
-    <div class="table-responsive">
-        <table class="table admin-table">
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-people"></i> All Users
+                <span class="count-badge">@users.Count</span>
+            </h2>
+            <p class="list-card-sub">Every account in the system with their assigned role.</p>
+        </div>
+    </div>
+
+    @if (!users.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-people"></i></div>
+            <h3>No users yet</h3>
+            <p>Users will appear here once they register.</p>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
             <thead>
                 <tr>
+                    <th style="width:40px;">#</th>
+                    <th style="width:60px;">Avatar</th>
                     <th>User</th>
                     <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Last Login</th>
-                    <th class="text-end">Action</th>
+                    <th style="width:120px;">Role</th>
+                    <th style="width:130px;">Joined</th>
+                    <th class="right" style="width:120px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>
-                        <div class="member-cell">
-                            <div class="member-avatar">A</div>
-                            <div><div class="member-name">Administrator</div><div class="member-sub">Super Admin</div></div>
-                        </div>
-                    </td>
-                    <td class="text-muted">admin@kpgja.com</td>
-                    <td><span class="badge bg-dark">Admin</span></td>
-                    <td><span class="status-badge status-active">Active</span></td>
-                    <td class="text-muted">Just now</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-dark" style="border-radius:6px;"><i class="bi bi-pencil"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="member-cell">
-                            <div class="member-avatar">S</div>
-                            <div><div class="member-name">Sarah Iqbal</div><div class="member-sub">Editor</div></div>
-                        </div>
-                    </td>
-                    <td class="text-muted">sarah@kpgja.com</td>
-                    <td><span class="badge bg-info">Editor</span></td>
-                    <td><span class="status-badge status-active">Active</span></td>
-                    <td class="text-muted">2 hours ago</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-dark" style="border-radius:6px;"><i class="bi bi-pencil"></i></button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="member-cell">
-                            <div class="member-avatar" style="background:#e5e7eb;color:#666;">R</div>
-                            <div><div class="member-name">Rafiq Ahmed</div><div class="member-sub">Reviewer</div></div>
-                        </div>
-                    </td>
-                    <td class="text-muted">rafiq@kpgja.com</td>
-                    <td><span class="badge bg-secondary">Reviewer</span></td>
-                    <td><span class="status-badge status-pending">Invited</span></td>
-                    <td class="text-muted">Never</td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-dark" style="border-radius:6px;"><i class="bi bi-pencil"></i></button>
-                    </td>
-                </tr>
+                @{ int n = 0; }
+                @foreach (var (u, role) in users)
+                {
+                    n++;
+                    var initial = !string.IsNullOrEmpty(u.Email) ? u.Email[0].ToString().ToUpper() : "?";
+                    var displayName = u.Email?.Split('@')[0] ?? "User";
+
+                    <tr>
+                        <td class="row-num">@n</td>
+                        <td>
+                            <div class="user-avatar"
+                                 style="width:40px;height:40px;border-radius:50%;background:#172033;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;">
+                                @initial
+                            </div>
+                        </td>
+                        <td>
+                            <div class="strong">@displayName</div>
+                            <div class="desc-cell">ID: @u.Id.Substring(0, 8)...</div>
+                        </td>
+                        <td class="text-muted">@u.Email</td>
+                        <td>
+                            @if (role == "Admin")
+                            {
+                                <span class="pill" style="background:#172033;color:#fff;">Admin</span>
+                            }
+                            else
+                            {
+                                <span class="pill" style="background:#e3f2fd;color:#0d47a1;">@role</span>
+                            }
+                        </td>
+                        <td class="text-muted" style="font-size:13px;">
+                            —
+                        </td>
+                        <td class="right">
+                            <div class="row-actions">
+                                <a href="/Admin/EditUser?id=@u.Id" class="icon-btn edit" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
-    </div>
+    }
 </div>

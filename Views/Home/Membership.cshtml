@@ -1,1124 +1,575 @@
-@{ ViewData["Title"] = "Membership | KPGJA"; }
+@model List<Entities.Entities.MembershipFee>
+@{
+    ViewData["Title"] = "Membership | KPGJA";
+    var fees = Model ?? new();
+}
+
+<!-- HERO -->
+<section class="page-hero">
+    <div class="container">
+        <span class="section-kicker text-warning">MEMBERSHIP</span>
+        <h1>Membership Categories</h1>
+        <p class="lead text-white-50 mt-3">
+            Choose the membership tier that fits your role in the gems and jewellery sector.
+        </p>
+    </div>
+</section>
+
+<main>
+
+    <!-- ==================== MEMBERSHIP PROCESS (hardcoded) ==================== -->
+    <section class="py-5 membership-process-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">MEMBERSHIP PROCESS</span>
+                <h2 class="section-heading">How to Become a Member</h2>
+                <p class="text-secondary mx-auto" style="max-width:640px;">
+                    Follow the online membership process to apply for membership with the Khyber
+                    Pakhtunkhwa Gems &amp; Jewellery Association.
+                </p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Step 1 -->
+                <div class="col-md-6 col-lg-4 col-xl process-step">
+                    <div class="process-card">
+                        <span class="process-number">01</span>
+                        <div class="process-icon">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        <h4>Register</h4>
+                        <p>Create your online membership account using your basic information.</p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="col-md-6 col-lg-4 col-xl process-step">
+                    <div class="process-card">
+                        <span class="process-number">02</span>
+                        <div class="process-icon">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                        <h4>Submit</h4>
+                        <p>Complete your application and upload the required documents.</p>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="col-md-6 col-lg-4 col-xl process-step">
+                    <div class="process-card">
+                        <span class="process-number">03</span>
+                        <div class="process-icon">
+                            <i class="bi bi-search"></i>
+                        </div>
+                        <h4>Review &amp; Approval</h4>
+                        <p>Your application is reviewed and processed by the Association.</p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="col-md-6 col-lg-4 col-xl process-step">
+                    <div class="process-card">
+                        <span class="process-number">04</span>
+                        <div class="process-icon">
+                            <i class="bi bi-credit-card-2-front"></i>
+                        </div>
+                        <h4>Payment</h4>
+                        <p>Pay the applicable membership fee after approval.</p>
+                    </div>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="col-md-6 col-lg-4 col-xl process-step">
+                    <div class="process-card">
+                        <span class="process-number">05</span>
+                        <div class="process-icon">
+                            <i class="bi bi-patch-check"></i>
+                        </div>
+                        <h4>Membership Active</h4>
+                        <p>Your membership becomes active after successful payment and completion.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== FEES & BENEFITS (dynamic from DB) ==================== -->
+    @if (fees.Any())
+    {
+        <section class="py-5 fees-section">
+            <div class="container">
+                <div class="text-center mb-5">
+                    <h2 class="section-heading">Membership Fees &amp; Benefits</h2>
+                    <p class="text-secondary mx-auto" style="max-width:640px;">
+                        Choose the membership category that best matches your role in the Khyber
+                        Pakhtunkhwa gems and jewellery sector.
+                    </p>
+                    <div class="mt-3">
+                        <span class="fee-badge">Fee Structure 2026–2027</span>
+                    </div>
+                </div>
+
+                <div class="row g-4 justify-content-center">
+                    @foreach (var fee in fees.OrderBy(f => f.DisplayOrder))
+                    {
+                        var benefits = (fee.Benefits ?? "")
+                            .Split(new[] { ",", "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+                            .Select(x => x.Trim())
+                            .Where(x => !string.IsNullOrEmpty(x))
+                            .ToList();
+
+                        <div class="col-md-6 col-lg-4">
+                            <div class="membership-card">
+                                <div class="membership-card-header">
+                                    <div class="membership-card-letter">@fee.Code</div>
+                                    <h4>@fee.Category</h4>
+                                </div>
+
+                                <div class="membership-card-pricing">
+                                    <div class="membership-price">
+                                        Rs. @fee.AdmissionFee.ToString("N0")
+                                    </div>
+                                    <div class="membership-price-label">
+                                        @(string.IsNullOrEmpty(fee.Note) ? "One-time admission fee" : fee.Note)
+                                    </div>
+                                </div>
+
+                                @if (benefits.Any())
+                                {
+                                    <div class="membership-card-benefits">
+                                        <h6>Membership Benefits</h6>
+                                        <ul>
+                                            @foreach (var benefit in benefits)
+                                            {
+                                                <li>
+                                                    <i class="bi bi-check2"></i>
+                                                    <span>@benefit</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+
+                                <div class="membership-card-action">
+                                    <a href="/Member/Register" class="btn btn-gold w-100">
+                                        Apply for Membership
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="py-5 fees-section">
+            <div class="container text-center">
+                <p class="text-muted">Membership information coming soon.</p>
+            </div>
+        </section>
+    }
+
+    <!-- ==================== BENEFITS OF MEMBERSHIP (hardcoded) ==================== -->
+    <section class="py-5 benefits-section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">MEMBER BENEFITS</span>
+                <h2 class="section-heading">Benefits of Membership</h2>
+                <p class="text-secondary mx-auto" style="max-width:640px;">
+                    Membership provides opportunities for networking, learning, business development and
+                    engagement with the gems and jewellery industry.
+                </p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon"><i class="bi bi-people"></i></div>
+                        <h5>Industry Networking</h5>
+                        <p>Connect with businesses and stakeholders across the gems and jewellery sector.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon"><i class="bi bi-mortarboard"></i></div>
+                        <h5>Training Opportunities</h5>
+                        <p>Participate in training, skills and capacity-building activities.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon"><i class="bi bi-calendar-event"></i></div>
+                        <h5>Events &amp; Exhibitions</h5>
+                        <p>Stay informed about association events, activities and exhibitions.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon"><i class="bi bi-person-vcard"></i></div>
+                        <h5>Digital Member Profile</h5>
+                        <p>Manage your membership information through the online member portal.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon"><i class="bi bi-globe"></i></div>
+                        <h5>Market Opportunities</h5>
+                        <p>Access information about relevant industry and market opportunities.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="benefit-card">
+                        <div class="benefit-icon"><i class="bi bi-megaphone"></i></div>
+                        <h5>Association Updates</h5>
+                        <p>Receive relevant news, announcements and membership updates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+        <!-- ==================== REQUIRED DOCUMENTS (hardcoded) ==================== -->
+    <section class="py-5 documents-section">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+
+                <!-- Left: heading + CTA -->
+                <div class="col-lg-5">
+                    <span class="section-kicker">REQUIRED DOCUMENTS</span>
+                    <h2 class="section-heading">Documents Required for Membership</h2>
+                    <p class="text-secondary mb-4">
+                        Applicants are required to provide the following documents during the online
+                        membership registration process.
+                    </p>
+                    <a href="/Member/Register" class="btn btn-gold">
+                        Start Registration <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+
+                <!-- Right: document list -->
+                <div class="col-lg-7">
+                    <div class="documents-list-card">
+                        <div class="documents-item">
+                            <div class="documents-icon">
+                                <i class="bi bi-person-vcard"></i>
+                            </div>
+                            <div>
+                                <h5>CNIC</h5>
+                                <p>Copy of valid CNIC.</p>
+                            </div>
+                        </div>
+
+                        <div class="documents-item">
+                            <div class="documents-icon">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+                            <div>
+                                <h5>NTN Certificate / Number</h5>
+                                <p>NTN certificate or NTN number, where applicable.</p>
+                            </div>
+                        </div>
+
+                        <div class="documents-item">
+                            <div class="documents-icon">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+                            <div>
+                                <h5>Passport-size Photograph</h5>
+                                <p>Recent passport-size photograph.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Important Information Policy Box -->
+            <div class="policy-box mt-5">
+                <div class="policy-icon">
+                    <i class="bi bi-info-circle"></i>
+                </div>
+                <div class="policy-content">
+                    <span class="policy-kicker">IMPORTANT INFORMATION</span>
+                    <h3>Membership Application &amp; Fee Policy</h3>
+                    <p>Membership fees are non-refundable once paid.</p>
+                    <p>
+                        Submission of an application does not automatically guarantee membership.
+                        Applications are subject to review and approval by the Association in
+                        accordance with its membership requirements.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== JOIN CTA (hardcoded) ==================== -->
+    <section class="join-cta-section">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <span class="section-kicker text-warning">JOIN KPGJA</span>
+                    <h2 class="join-cta-heading">Become a KPGJA Member</h2>
+                    <p class="join-cta-text">Create your account and start your online membership application.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <div class="d-flex gap-2 justify-content-lg-end flex-wrap">
+                        <a href="/Member/Register" class="btn btn-gold btn-lg">
+                            Apply for Membership <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                        <a href="/Member/Login" class="btn btn-outline-light btn-lg">
+                            Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+
+</main>
 
 @section Styles {
 <style>
+    /* ============ MEMBERSHIP PROCESS ============ */
+    .membership-process-section { background: #fdfcf8; }
+    .fees-section { background: #f7f4ec; }
+    .benefits-section { background: #fdfcf8; }
 
+    .process-step { display: flex; }
+    .process-card {
+        background: #fff;
+        border: 1px solid #ececec;
+        border-radius: 16px;
+        padding: 32px 24px;
+        text-align: center;
+        position: relative;
+        width: 100%;
+        transition: all .25s ease;
+    }
+    .process-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0,0,0,.07);
+    }
+    .process-number {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #172033;
+        color: #fff;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .process-icon {
+        width: 60px;
+        height: 60px;
+        margin: 8px auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fdf6e3;
+        color: #b88a2d;
+        border-radius: 50%;
+        font-size: 26px;
+    }
+    .process-card h4 {
+        font-family: "Playfair Display", serif;
+        font-size: 19px;
+        color: #172033;
+        margin-bottom: 10px;
+    }
+    .process-card p {
+        font-size: 13.5px;
+        color: #6c7280;
+        margin: 0;
+        line-height: 1.55;
+    }
 
-        /* =====================================================
-           MEMBERSHIP FEE
-        ===================================================== */
+    /* ============ FEES BADGE ============ */
+    .fee-badge {
+        display: inline-block;
+        padding: 8px 18px;
+        background: #172033;
+        color: #fff;
+        font-size: 12.5px;
+        font-weight: 600;
+        border-radius: 999px;
+        letter-spacing: 0.3px;
+    }
 
-        .membership-fee {
-            font-family: "Playfair Display", serif;
-            font-size: 30px;
-            font-weight: 700;
-            color: #b88a2d;
-            margin: 15px 0 10px;
-        }
+    /* ============ MEMBERSHIP CARDS ============ */
+    .membership-card {
+        background: #fff;
+        border: 1px solid #e9eaed;
+        border-radius: 20px;
+        padding: 32px 28px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        transition: all .25s ease;
+    }
+    .membership-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 45px rgba(0,0,0,.08);
+    }
+    .membership-card-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+    .membership-card-letter {
+        width: 44px;
+        height: 44px;
+        background: #172033;
+        color: #d6a84f;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Playfair Display", serif;
+        font-weight: 700;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    .membership-card-header h4 {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+        color: #172033;
+        margin: 0;
+        line-height: 1.35;
+    }
+    .membership-card-pricing {
+        padding: 18px 0;
+        border-top: 1px solid #f0ede5;
+        border-bottom: 1px solid #f0ede5;
+        margin-bottom: 22px;
+    }
+    .membership-price {
+        font-family: "Playfair Display", serif;
+        font-size: 30px;
+        font-weight: 700;
+        color: #b88a2d;
+        line-height: 1;
+    }
+    .membership-price-label {
+        font-size: 12.5px;
+        color: #8a8a8a;
+        margin-top: 6px;
+    }
+    .membership-card-benefits {
+        flex: 1;
+        margin-bottom: 24px;
+    }
+    .membership-card-benefits h6 {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #b88a2d;
+        margin-bottom: 12px;
+    }
+    .membership-card-benefits ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .membership-card-benefits li {
+        display: flex;
+        gap: 10px;
+        font-size: 13.5px;
+        color: #4a4a4a;
+        line-height: 1.6;
+        margin-bottom: 8px;
+    }
+    .membership-card-benefits li i {
+        color: #b88a2d;
+        font-size: 14px;
+        margin-top: 3px;
+        flex-shrink: 0;
+    }
+    .membership-card-action { margin-top: auto; }
 
+    /* ============ BENEFIT CARDS ============ */
+    .benefit-card {
+        background: #fff;
+        border: 1px solid #ececec;
+        border-radius: 16px;
+        padding: 32px 24px;
+        text-align: center;
+        height: 100%;
+        transition: all .25s ease;
+    }
+    .benefit-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0,0,0,.07);
+    }
+    .benefit-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fdf6e3;
+        color: #b88a2d;
+        border-radius: 50%;
+        font-size: 26px;
+    }
+    .benefit-card h5 {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+        color: #172033;
+        margin-bottom: 10px;
+    }
+    .benefit-card p {
+        font-size: 13.5px;
+        color: #6c7280;
+        margin: 0;
+        line-height: 1.6;
+    }
 
-        /* =====================================================
-           REQUIRED DOCUMENTS
-        ===================================================== */
+    /* ============ JOIN CTA ============ */
+    .join-cta-section {
+        background: #0f2f24;
+        color: #fff;
+        padding: 60px 0;
+    }
+    .join-cta-heading {
+        font-family: "Playfair Display", serif;
+        font-size: 38px;
+        font-weight: 700;
+        color: #fff;
+        margin: 8px 0 10px;
+    }
+    .join-cta-text {
+        color: rgba(255,255,255,.75);
+        font-size: 15.5px;
+        margin: 0;
+    }
+    .join-cta-section .btn-outline-light {
+        border-color: rgba(255,255,255,.6);
+        color: #fff;
+    }
+    .join-cta-section .btn-outline-light:hover {
+        background: #fff;
+        color: #0f2f24;
+        border-color: #fff;
+    }
 
-        .required-document-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
-            padding: 18px 0;
-            border-bottom: 1px solid #e9eaed;
-        }
-
-        .required-document-item:first-child {
-            padding-top: 0;
-        }
-
-        .required-document-item:last-child {
-            border-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .required-document-icon {
-            width: 45px;
-            height: 45px;
-            min-width: 45px;
-            border-radius: 12px;
-            background: #f5f1e7;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 21px;
-        }
-
-        .required-document-item h5 {
-            margin-bottom: 4px;
-            color: #172033;
-        }
-
-        .required-document-item p {
-            color: #6c7280;
-            font-size: 14px;
-        }
-
-
-        /* =====================================================
-           MEMBERSHIP CATEGORY CARD
-        ===================================================== */
-
-        .membership-category-card {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .membership-category-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: #d6a84f;
-        }
-
-
-        /* =====================================================
-           PROCESS NUMBER
-        ===================================================== */
-
-        .membership-process-card {
-            position: relative;
-        }
-
-        .membership-process-number {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #172033;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-
-        /* =====================================================
-           MEMBERSHIP NOTE
-        ===================================================== */
-
-        .membership-note-icon {
-            font-size: 42px;
-        }
-
-
-        /* =====================================================
-           MOBILE
-        ===================================================== */
-
-        @@media (max-width: 767px) {
-
-            .membership-fee {
-                font-size: 27px;
-            }
-
-        }
-
-    
+    @@media (max-width: 991px) {
+        .join-cta-heading { font-size: 28px; }
+    }
 </style>
 }
-
-<!-- =========================================================
-     TOP BAR
-========================================================= -->
-
-
-
-
-<!-- =========================================================
-     PAGE HERO
-========================================================= -->
-
-<section class="page-hero">
-
-    <div class="container">
-
-        <span class="section-kicker text-warning">
-
-            JOIN KPGJA
-
-        </span>
-
-
-        <h1>
-            Membership
-        </h1>
-
-
-        <p class="lead text-white-50 mb-0">
-
-            Join the KPGJA community and manage your
-            membership online.
-
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     MEMBERSHIP PROCESS
-========================================================= -->
-
-<section class="py-5">
-
-    <div class="container">
-
-
-        <div class="text-center mb-5">
-
-            <span class="section-kicker">
-
-                MEMBERSHIP PROCESS
-
-            </span>
-
-
-            <h2 class="section-heading">
-
-                How to Become a Member
-
-            </h2>
-
-
-            <p class="section-description mx-auto">
-
-                Follow the online membership process to apply
-                for membership with the Khyber Pakhtunkhwa
-                Gems & Jewellery Association.
-
-            </p>
-
-        </div>
-
-
-        <div class="row g-4">
-
-
-            <!-- 01 -->
-
-            <div class="col-md-6 col-lg">
-
-                <div class="objective-card
-                            membership-process-card
-                            h-100 text-center">
-
-                    <span class="membership-process-number">
-                        01
-                    </span>
-
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-person-plus"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Register
-                    </h4>
-
-
-                    <p>
-
-                        Create your online membership account
-                        using your basic information.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 02 -->
-
-            <div class="col-md-6 col-lg">
-
-                <div class="objective-card
-                            membership-process-card
-                            h-100 text-center">
-
-                    <span class="membership-process-number">
-                        02
-                    </span>
-
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-file-earmark-check"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Submit
-                    </h4>
-
-
-                    <p>
-
-                        Complete your application and upload
-                        the required documents.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 03 -->
-
-            <div class="col-md-6 col-lg">
-
-                <div class="objective-card
-                            membership-process-card
-                            h-100 text-center">
-
-                    <span class="membership-process-number">
-                        03
-                    </span>
-
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-search"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Review & Approval
-                    </h4>
-
-
-                    <p>
-
-                        Your application is reviewed and
-                        processed by the Association.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 04 -->
-
-            <div class="col-md-6 col-lg">
-
-                <div class="objective-card
-                            membership-process-card
-                            h-100 text-center">
-
-                    <span class="membership-process-number">
-                        04
-                    </span>
-
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-credit-card"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Payment
-                    </h4>
-
-
-                    <p>
-
-                        Pay the applicable membership fee
-                        after approval.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 05 -->
-
-            <div class="col-md-6 col-lg">
-
-                <div class="objective-card
-                            membership-process-card
-                            h-100 text-center">
-
-                    <span class="membership-process-number">
-                        05
-                    </span>
-
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-patch-check"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Membership Active
-                    </h4>
-
-
-                    <p>
-
-                        Your membership becomes active after
-                        successful payment and completion.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     MEMBERSHIP CATEGORIES & FEES
-========================================================= -->
-
-<section class="objectives-section py-5">
-
-    <div class="container">
-
-
-        <div class="text-center mb-5">
-
-            <span class="section-kicker">
-
-                MEMBERSHIP CATEGORIES
-
-            </span>
-
-
-            <h2 class="section-heading">
-
-                Membership Fee Structure
-
-            </h2>
-
-
-            <p class="section-description mx-auto">
-
-                Membership of the KP Gems & Jewellery Association
-                is open to eligible individuals and businesses
-                associated with the gems and jewellery sector.
-
-            </p>
-
-        </div>
-
-
-        <div class="row g-4 justify-content-center">
-
-
-            <!-- ORDINARY MEMBER -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card
-                            membership-category-card
-                            h-100 text-center">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-person"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Ordinary Member
-                    </h4>
-
-
-                    <div class="membership-fee">
-
-                        PKR 1,000
-
-                    </div>
-
-
-                    <p class="mb-0">
-
-                        Membership fee for Ordinary Members.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- ASSOCIATE MEMBER -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card
-                            membership-category-card
-                            h-100 text-center">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-people"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Associate Member
-                    </h4>
-
-
-                    <div class="membership-fee">
-
-                        PKR 2,500
-
-                    </div>
-
-
-                    <p class="mb-0">
-
-                        Membership fee for Associate Members.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- HONORARY MEMBER -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card
-                            membership-category-card
-                            h-100 text-center">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-award"></i>
-
-                    </div>
-
-
-                    <h4>
-                        Honorary Member
-                    </h4>
-
-
-                    <div class="membership-fee">
-
-                        PKR 3,500
-
-                    </div>
-
-
-                    <p class="mb-0">
-
-                        Membership fee for Honorary Members.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-
-        <div class="text-center mt-4">
-
-            <p class="small text-secondary mb-0">
-
-                The above fee structure is applicable for the
-                time being and may be revised by the Association
-                in the future.
-
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     REQUIRED DOCUMENTS
-========================================================= -->
-
-<section class="py-5">
-
-    <div class="container">
-
-        <div class="row align-items-center g-5">
-
-
-            <!-- LEFT -->
-
-            <div class="col-lg-6">
-
-                <span class="section-kicker">
-
-                    REQUIRED DOCUMENTS
-
-                </span>
-
-
-                <h2 class="section-heading">
-
-                    Documents Required for Membership
-
-                </h2>
-
-
-                <p class="section-description">
-
-                    Applicants are required to provide the
-                    following documents during the online
-                    membership registration process.
-
-                </p>
-
-
-                <a href="/Member/Register"
-                   class="btn btn-gold mt-2">
-
-                    Start Registration
-
-                    <i class="bi bi-arrow-right ms-1"></i>
-
-                </a>
-
-            </div>
-
-
-            <!-- RIGHT -->
-
-            <div class="col-lg-6">
-
-                <div class="objective-card">
-
-
-                    <!-- CNIC -->
-
-                    <div class="required-document-item">
-
-                        <div class="required-document-icon">
-
-                            <i class="bi bi-person-vcard"></i>
-
-                        </div>
-
-
-                        <div>
-
-                            <h5>
-                                CNIC
-                            </h5>
-
-
-                            <p class="mb-0">
-
-                                Copy of valid CNIC.
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- NTN -->
-
-                    <div class="required-document-item">
-
-                        <div class="required-document-icon">
-
-                            <i class="bi bi-file-earmark-text"></i>
-
-                        </div>
-
-
-                        <div>
-
-                            <h5>
-                                NTN Certificate / Number
-                            </h5>
-
-
-                            <p class="mb-0">
-
-                                NTN certificate or NTN number,
-                                where applicable.
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- PHOTO -->
-
-                    <div class="required-document-item">
-
-                        <div class="required-document-icon">
-
-                            <i class="bi bi-person-square"></i>
-
-                        </div>
-
-
-                        <div>
-
-                            <h5>
-                                Passport-size Photograph
-                            </h5>
-
-
-                            <p class="mb-0">
-
-                                Recent passport-size photograph.
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     IMPORTANT NOTE
-========================================================= -->
-
-<section class="pb-5">
-
-    <div class="container">
-
-
-        <div class="committee-note">
-
-
-            <div class="row align-items-start g-4">
-
-
-                <div class="col-lg-1 text-center">
-
-                    <i class="bi bi-info-circle text-warning
-                              membership-note-icon">
-                    </i>
-
-                </div>
-
-
-                <div class="col-lg-11">
-
-                    <span class="section-kicker text-warning">
-
-                        IMPORTANT INFORMATION
-
-                    </span>
-
-
-                    <h4 class="text-white mb-3">
-
-                        Membership Application & Fee Policy
-
-                    </h4>
-
-
-                    <p class="mb-2">
-
-                        Membership fees are non-refundable once paid.
-
-                    </p>
-
-
-                    <p class="mb-0">
-
-                        Submission of an application does not
-                        automatically guarantee membership.
-                        Applications are subject to review and
-                        approval by the Association in accordance
-                        with its membership requirements.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     MEMBER BENEFITS
-========================================================= -->
-
-<section class="objectives-section py-5">
-
-    <div class="container">
-
-
-        <div class="text-center mb-5">
-
-            <span class="section-kicker">
-
-                MEMBER BENEFITS
-
-            </span>
-
-
-            <h2 class="section-heading">
-
-                Benefits of Membership
-
-            </h2>
-
-
-            <p class="section-description mx-auto">
-
-                Membership provides opportunities for networking,
-                learning, business development and engagement
-                with the gems and jewellery industry.
-
-            </p>
-
-        </div>
-
-
-        <div class="row g-4">
-
-
-            <!-- 01 -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card h-100">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-people"></i>
-
-                    </div>
-
-
-                    <h5>
-
-                        Industry Networking
-
-                    </h5>
-
-
-                    <p>
-
-                        Connect with businesses and stakeholders
-                        across the gems and jewellery sector.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 02 -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card h-100">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-mortarboard"></i>
-
-                    </div>
-
-
-                    <h5>
-
-                        Training Opportunities
-
-                    </h5>
-
-
-                    <p>
-
-                        Participate in training, skills and
-                        capacity-building activities.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 03 -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card h-100">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-calendar-event"></i>
-
-                    </div>
-
-
-                    <h5>
-
-                        Events & Exhibitions
-
-                    </h5>
-
-
-                    <p>
-
-                        Stay informed about association events,
-                        activities and exhibitions.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 04 -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card h-100">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-person-vcard"></i>
-
-                    </div>
-
-
-                    <h5>
-
-                        Digital Member Profile
-
-                    </h5>
-
-
-                    <p>
-
-                        Manage your membership information through
-                        the online member portal.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 05 -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card h-100">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-globe2"></i>
-
-                    </div>
-
-
-                    <h5>
-
-                        Market Opportunities
-
-                    </h5>
-
-
-                    <p>
-
-                        Access information about relevant industry
-                        and market opportunities.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- 06 -->
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card h-100">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-megaphone"></i>
-
-                    </div>
-
-
-                    <h5>
-
-                        Association Updates
-
-                    </h5>
-
-
-                    <p>
-
-                        Receive relevant news, announcements and
-                        membership updates.
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     FINAL CTA
-========================================================= -->
-
-<section class="contact-cta py-5">
-
-    <div class="container">
-
-
-        <div class="row align-items-center g-4">
-
-
-            <div class="col-lg-8">
-
-
-                <span class="section-kicker text-warning">
-
-                    JOIN KPGJA
-
-                </span>
-
-
-                <h2>
-
-                    Become a KPGJA Member
-
-                </h2>
-
-
-                <p>
-
-                    Create your account and start your online
-                    membership application.
-
-                </p>
-
-            </div>
-
-
-            <div class="col-lg-4 text-lg-end">
-
-
-                <a href="/Member/Register"
-                   class="btn btn-gold btn-lg">
-
-                    Apply for Membership
-
-                    <i class="bi bi-arrow-right ms-1"></i>
-
-                </a>
-
-
-                <a href="/Member/Login"
-                   class="btn btn-outline-light btn-lg ms-2">
-
-                    Login
-
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     FOOTER
-========================================================= -->
-
-
-
-
-<!-- =========================================================
-     BOOTSTRAP JS
-========================================================= -->
-
-
-
-
-<!-- =========================================================
-     SITE JS
-========================================================= -->

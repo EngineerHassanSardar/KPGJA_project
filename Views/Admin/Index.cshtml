@@ -2,7 +2,6 @@
     Layout = "_AdminLayout";
     ViewData["Title"] = "Dashboard";
 }
-
 <!-- Stat Cards -->
 <div class="row g-3 mb-4">
     <div class="col-sm-6 col-xl-3">
@@ -97,51 +96,83 @@
         </div>
     </div>
 
-    <div class="col-lg-4">
-        <div class="soft-card p-4 h-100">
-            <div class="card-head">
-                <i class="bi bi-activity"></i>
-                <h5>Recent Activity</h5>
-            </div>
-            <ul class="activity-feed">
-                <li class="activity-item">
-                    <div class="activity-icon green"><i class="bi bi-check2"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-main"><strong>Fatima Bibi</strong> was approved as Active Member</div>
-                        <span class="activity-time">2 hours ago</span>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon blue"><i class="bi bi-cash"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-main">Payment verified for <strong>Ayesha Tariq</strong></div>
-                        <span class="activity-time">5 hours ago</span>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon gold"><i class="bi bi-file-earmark-plus"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-main">New application from <strong>Ali Khan</strong></div>
-                        <span class="activity-time">1 day ago</span>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon red"><i class="bi bi-x-circle"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-main"><strong>Zubair Shah</strong>'s application was rejected</div>
-                        <span class="activity-time">2 days ago</span>
-                    </div>
-                </li>
-                <li class="activity-item">
-                    <div class="activity-icon blue"><i class="bi bi-envelope"></i></div>
-                    <div class="activity-text">
-                        <div class="activity-main">Fee receipt emailed to <strong>Hamza Ahmad</strong></div>
-                        <span class="activity-time">3 days ago</span>
-                    </div>
-                </li>
-            </ul>
+   @{
+    var recentActivity = ViewBag.RecentActivity as List<Entities.Entities.ActivityLogEntry> ?? new();
+}
+
+<div class="col-lg-4">
+    <div class="soft-card p-4 h-100">
+        <div class="card-head">
+            <i class="bi bi-activity"></i>
+            <h5>Recent Activity</h5>
         </div>
+
+        @if (recentActivity.Any())
+        {
+            <ul class="activity-feed">
+                @foreach (var log in recentActivity)
+                {
+                    var iconClass = log.Action switch
+                    {
+                        "Created" => "bi-file-earmark-plus",
+                        "Updated" => "bi-pencil-square",
+                        "Deleted" => "bi-x-circle",
+                        "LoggedIn" => "bi-box-arrow-in-right",
+                        "LoggedOut" => "bi-box-arrow-right",
+                        "Saved" => "bi-check2-circle",
+                        "Read" => "bi-envelope-open",
+                        _ => "bi-activity"
+                    };
+
+                    var iconColor = log.Action switch
+                    {
+                        "Created" => "gold",
+                        "Updated" => "blue",
+                        "Deleted" => "red",
+                        "LoggedIn" => "green",
+                        "LoggedOut" => "red",
+                        _ => "gold"
+                    };
+
+                    // Calculate "time ago"
+                    var ts = log.Timestamp.ToLocalTime();
+                    var diff = DateTime.Now - ts;
+                    string ago;
+                    if (diff.TotalMinutes < 1) ago = "just now";
+                    else if (diff.TotalMinutes < 60) ago = $"{(int)diff.TotalMinutes} min ago";
+                    else if (diff.TotalHours < 24) ago = $"{(int)diff.TotalHours} hours ago";
+                    else if (diff.TotalDays < 30) ago = $"{(int)diff.TotalDays} days ago";
+                    else ago = ts.ToString("dd MMM yyyy");
+
+                    <li class="activity-item">
+                        <div class="activity-icon @iconColor">
+                            <i class="bi @iconClass"></i>
+                        </div>
+                        <div class="activity-text">
+                            <div class="activity-main">
+                                <strong>@log.UserEmail</strong>
+                                @log.Action
+                                <em style="font-style:normal; color:#999;">@log.EntityType</em>
+                                @if (!string.IsNullOrEmpty(log.Details))
+                                {
+                                    <span style="color:#888;"> — @log.Details</span>
+                                }
+                            </div>
+                            <span class="activity-time">@ago</span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <div class="text-center py-4">
+                <i class="bi bi-clock-history" style="font-size:36px; color:#ccc;"></i>
+                <p class="text-muted small mb-0 mt-2">No activity yet</p>
+            </div>
+        }
     </div>
+</div>
 </div>
 
 @section Scripts {

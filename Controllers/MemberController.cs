@@ -1,4 +1,5 @@
-using KPGJA.Web.Models;
+using Core.Data;
+using Entities.Entities;
 using KPGJA.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,27 +13,33 @@ public class MemberController : Controller
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IWebHostEnvironment _environment;
-
-    private static readonly Dictionary<string, decimal> Fees = new()
-    {
-        ["Ordinary Member"] = 1000m,
-        ["Associate Member"] = 2500m,
-        ["Honorary Member"] = 3500m
-    };
+    private readonly ApplicationDbContext _db;
 
     public MemberController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment environment,
+        ApplicationDbContext db)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _environment = environment;
+        _db = db;
     }
 
+    // ==================== REGISTER ====================
     [AllowAnonymous]
     [HttpGet]
-    public IActionResult Register() => View(new RegisterViewModel());
+    public IActionResult Register()
+    {
+        ViewBag.Fees = _db.MembershipFees
+            .Where(f => f.IsActive)
+            .OrderBy(f => f.DisplayOrder)
+            .AsNoTracking()
+            .ToList();
+
+        return View(new RegisterViewModel());
+    }
 
     [AllowAnonymous]
     [HttpPost]
@@ -40,14 +47,19 @@ public class MemberController : Controller
     public async Task<IActionResult> Register(RegisterViewModel model)
     {
         if (!ModelState.IsValid)
+        {
+            ViewBag.Fees = _db.MembershipFees
+                .Where(f => f.IsActive)
+                .OrderBy(f => f.DisplayOrder)
+                .AsNoTracking()
+                .ToList();
             return View(model);
+        }
 
-        // ---------- 1. Create the user account ----------
         var user = new ApplicationUser
         {
             UserName = model.Email,
             Email = model.Email,
-            FullName = model.FullName,
             PhoneNumber = model.MobileNo,
             EmailConfirmed = true
         };
@@ -58,10 +70,16 @@ public class MemberController : Controller
         {
             foreach (var error in result.Errors)
                 ModelState.AddModelError("", error.Description);
+
+            ViewBag.Fees = _db.MembershipFees
+                .Where(f => f.IsActive)
+                .OrderBy(f => f.DisplayOrder)
+                .AsNoTracking()
+                .ToList();
             return View(model);
         }
 
-        // ---------- 2. Save uploaded files ----------
+        // ---------- Save uploaded files ----------
         var cnicPath = await SaveOptionalAsync(model.CnicDocument, "cnic");
         var photoPath = await SaveOptionalAsync(model.PassportPhoto, "photo");
         var businessPath = await SaveOptionalAsync(model.BusinessRegistrationDocument, "business");
@@ -69,9 +87,10 @@ public class MemberController : Controller
         var bankSlipPath = await SaveOptionalAsync(model.BankDepositSlip, "bank");
         var recommendPath = await SaveOptionalAsync(model.RecommendationDocument, "recommendation");
 
-        // ---------- 3. Create the MembershipApplication record ----------
-        // NOTE: This is temporary — only saves in-memory for now.
-        // Once we add DbContext + migrations in Phase 2, this will save to SQL Server.
+        // ---------- Look up the fee from the DB ----------
+        var selectedFee = _db.MembershipFees
+            .AsNoTracking()
+            .FirstOrDefault(f => f.Category == model.MembershipCategory);
 
         var application = new MembershipApplication
         {
@@ -87,11 +106,10 @@ public class MemberController : Controller
             BusinessAddress = model.BusinessAddress,
             MembershipCategory = model.MembershipCategory,
             BusinessTypes = string.Join(", ", model.BusinessType),
-            MembershipFee = Fees.TryGetValue(model.MembershipCategory, out var fee) ? fee : 0m,
+            MembershipFee = selectedFee?.AdmissionFee ?? 0m,
             Status = "Pending Review",
             ApplicationDate = DateTime.UtcNow,
 
-            // Document paths
             CnicDocumentPath = cnicPath,
             PassportPhotoPath = photoPath,
             BusinessRegistrationDocumentPath = businessPath,
@@ -100,15 +118,20 @@ public class MemberController : Controller
             RecommendationDocumentPath = recommendPath
         };
 
-        // ---------- 4. Sign the user in ----------
+        // ---------- Persist to DB ----------
+        // NOTE: uncomment these two lines once MembershipApplications DbSet
+        // is added to ApplicationDbContext
+        // _db.MembershipApplications.Add(application);
+        // await _db.SaveChangesAsync();
+
+        // ---------- Sign the user in ----------
         await _signInManager.SignInAsync(user, isPersistent: false);
 
-        // ---------- 5. Show success and redirect to Dashboard ----------
         TempData["Success"] = $"Thank you {model.FullName}. Your application has been submitted.";
         return RedirectToAction(nameof(Dashboard));
     }
 
-
+    // ==================== LOGIN ====================
     [AllowAnonymous]
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
@@ -130,6 +153,11 @@ public class MemberController : Controller
             ModelState.AddModelError("", "Invalid email or password.");
             return View(model);
         }
+        if (!user.IsActive)
+        {
+            ModelState.AddModelError("", "Your account has been deactivated. Contact admin.");
+            return View(model);
+        }
 
         var result = await _signInManager.PasswordSignInAsync(
             user.UserName!, model.Password, model.RememberMe, lockoutOnFailure: false);
@@ -148,13 +176,15 @@ public class MemberController : Controller
         return View(model);
     }
 
+    // ==================== DASHBOARD ====================
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> Dashboard()
-    {        
+    {
         return View();
     }
 
+    // ==================== LOGOUT ====================
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -164,9 +194,11 @@ public class MemberController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+    // ==================== ACCESS DENIED ====================
     [AllowAnonymous]
     public IActionResult AccessDenied() => View();
 
+    // ==================== HELPERS ====================
     private async Task<string> SaveFileAsync(IFormFile file, string category)
     {
         var relative = await SaveOptionalAsync(file, category);

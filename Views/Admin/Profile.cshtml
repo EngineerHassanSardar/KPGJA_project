@@ -1,54 +1,112 @@
-﻿@{ Layout = "_AdminLayout"; ViewData["Title"] = "My Profile"; }
+@model Core.Data.ApplicationUser
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "My Profile";
+    var role = ViewBag.Role as string ?? "Admin";
+    var displayName = Model.Email?.Split('@')[0] ?? "User";
+    var initial = !string.IsNullOrEmpty(displayName) ? displayName[0].ToString().ToUpper() : "U";
+}
 
-@if (TempData["Success"] is string success)
+@if (TempData["Success"] is string s)
 {
     <div class="alert alert-success alert-dismissible fade show py-2">
-        <i class="bi bi-check-circle me-1"></i> @success
+        <i class="bi bi-check-circle me-1"></i> @s
         <button class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-<form method="post" asp-action="ProfileSave">
-    @Html.AntiForgeryToken()
-    <div class="row g-3">
-        <div class="col-lg-8">
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Account</div>
+        <h1>My Profile</h1>
+        <p>Manage your account details and password.</p>
+    </div>
+</div>
+
+<div class="row g-3">
+
+    <!-- LEFT — Profile Info -->
+    <div class="col-lg-8">
+        <form method="post" asp-action="ProfileSave">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Id" value="@Model.Id" />
+
+            <!-- PROFILE INFORMATION -->
             <div class="soft-card p-4 mb-3">
-                <h5 class="card-head-title small fw-bold mb-3"><i class="bi bi-person me-1"></i> Profile Information</h5>
+                <div class="card-head">
+                    <i class="bi bi-person"></i>
+                    <h5>Profile Information</h5>
+                </div>
+
                 <div class="row g-3">
-                    <div class="col-md-6"><label class="form-label small fw-semibold">Full Name</label><input class="form-control" value="Administrator"></div>
-                    <div class="col-md-6"><label class="form-label small fw-semibold">Email</label><input class="form-control" value="admin@kpgja.com"></div>
-                    <div class="col-md-6"><label class="form-label small fw-semibold">Phone</label><input class="form-control" value="+92 300 1234567"></div>
-                    <div class="col-md-6"><label class="form-label small fw-semibold">Role</label><input class="form-control" value="Super Admin" disabled></div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Full Name</label>
+                      <input value="@displayName" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Email</label>
+                        <input value="@Model.Email" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Phone</label>
+                        <input name="PhoneNumber" class="form-control"
+                               value="@Model.PhoneNumber" placeholder="+92 300 1234567">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Role</label>
+                        <input value="@role" class="form-control" readonly style="background:#f5f4ef;">
+                    </div>
                 </div>
             </div>
 
-            <div class="soft-card p-4">
-                <h5 class="card-head-title small fw-bold mb-3"><i class="bi bi-shield-lock me-1"></i> Change Password</h5>
+            <!-- CHANGE PASSWORD -->
+            <div class="soft-card p-4 mb-3">
+                <div class="card-head">
+                    <i class="bi bi-shield-lock"></i>
+                    <h5>Change Password</h5>
+                </div>
+
                 <div class="row g-3">
-                    <div class="col-md-4"><label class="form-label small fw-semibold">Current Password</label><input type="password" class="form-control"></div>
-                    <div class="col-md-4"><label class="form-label small fw-semibold">New Password</label><input type="password" class="form-control"></div>
-                    <div class="col-md-4"><label class="form-label small fw-semibold">Confirm Password</label><input type="password" class="form-control"></div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Current Password</label>
+                        <input name="CurrentPassword" type="password" class="form-control" placeholder="••••••••">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">New Password</label>
+                        <input name="NewPassword" type="password" class="form-control" placeholder="••••••••">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Confirm Password</label>
+                        <input name="ConfirmPassword" type="password" class="form-control" placeholder="••••••••">
+                    </div>
+                </div>
+                <div class="small text-muted mt-2" style="font-size:11px;">
+                    Leave blank to keep your current password.
                 </div>
             </div>
-        </div>
 
-        <div class="col-lg-4">
-            <div class="soft-card p-4 text-center">
-                <div class="user-avatar mx-auto mb-3" style="width:80px;height:80px;font-size:32px;">A</div>
-                <div class="fw-bold">Administrator</div>
-                <div class="small text-muted">admin@kpgja.com</div>
-                <div class="mt-3">
-                    <input type="file" class="form-control form-control-sm" accept="image/*">
-                </div>
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> Update Profile
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- RIGHT — Avatar Card -->
+    <div class="col-lg-4">
+        <div class="soft-card p-4 text-center">
+            <div style="width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#17352d,#0d1a16);color:#d6a84f;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;margin:0 auto 20px;">
+                @initial
+            </div>
+            <h5 style="font-family:'Playfair Display',serif;">@displayName</h5>
+            <p class="text-muted small mb-3">@Model.Email</p>
+
+            <input type="file" class="form-control form-control-sm mt-3" disabled>
+            <div class="small text-muted mt-2" style="font-size:11px;">
+                Photo upload coming soon
             </div>
         </div>
     </div>
 
-    <div class="d-flex justify-content-end gap-2 mt-3">
-        <button type="submit" class="btn btn-gold btn-sm px-3"><i class="bi bi-check2 me-1"></i> Update Profile</button>
-    </div>
-</form>@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+</div>

@@ -1,812 +1,239 @@
-@{ ViewData["Title"] = "Events &amp; Activities | KPGJA"; }
-
-@section Styles {
-<style>
-
-        .events-intro {
-            max-width: 820px;
-            margin: 0 auto;
-        }
-
-        .event-card {
-            background: #fff;
-            border: 1px solid #e9eaed;
-            border-radius: 20px;
-            overflow: hidden;
-            height: 100%;
-            transition: .25s ease;
-        }
-
-        .event-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,.08);
-        }
-
-        .event-image {
-            position: relative;
-            height: 230px;
-            overflow: hidden;
-            background: #172033;
-        }
-
-        .event-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform .4s ease;
-        }
-
-        .event-card:hover .event-image img {
-            transform: scale(1.06);
-        }
-
-        .event-category {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 2;
-            background: #d6a84f;
-            color: #172033;
-            padding: 7px 12px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .event-date {
-            position: absolute;
-            right: 15px;
-            bottom: 15px;
-            z-index: 2;
-            width: 58px;
-            height: 62px;
-            background: #fff;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,.15);
-        }
-
-        .event-date strong {
-            font-size: 20px;
-            line-height: 1;
-            color: #172033;
-        }
-
-        .event-date span {
-            font-size: 10px;
-            text-transform: uppercase;
-            color: #b88a2d;
-            font-weight: 700;
-            margin-top: 4px;
-        }
-
-        .event-body {
-            padding: 25px;
-        }
-
-        .event-body h4 {
-            font-family: "Playfair Display", serif;
-            color: #172033;
-            margin-bottom: 10px;
-        }
-
-        .event-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            color: #6c7280;
-            font-size: 13px;
-            margin-bottom: 15px;
-        }
-
-        .event-meta i {
-            color: #b88a2d;
-            margin-right: 5px;
-        }
-
-        .event-body p {
-            color: #6c7280;
-            font-size: 14px;
-        }
-
-        .event-section-title {
-            display: flex;
-            align-items: end;
-            justify-content: space-between;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .event-section-title h2 {
-            margin-bottom: 0;
-        }
-
-        .event-feature {
-            background: #172033;
-            border-radius: 22px;
-            overflow: hidden;
-            color: #fff;
-        }
-
-        .event-feature-image {
-            min-height: 350px;
-            height: 100%;
-        }
-
-        .event-feature-image img {
-            width: 100%;
-            height: 100%;
-            min-height: 350px;
-            object-fit: cover;
-        }
-
-        .event-feature-content {
-            padding: 45px;
-        }
-
-        .event-feature-content h2 {
-            font-family: "Playfair Display", serif;
-        }
-
-        .event-feature-content p {
-            color: rgba(255,255,255,.72);
-        }
-
-        .event-feature-meta {
-            color: rgba(255,255,255,.7);
-        }
-
-        .event-feature-meta i {
-            color: #d6a84f;
-        }
-
-        .activity-card {
-            border: 1px solid #e9eaed;
-            border-radius: 18px;
-            padding: 25px;
-            height: 100%;
-            background: #fff;
-        }
-
-        .activity-icon {
-            width: 52px;
-            height: 52px;
-            border-radius: 14px;
-            background: #f5f1e7;
-            color: #b88a2d;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 18px;
-        }
-
-        .activity-card h5 {
-            font-family: "Playfair Display", serif;
-            color: #172033;
-        }
-
-        .activity-card p {
-            color: #6c7280;
-            margin-bottom: 0;
-            font-size: 14px;
-        }
-
-        .events-cta {
-            background: #f7f5ef;
-            border-radius: 22px;
-            padding: 45px;
-        }
-
-        @@media (max-width: 767px) {
-            .event-feature-content {
-                padding: 30px;
-            }
-
-            .event-feature-image,
-            .event-feature-image img {
-                min-height: 250px;
-            }
-
-            .events-cta {
-                padding: 30px;
-            }
-        }
-    
-</style>
+@model List<Entities.Entities.EventItem>
+@{
+    ViewData["Title"] = "Events & Activities | KPGJA";
+    var featured = Model?.FirstOrDefault(e => e.IsFeatured)
+                ?? Model?.OrderByDescending(e => e.StartDate).FirstOrDefault();
+    var rest = Model?.Where(e => e.Id != featured?.Id)
+                     .OrderBy(e => e.StartDate)
+                     .ToList()
+                ?? new List<Entities.Entities.EventItem>();
 }
 
-<!-- Top Bar -->
 
 
-<!-- Hero -->
 <section class="page-hero">
-
     <div class="container">
-
         <div class="row align-items-center">
-
             <div class="col-lg-8">
-
-                <span class="section-kicker text-warning">
-                    KPGJA EVENTS
-                </span>
-
-                <h1>
-                    Events & Activities
-                </h1>
-
+                <span class="section-kicker text-warning">KPGJA EVENTS</span>
+                <h1>Events &amp; Activities</h1>
                 <p class="lead text-white-50 mt-3">
                     Exhibitions, training programs, networking sessions,
                     seminars and activities that connect and strengthen
                     the gems and jewellery community.
                 </p>
-
             </div>
-
         </div>
-
     </div>
-
 </section>
 
 <main>
 
-    <!-- Introduction -->
     <section class="py-5">
-
         <div class="container">
-
             <div class="events-intro text-center">
-
-                <span class="section-kicker">
-                    CONNECT · LEARN · GROW
-                </span>
-
-                <h2 class="section-heading mt-2">
-                    Bringing the industry together
-                </h2>
-
+                <span class="section-kicker">CONNECT · LEARN · GROW</span>
+                <h2 class="section-heading mt-2">Bringing the industry together</h2>
                 <p class="section-description mt-3">
                     KPGJA events provide opportunities for members,
                     businesses, professionals, entrepreneurs and
                     stakeholders to connect, learn and discover
                     new opportunities.
                 </p>
-
             </div>
-
         </div>
-
     </section>
 
-    <!-- Featured Event -->
-    <section class="pb-5">
-
-        <div class="container">
-
-            <div class="event-feature">
-
-                <div class="row g-0 align-items-stretch">
-
-                    <div class="col-lg-6">
-
-                        <div class="event-feature-image">
-
-                            <img src="/assets/img/events/exhibition.jpg"
-                                 alt="Gem and Jewellery Exhibition">
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-lg-6">
-
-                        <div class="event-feature-content h-100 d-flex flex-column justify-content-center">
-
-                            <span class="section-kicker text-warning">
-                                FEATURED EVENT
-                            </span>
-
-                            <h2 class="mt-2">
-                                Gem & Jewellery Exhibition
-                            </h2>
-
-                            <p class="mt-3">
-                                An opportunity for businesses, designers,
-                                traders and industry professionals to
-                                showcase products, build connections and
-                                explore new market opportunities.
-                            </p>
-
-                            <div class="event-feature-meta mt-3">
-
-                                <div class="mb-2">
-                                    <i class="bi bi-geo-alt me-2"></i>
-                                    Peshawar, Khyber Pakhtunkhwa
-                                </div>
-
-                                <div class="mb-2">
-                                    <i class="bi bi-calendar-event me-2"></i>
-                                    Date to be announced
-                                </div>
-
-                                <div>
-                                    <i class="bi bi-clock me-2"></i>
-                                    Event schedule to be announced
-                                </div>
-
-                            </div>
-
-                            <div class="mt-4">
-
-                                <a href="/Home/Contact"
-                                   class="btn btn-gold">
-
-                                    <i class="bi bi-info-circle me-1"></i>
-                                    Event Information
-
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+    @if (Model == null || !Model.Any())
+    {
+        <section class="pb-5">
+            <div class="container">
+                <div class="events-empty">
+                    <i class="bi bi-calendar-event"></i>
+                    <h3>No events yet</h3>
+                    <p>Check back soon for upcoming KPGJA events and activities.</p>
                 </div>
-
             </div>
+        </section>
+    }
+    else
+    {
+               @if (featured != null)
+        {
+            <section class="pb-5">
+                <div class="container">
+                    <div class="event-feature">
+                        <div class="d-flex flex-column flex-lg-row align-items-stretch" style="min-height:420px;">
 
-        </div>
+                            <!-- LEFT: Image -->
+                            <div style="flex:1 1 50%; min-width:0; overflow:hidden; background:#0d1424;">
+                                @if (!string.IsNullOrEmpty(featured.CoverImagePath))
+                                {
+                                    <img src="@featured.CoverImagePath"
+                                         alt="@featured.Title"
+                                         style="width:100%; height:100%; min-height:380px; object-fit:cover; display:block;">
+                                }
+                            </div>
 
-    </section>
+                            <!-- RIGHT: Content -->
+                            <div style="flex:1 1 50%; min-width:0; padding:50px 45px; display:flex; flex-direction:column; justify-content:center; color:#fff; overflow:hidden; word-break:break-word; overflow-wrap:anywhere;">
+                                <span class="section-kicker text-warning">FEATURED EVENT</span>
 
-    <!-- Upcoming Events -->
-    <section class="py-5 bg-light">
+                                <h2 class="mt-2" style="font-family:'Playfair Display',serif; font-size:30px; line-height:1.25; color:#fff; margin-bottom:18px; word-break:break-word; overflow-wrap:anywhere;">
+                                    @featured.Title
+                                </h2>
 
-        <div class="container">
+                                <p class="mt-3" style="color:rgba(255,255,255,.75); line-height:1.8; margin-bottom:20px; word-break:break-word; overflow-wrap:anywhere;">
+                                    @featured.Description
+                                </p>
 
-            <div class="event-section-title">
+                                <div class="d-flex flex-column gap-2" style="color:rgba(255,255,255,.7); font-size:14px;">
+                                    @if (!string.IsNullOrEmpty(featured.Location))
+                                    {
+                                        <div>
+                                            <i class="bi bi-geo-alt me-2" style="color:#d6a84f;"></i>
+                                            @featured.Location
+                                        </div>
+                                    }
+                                    <div>
+                                        <i class="bi bi-calendar-event me-2" style="color:#d6a84f;"></i>
+                                        @featured.StartDate.ToString("dd MMM yyyy")
+                                        @if (featured.EndDate.HasValue && featured.EndDate.Value != featured.StartDate)
+                                        {
+                                            <span> – @featured.EndDate.Value.ToString("dd MMM yyyy")</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
 
-                <div>
-
-                    <span class="section-kicker">
-                        UPCOMING
-                    </span>
-
-                    <h2 class="section-heading mt-2">
-                        Upcoming Events
-                    </h2>
-
+                        </div>
+                    </div>
                 </div>
-
-            </div>
-
-            <div class="row g-4">
-
-                <!-- Event 1 -->
-                <div class="col-md-6">
-
-                    <div class="event-card">
-
-                        <div class="event-image">
-
-                            <img src="/assets/img/events/exhibition.jpg"
-                                 alt="Gem and Jewellery Exhibition"
-                                 loading="lazy">
-
-                            <span class="event-category">
-                                Exhibition
-                            </span>
-
-                            <div class="event-date">
-                                <strong>--</strong>
-                                <span>TBA</span>
-                            </div>
-
+            </section>
+        }
+        @if (rest.Any())
+        {
+            <section class="py-5 bg-light">
+                <div class="container">
+                    <div class="event-section-title">
+                        <div>
+                            <span class="section-kicker">UPCOMING</span>
+                            <h2 class="section-heading mt-2">Upcoming Events</h2>
                         </div>
-
-                        <div class="event-body">
-
-                            <h4>
-                                Gem & Jewellery Exhibition
-                            </h4>
-
-                            <div class="event-meta">
-
-                                <span>
-                                    <i class="bi bi-geo-alt"></i>
-                                    Peshawar
-                                </span>
-
-                                <span>
-                                    <i class="bi bi-calendar"></i>
-                                    Date TBA
-                                </span>
-
-                            </div>
-
-                            <p>
-                                Showcase gemstones, jewellery, designs
-                                and products while connecting with
-                                businesses and visitors.
-                            </p>
-
-                            <a href="/Home/Contact"
-                               class="btn btn-outline-secondary btn-sm">
-
-                                View Details
-
-                            </a>
-
-                        </div>
-
                     </div>
 
-                </div>
+                    <div class="row g-4">
+                        @foreach (var ev in rest)
+                        {
+                            <div class="col-md-6">
+                                <div class="event-card">
+                                    <div class="event-image">
+                                        @if (!string.IsNullOrEmpty(ev.CoverImagePath))
+                                        {
+                                          <img src="@ev.CoverImagePath" alt="@ev.Title" loading="lazy"
+     style="width:100%; height:100%; object-fit:cover; object-position:center;">
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-calendar-event placeholder"></i>
+                                        }
 
-                <!-- Event 2 -->
-                <div class="col-md-6">
+                                        @if (!string.IsNullOrEmpty(ev.Category))
+                                        {
+                                            <span class="event-category">@ev.Category</span>
+                                        }
 
-                    <div class="event-card">
+                                        <div class="event-date">
+                                            <strong>@ev.StartDate.Day</strong>
+                                            <span>@ev.StartDate.ToString("MMM")</span>
+                                        </div>
+                                    </div>
 
-                        <div class="event-image">
-
-                            <img src="/assets/img/events/networking.jpg"
-                                 alt="Business Networking Summit"
-                                 loading="lazy">
-
-                            <span class="event-category">
-                                Networking
-                            </span>
-
-                            <div class="event-date">
-                                <strong>--</strong>
-                                <span>TBA</span>
+                                    <div class="event-body">
+                                        <h4>@ev.Title</h4>
+                                        <div class="event-meta">
+                                            @if (!string.IsNullOrEmpty(ev.Location))
+                                            {
+                                                <span><i class="bi bi-geo-alt"></i> @ev.Location</span>
+                                            }
+                                            <span><i class="bi bi-calendar"></i> @ev.StartDate.ToString("dd MMM yyyy")</span>
+                                        </div>
+                                        <p>@ev.Description</p>
+                                    </div>
+                                </div>
                             </div>
-
-                        </div>
-
-                        <div class="event-body">
-
-                            <h4>
-                                Business Networking Summit
-                            </h4>
-
-                            <div class="event-meta">
-
-                                <span>
-                                    <i class="bi bi-geo-alt"></i>
-                                    Peshawar
-                                </span>
-
-                                <span>
-                                    <i class="bi bi-calendar"></i>
-                                    Date TBA
-                                </span>
-
-                            </div>
-
-                            <p>
-                                Connect with industry businesses,
-                                entrepreneurs, professionals and
-                                potential partners.
-                            </p>
-
-                            <a href="/Home/Contact"
-                               class="btn btn-outline-secondary btn-sm">
-
-                                View Details
-
-                            </a>
-
-                        </div>
-
+                        }
                     </div>
-
                 </div>
+            </section>
+        }
+    }
 
-                <!-- Event 3 -->
-                <div class="col-md-6">
-
-                    <div class="event-card">
-
-                        <div class="event-image">
-
-                            <img src="/assets/img/events/training.jpg"
-                                 alt="Skills and Training Seminar"
-                                 loading="lazy">
-
-                            <span class="event-category">
-                                Training
-                            </span>
-
-                            <div class="event-date">
-                                <strong>--</strong>
-                                <span>TBA</span>
-                            </div>
-
-                        </div>
-
-                        <div class="event-body">
-
-                            <h4>
-                                Skills & Training Seminar
-                            </h4>
-
-                            <div class="event-meta">
-
-                                <span>
-                                    <i class="bi bi-geo-alt"></i>
-                                    Peshawar
-                                </span>
-
-                                <span>
-                                    <i class="bi bi-calendar"></i>
-                                    Date TBA
-                                </span>
-
-                            </div>
-
-                            <p>
-                                Training and knowledge-sharing sessions
-                                focused on professional and technical
-                                development.
-                            </p>
-
-                            <a href="/Home/Contact"
-                               class="btn btn-outline-secondary btn-sm">
-
-                                View Details
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- Event 4 -->
-                <div class="col-md-6">
-
-                    <div class="event-card">
-
-                        <div class="event-image">
-
-                            <img src="/assets/img/events/women-workshop.jpg"
-                                 alt="Women Entrepreneurship Workshop"
-                                 loading="lazy">
-
-                            <span class="event-category">
-                                Women
-                            </span>
-
-                            <div class="event-date">
-                                <strong>--</strong>
-                                <span>TBA</span>
-                            </div>
-
-                        </div>
-
-                        <div class="event-body">
-
-                            <h4>
-                                Women Entrepreneurship Workshop
-                            </h4>
-
-                            <div class="event-meta">
-
-                                <span>
-                                    <i class="bi bi-geo-alt"></i>
-                                    Peshawar
-                                </span>
-
-                                <span>
-                                    <i class="bi bi-calendar"></i>
-                                    Date TBA
-                                </span>
-
-                            </div>
-
-                            <p>
-                                Supporting women entrepreneurs through
-                                business development, networking and
-                                industry opportunities.
-                            </p>
-
-                            <a href="/Home/Contact"
-                               class="btn btn-outline-secondary btn-sm">
-
-                                View Details
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- Activities -->
     <section class="py-5">
-
         <div class="container">
-
             <div class="text-center mb-5">
-
-                <span class="section-kicker">
-                    ACTIVITIES
-                </span>
-
-                <h2 class="section-heading mt-2">
-                    What happens through KPGJA
-                </h2>
-
-                <p class="section-description mx-auto mt-3"
-                   style="max-width:700px;">
-
+                <span class="section-kicker">ACTIVITIES</span>
+                <h2 class="section-heading mt-2">What happens through KPGJA</h2>
+                <p class="section-description mx-auto mt-3" style="max-width:700px;">
                     Events can support knowledge sharing, market access,
                     networking and professional development throughout
                     the industry.
-
                 </p>
-
             </div>
 
             <div class="row g-4">
-
                 <div class="col-md-6 col-lg-3">
-
                     <div class="activity-card">
-
-                        <div class="activity-icon">
-                            <i class="bi bi-shop-window"></i>
-                        </div>
-
-                        <h5>
-                            Exhibitions
-                        </h5>
-
-                        <p>
-                            Product showcases, exhibitions and opportunities
-                            to connect businesses with markets.
-                        </p>
-
+                        <div class="activity-icon"><i class="bi bi-shop-window"></i></div>
+                        <h5>Exhibitions</h5>
+                        <p>Product showcases, exhibitions and opportunities to connect businesses with markets.</p>
                     </div>
-
                 </div>
-
                 <div class="col-md-6 col-lg-3">
-
                     <div class="activity-card">
-
-                        <div class="activity-icon">
-                            <i class="bi bi-mortarboard"></i>
-                        </div>
-
-                        <h5>
-                            Training
-                        </h5>
-
-                        <p>
-                            Workshops, seminars and skills development
-                            activities for industry participants.
-                        </p>
-
+                        <div class="activity-icon"><i class="bi bi-mortarboard"></i></div>
+                        <h5>Training</h5>
+                        <p>Workshops, seminars and skills development activities for industry participants.</p>
                     </div>
-
                 </div>
-
                 <div class="col-md-6 col-lg-3">
-
                     <div class="activity-card">
-
-                        <div class="activity-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-
-                        <h5>
-                            Networking
-                        </h5>
-
-                        <p>
-                            Bringing members, businesses and stakeholders
-                            together for meaningful connections.
-                        </p>
-
+                        <div class="activity-icon"><i class="bi bi-people"></i></div>
+                        <h5>Networking</h5>
+                        <p>Bringing members, businesses and stakeholders together for meaningful connections.</p>
                     </div>
-
                 </div>
-
                 <div class="col-md-6 col-lg-3">
-
                     <div class="activity-card">
-
-                        <div class="activity-icon">
-                            <i class="bi bi-lightbulb"></i>
-                        </div>
-
-                        <h5>
-                            Seminars
-                        </h5>
-
-                        <p>
-                            Knowledge-sharing sessions covering industry
-                            trends, opportunities and business development.
-                        </p>
-
+                        <div class="activity-icon"><i class="bi bi-lightbulb"></i></div>
+                        <h5>Seminars</h5>
+                        <p>Knowledge-sharing sessions covering industry trends, opportunities and business development.</p>
                     </div>
-
                 </div>
-
             </div>
-
         </div>
-
     </section>
 
-    <!-- CTA -->
     <section class="pb-5">
-
         <div class="container">
-
             <div class="events-cta text-center">
-
-                <span class="section-kicker">
-                    STAY CONNECTED
-                </span>
-
-                <h2 class="section-heading mt-2">
-                    Don't miss upcoming KPGJA activities
-                </h2>
-
-                <p class="section-description mx-auto mt-3"
-                   style="max-width:700px;">
-
+                <span class="section-kicker">STAY CONNECTED</span>
+                <h2 class="section-heading mt-2">Don't miss upcoming KPGJA activities</h2>
+                <p class="section-description mx-auto mt-3" style="max-width:700px;">
                     Become a member to stay connected with association
                     activities, industry opportunities, events and
                     future programs.
-
                 </p>
-
                 <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
-
-                    <a href="/Member/Register"
-                       class="btn btn-gold btn-lg">
-
-                        <i class="bi bi-person-plus me-1"></i>
-                        Become a Member
-
+                    <a href="/Member/Register" class="btn btn-gold btn-lg">
+                        <i class="bi bi-person-plus me-1"></i> Become a Member
                     </a>
-
-                    <a href="/Home/Contact"
-                       class="btn btn-navy btn-lg">
-
-                        <i class="bi bi-envelope me-1"></i>
-                        Contact KPGJA
-
+                    <a href="/Home/Contact" class="btn btn-navy btn-lg">
+                        <i class="bi bi-envelope me-1"></i> Contact KPGJA
                     </a>
-
                 </div>
-
             </div>
-
         </div>
-
     </section>
 
 </main>
-
-<!-- Footer -->

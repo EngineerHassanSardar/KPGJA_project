@@ -1,13 +1,117 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Entities.Entities;
 using KPGJA.Web.ViewModels;
-using KPGJA.Web.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace KPGJA.Web.Controllers;
 
-// [Authorize(Roles = "Admin")]  // <-- Uncomment in Phase 2
+[Authorize(Roles = "Admin")]
 public class AdminController : Controller
 {
+    private readonly Core.Data.ApplicationDbContext _db;
+    private readonly UserManager<Core.Data.ApplicationUser> _userManager;
+    private readonly SignInManager<Core.Data.ApplicationUser> _signInManager;
+    private readonly KPGJA.Web.Services.ActivityLogger _logger;
+    private readonly RoleManager<IdentityRole> _roleManager;
+
+    public AdminController(
+        Core.Data.ApplicationDbContext db,
+        UserManager<Core.Data.ApplicationUser> userManager,
+        SignInManager<Core.Data.ApplicationUser> signInManager,
+        KPGJA.Web.Services.ActivityLogger logger,
+        RoleManager<IdentityRole> roleManager)
+    {
+        _db = db;
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _logger = logger;
+        _roleManager = roleManager;
+    }
+
+    // Allow login + logout without admin auth
+    public override void OnActionExecuting(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext context)
+    {
+        var actionName = context.RouteData.Values["action"]?.ToString();
+        if (actionName == "Login" || actionName == "Logout")
+        {
+            base.OnActionExecuting(context);
+            return;
+        }
+
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            context.Result = RedirectToAction("Login", "Admin");
+            return;
+        }
+
+        if (!User.IsInRole("Admin"))
+        {
+            context.Result = RedirectToAction("AccessDenied", "Member");
+            return;
+        }
+
+        base.OnActionExecuting(context);
+    }
+
+    // ==================== ADMIN LOGIN ====================
+    [AllowAnonymous]
+    [HttpGet]
+    public IActionResult Login(string? returnUrl = null)
+    {
+        if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+            return RedirectToAction(nameof(Index));
+
+        ViewData["ReturnUrl"] = returnUrl;
+        return View(new LoginViewModel());
+    }
+
+    [AllowAnonymous]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Login(LoginViewModel model, string? returnUrl = null)
+    {
+        ViewData["ReturnUrl"] = returnUrl;
+        if (!ModelState.IsValid) return View(model);
+
+        var user = await _userManager.FindByEmailAsync(model.Username);
+        if (user == null)
+        {
+            ModelState.AddModelError("", "Invalid email or password.");
+            return View(model);
+        }
+
+        if (!user.IsActive)
+        {
+            ModelState.AddModelError("", "Your account has been deactivated. Contact admin.");
+            return View(model);
+        }
+
+        var result = await _signInManager.PasswordSignInAsync(
+            user.UserName!, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+        if (result.Succeeded)
+        {
+            await _logger.LogAsync("LoggedIn", "Admin", 0, "Admin signed in");
+
+            return !string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl)
+                ? Redirect(returnUrl)
+                : RedirectToAction(nameof(Index));
+        }
+
+        ModelState.AddModelError("", "Invalid email or password.");
+        return View(model);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Logout()
+    {
+        await _logger.LogAsync("LoggedOut", "Admin", 0, "Admin signed out");
+        await _signInManager.SignOutAsync();
+        return RedirectToAction(nameof(Login));
+    }
+
     // ==================== DASHBOARD ====================
     public IActionResult Index()
     {
@@ -16,6 +120,14 @@ public class AdminController : Controller
         ViewBag.Pending = apps.Count(a => a.Status == "Pending Review");
         ViewBag.ApprovedForPayment = apps.Count(a => a.Status == "Approved for Payment" || a.Status == "Payment Submitted");
         ViewBag.TotalMembers = apps.Count(a => a.Status == "Active Member" || a.Status == "Approved");
+
+        var recentActivity = _db.ActivityLogEntries
+            .OrderByDescending(l => l.Timestamp)
+            .Take(10)
+            .ToList();
+
+        ViewBag.RecentActivity = recentActivity;
+
         return View();
     }
 
@@ -65,320 +177,83 @@ public class AdminController : Controller
         View(GetMockApplications().Where(a => a.Status == "Approved for Payment"
             || a.Status == "Payment Submitted" || a.Status == "Payment Verified").ToList());
 
-  
-
-    // ==================== NEWS ====================
-    public IActionResult News(bool showForm = false, int? id = null)
+    // ==================== MEMBERSHIP FEES ====================
+    public IActionResult MembershipFees(bool showForm = false, int? id = null)
     {
         ViewBag.ShowForm = showForm;
-        ViewBag.CurrentArticle = id.HasValue
-            ? GetMockNews().FirstOrDefault(n => n.Id == id.Value)
+        ViewBag.CurrentFee = id.HasValue
+            ? _db.MembershipFees.AsNoTracking().FirstOrDefault(f => f.Id == id.Value)
             : null;
-        return View(GetMockNews());
+
+        var fees = _db.MembershipFees.AsNoTracking()
+            .OrderBy(f => f.DisplayOrder)
+            .ToList();
+
+        return View(fees);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult NewsSave(NewsArticle model)
+    public async Task<IActionResult> MembershipFeeSave(MembershipFee model)
     {
-        TempData["Success"] = model.Id > 0
-            ? $"\"{model.Title}\" updated (preview only)."
-            : $"\"{model.Title}\" published (preview only).";
-        return RedirectToAction(nameof(News));
+        model.Code = (model.Code ?? "").Trim().ToUpperInvariant();
+        model.Category = (model.Category ?? "").Trim();
+
+        bool codeTaken = _db.MembershipFees.Any(f => f.Code == model.Code && f.Id != model.Id);
+        if (codeTaken)
+        {
+            TempData["Error"] = $"Code \"{model.Code}\" is already in use.";
+            return RedirectToAction(nameof(MembershipFees));
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            var existing = _db.MembershipFees.FirstOrDefault(f => f.Id == model.Id);
+            if (existing == null)
+            {
+                TempData["Error"] = "Fee not found.";
+                return RedirectToAction(nameof(MembershipFees));
+            }
+
+            existing.Code = model.Code;
+            existing.Category = model.Category;
+            existing.AdmissionFee = model.AdmissionFee;
+            existing.Benefits = model.Benefits;
+            existing.Note = model.Note;
+            existing.DisplayOrder = model.DisplayOrder;
+            existing.IsActive = model.IsActive;
+
+            TempData["Success"] = $"\"{model.Category}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.MembershipFees.Add(model);
+            TempData["Success"] = $"\"{model.Category}\" added.";
+            action = "Created";
+        }
+
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "MembershipFee", model.Id,
+            $"Category: {model.Category}, Fee: {model.AdmissionFee}");
+
+        return RedirectToAction(nameof(MembershipFees));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult NewsDelete(int id)
+    public async Task<IActionResult> MembershipFeeDelete(int id)
     {
-        TempData["Success"] = $"Article #{id} deleted (preview only).";
-        return RedirectToAction(nameof(News));
+        var fee = _db.MembershipFees.Find(id);
+        if (fee != null)
+        {
+            _db.MembershipFees.Remove(fee);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{fee.Category}\" removed.";
+            await _logger.LogAsync("Deleted", "MembershipFee", id, $"Category: {fee.Category}");
+        }
+        return RedirectToAction(nameof(MembershipFees));
     }
-
-    // ==================== EVENTS ====================
-    public IActionResult Events(bool showForm = false, int? id = null)
-    {
-        ViewBag.ShowForm = showForm;
-        ViewBag.CurrentEvent = id.HasValue
-            ? GetMockEvents().FirstOrDefault(e => e.Id == id.Value)
-            : null;
-        return View(GetMockEvents());
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult EventSave(EventItem model)
-    {
-        TempData["Success"] = model.Id > 0
-            ? $"\"{model.Title}\" updated (preview only)."
-            : $"\"{model.Title}\" created (preview only).";
-        return RedirectToAction(nameof(Events));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult EventDelete(int id)
-    {
-        TempData["Success"] = $"Event #{id} deleted (preview only).";
-        return RedirectToAction(nameof(Events));
-    }
-
-    // ==================== COMMITTEE ====================
-    public IActionResult Committee(bool showForm = false, int? id = null)
-    {
-        ViewBag.ShowForm = showForm;
-        ViewBag.CurrentMember = id.HasValue
-            ? GetMockCommittee().FirstOrDefault(m => m.Id == id.Value)
-            : null;
-        return View(GetMockCommittee());
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult CommitteeSave(CommitteeMember model)
-    {
-        TempData["Success"] = model.Id > 0
-            ? $"\"{model.FullName}\" updated (preview only)."
-            : $"\"{model.FullName}\" added (preview only).";
-        return RedirectToAction(nameof(Committee));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult CommitteeDelete(int id)
-    {
-        TempData["Success"] = $"Member #{id} removed (preview only).";
-        return RedirectToAction(nameof(Committee));
-    }
-
-    // ==================== ABOUT ====================
-    public IActionResult About(bool showForm = false, int? id = null)
-    {
-        ViewBag.ShowForm = showForm;
-        ViewBag.Sections = GetMockAboutSections();
-        ViewBag.CurrentSection = id.HasValue
-            ? GetMockAboutSections().FirstOrDefault(s => s.Id == id.Value)
-            : null;
-        return View(GetMockAbout());
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult AboutSave(AboutContent model)
-    {
-        TempData["Success"] = "About page header saved (preview only).";
-        return RedirectToAction(nameof(About));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult AboutSectionSave(AboutSection model)
-    {
-        TempData["Success"] = model.Id > 0
-            ? $"\"{model.Title}\" updated (preview only)."
-            : $"\"{model.Title}\" added (preview only).";
-        return RedirectToAction(nameof(About));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult AboutSectionDelete(int id)
-    {
-        TempData["Success"] = $"Section #{id} removed (preview only).";
-        return RedirectToAction(nameof(About));
-    }
-
-    // ==================== WOMEN ====================
-    public IActionResult Women(bool showForm = false, bool showIntroForm = false, int? id = null)
-    {
-        ViewBag.ShowForm = showForm;
-        ViewBag.ShowIntroForm = showIntroForm;
-        ViewBag.Features = GetMockWomenFeatures();
-        ViewBag.CurrentFeature = id.HasValue
-            ? GetMockWomenFeatures().FirstOrDefault(f => f.Id == id.Value)
-            : null;
-        return View(GetMockWomen());
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult WomenSave(WomenEmpowermentContent model)
-    {
-        TempData["Success"] = "Women page header saved (preview only).";
-        return RedirectToAction(nameof(Women));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult WomenFeatureSave(WomenFeature model)
-    {
-        TempData["Success"] = model.Id > 0
-            ? $"\"{model.Title}\" updated (preview only)."
-            : $"\"{model.Title}\" added (preview only).";
-        return RedirectToAction(nameof(Women));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult WomenFeatureDelete(int id)
-    {
-        TempData["Success"] = $"Feature #{id} removed (preview only).";
-        return RedirectToAction(nameof(Women));
-    }
-
-    // ==================== INDUSTRY ====================
-    public IActionResult Industry(bool showForm = false, int? id = null)
-    {
-        ViewBag.ShowForm = showForm;
-        ViewBag.CurrentArea = id.HasValue
-            ? GetMockIndustryAreas().FirstOrDefault(a => a.Id == id.Value)
-            : null;
-        return View(GetMockIndustryAreas());
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult IndustrySave(IndustryArea model)
-    {
-        TempData["Success"] = model.Id > 0
-            ? $"\"{model.Title}\" updated (preview only)."
-            : $"\"{model.Title}\" created (preview only).";
-        return RedirectToAction(nameof(Industry));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult IndustryDelete(int id)
-    {
-        TempData["Success"] = $"Area #{id} deleted (preview only).";
-        return RedirectToAction(nameof(Industry));
-    }
-
-    // ==================== CONTACT CONTENT (page editor) ====================
-    public IActionResult ContactContent(bool showForm = false)
-    {
-        ViewBag.ShowForm = showForm;
-        return View();
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult ContactContentSave()
-    {
-        TempData["Success"] = "Contact content saved (preview only).";
-        return RedirectToAction(nameof(ContactContent));
-    }
-
-    // ==================== CONTACT INQUIRIES (inbox) ====================
-    public IActionResult Contact() => View(GetMockContactInquiries());
-
-    public IActionResult ContactDetail(int id)
-    {
-        var inquiry = GetMockContactInquiries().FirstOrDefault(c => c.Id == id);
-        if (inquiry == null) return RedirectToAction(nameof(Contact));
-        return View(inquiry);
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult ContactMarkRead(int id)
-    {
-        TempData["Success"] = $"Inquiry #{id} marked as read.";
-        return RedirectToAction(nameof(Contact));
-    }
-
-    // ==================== SYSTEM ====================
-    public IActionResult Users() => View();
-    public IActionResult Settings() => View();
-    public IActionResult Profile() => View();
-    public IActionResult Reports() => View();
-    public IActionResult ActivityLog() => View();
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult SettingsSave()
-    {
-        TempData["Success"] = "Settings saved (preview only).";
-        return RedirectToAction(nameof(Settings));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult ProfileSave()
-    {
-        TempData["Success"] = "Profile updated (preview only).";
-        return RedirectToAction(nameof(Profile));
-    }
-
-    // ==================== MOCK DATA ====================
-    private static List<MembershipApplication> GetMockApplications() => new()
-    {
-        new MembershipApplication { Id=1, FullName="Ali Khan", FatherHusbandName="Muhammad Khan", Cnic="17301-1234567-1", BusinessName="Peshawar Gems & Co.", Designation="Owner", NatureOfBusiness="Gemstone Trading", MobileNo="0300-1234567", Email="ali.khan@example.com", CityDistrict="Peshawar", MembershipCategory="Ordinary Member", MembershipFee=1000m, BusinessAddress="Namak Mandi, Peshawar", BusinessTypes="Gemstone, Jewellery", Status="Pending Review", ApplicationDate=DateTime.UtcNow.AddDays(-2) },
-        new MembershipApplication { Id=2, FullName="Hamza Ahmad", FatherHusbandName="Rashid Ahmad", Cnic="15402-7654321-3", BusinessName="Swat Jewellers", Designation="CEO", NatureOfBusiness="Jewellery Manufacturing", MobileNo="0333-9876543", Email="hamza@swatjewellers.pk", CityDistrict="Swat", MembershipCategory="Associate Member", MembershipFee=2500m, BusinessAddress="Mingora Bazaar, Swat", BusinessTypes="Jewellery, Retail", Status="Approved for Payment", ApplicationDate=DateTime.UtcNow.AddDays(-5) },
-        new MembershipApplication { Id=3, FullName="Fatima Bibi", FatherHusbandName="Abdul Wali", Cnic="17301-1112223-4", BusinessName="Fatima Handcrafted Jewels", Designation="Founder", NatureOfBusiness="Handmade Jewellery", MobileNo="0345-1112223", Email="fatima@handcrafted.pk", CityDistrict="Peshawar", MembershipCategory="Ordinary Member", MembershipFee=1000m, BusinessAddress="University Road, Peshawar", BusinessTypes="Handmade, Artisan", Status="Active Member", ApplicationDate=DateTime.UtcNow.AddDays(-30), MembershipNo="KPG-2026-0003", FeeReceived=1000m, PaymentReference="TRX-99323" },
-        new MembershipApplication { Id=4, FullName="Zubair Shah", FatherHusbandName="Naeem Shah", Cnic="14302-3334445-5", BusinessName="Shah Gemstones", Designation="Partner", NatureOfBusiness="Wholesale", MobileNo="0311-3334445", Email="zubair@shahgems.com", CityDistrict="Mardan", MembershipCategory="Honorary Member", MembershipFee=3500m, BusinessAddress="Main Bazaar, Mardan", BusinessTypes="Wholesale, Export", Status="Rejected", ApplicationDate=DateTime.UtcNow.AddDays(-10) },
-        new MembershipApplication { Id=5, FullName="Ayesha Tariq", FatherHusbandName="Tariq Mehmood", Cnic="17301-5556667-6", BusinessName="Ayesha Silver Arts", Designation="Director", NatureOfBusiness="Silver Jewellery", MobileNo="0301-5556667", Email="ayesha@silverarts.pk", CityDistrict="Peshawar", MembershipCategory="Associate Member", MembershipFee=2500m, BusinessAddress="Saddar, Peshawar", BusinessTypes="Silver, Retail", Status="Payment Submitted", ApplicationDate=DateTime.UtcNow.AddDays(-3), FeeReceived=2500m, PaymentReference="TRX-88123" }
-    };
-
-    private static List<NewsArticle> GetMockNews() => new()
-    {
-        new NewsArticle { Id=1, Title="KPGJA Hosts Successful Gem & Jewellery Expo 2026", Category="Announcement", Summary="Over 200 exhibitors and 5,000 visitors attended the three-day expo in Peshawar.", Content="Full article content...", Author="Admin", IsPublished=true, PublishedDate=DateTime.UtcNow.AddDays(-3) },
-        new NewsArticle { Id=2, Title="Women Artisans Complete Jewellery Design Training", Category="Women Empowerment", Summary="25 women from Peshawar and Swat completed a 6-week intensive program.", Content="Full article content...", Author="Admin", IsPublished=true, PublishedDate=DateTime.UtcNow.AddDays(-10) },
-        new NewsArticle { Id=3, Title="New Export Compliance Guidelines for 2027", Category="Industry Update", Summary="The government has issued updated compliance guidelines for gemstone exporters.", Content="Full article content...", Author="Admin", IsPublished=false, PublishedDate=DateTime.UtcNow.AddDays(-1) },
-        new NewsArticle { Id=4, Title="KPGJA Signs MoU with International Gem Institute", Category="Press Release", Summary="Partnership will bring internationally recognized certification to local artisans.", Content="Full article content...", Author="Admin", IsPublished=true, PublishedDate=DateTime.UtcNow.AddDays(-20) }
-    };
-
-    private static List<EventItem> GetMockEvents() => new()
-    {
-        new EventItem { Id=1, Title="Gem & Jewellery Expo 2026", Location="Peshawar Expo Center", Description="Three-day exhibition featuring 200+ exhibitors.", StartDate=new DateTime(2026,11,12), EndDate=new DateTime(2026,11,14), IsPublished=true },
-        new EventItem { Id=2, Title="Women Artisans Workshop", Location="KPGJA Hall, Peshawar", Description="Hands-on jewellery design workshop for women artisans.", StartDate=new DateTime(2026,10,22), IsPublished=true },
-        new EventItem { Id=3, Title="Export Compliance Training", Location="Online Webinar", Description="Government guidelines for gemstone exporters.", StartDate=new DateTime(2026,11,5), IsPublished=true },
-        new EventItem { Id=4, Title="Annual General Meeting", Location="Serena Hotel, Peshawar", Description="Annual meeting of all KPGJA members.", StartDate=new DateTime(2026,12,30), IsPublished=false }
-    };
-
-    private static List<CommitteeMember> GetMockCommittee() => new()
-    {
-        new CommitteeMember { Id=1, FullName="Muhammad Aslam", Designation="President", Bio="Leading KPGJA since 2022.", DisplayOrder=1, IsActive=true },
-        new CommitteeMember { Id=2, FullName="Imran Haider", Designation="Vice President", Bio="Industry veteran with 20 years experience.", DisplayOrder=2, IsActive=true },
-        new CommitteeMember { Id=3, FullName="Rashid Mehmood", Designation="Secretary Chairman", Bio="Oversees KPGJA operations.", DisplayOrder=3, IsActive=true },
-        new CommitteeMember { Id=4, FullName="Nasir Ahmad", Designation="Finance Secretary", Bio="Manages association finances.", DisplayOrder=4, IsActive=true },
-        new CommitteeMember { Id=5, FullName="Sajid Ali", Designation="Office Secretary", Bio="Handles daily office operations.", DisplayOrder=5, IsActive=true },
-        new CommitteeMember { Id=6, FullName="Bilal Khan", Designation="Youth Secretary", Bio="Coordinates youth programs.", DisplayOrder=6, IsActive=true }
-    };
-
-    private static AboutContent GetMockAbout() => new()
-    {
-        Id = 1,
-        SectionTitle = "Who We Are",
-        MissionStatement = "To unite, empower and represent the gemstone and jewellery community of Khyber Pakhtunkhwa through advocacy, skill development and sustainable growth.",
-        VisionStatement = "A globally recognized, prosperous and inclusive gem and jewellery sector rooted in Khyber Pakhtunkhwa's rich heritage.",
-        LastUpdated = DateTime.UtcNow.AddDays(-15)
-    };
-
-    private static List<AboutSection> GetMockAboutSections() => new()
-    {
-        new AboutSection { Id=1, Title="Who We Are", Body="KPGJA is the apex body representing stakeholders across the entire gem and jewellery value chain.", IconClass="bi-people", DisplayOrder=1, IsActive=true },
-        new AboutSection { Id=2, Title="Our Mission", Body="To unite, empower and represent the gemstone and jewellery community of KP.", IconClass="bi-bullseye", DisplayOrder=2, IsActive=true },
-        new AboutSection { Id=3, Title="Our Vision", Body="A globally recognized, prosperous and inclusive gem and jewellery sector.", IconClass="bi-eye", DisplayOrder=3, IsActive=true },
-        new AboutSection { Id=4, Title="Our Values", Body="Integrity, transparency, craftsmanship and community-first growth.", IconClass="bi-heart", DisplayOrder=4, IsActive=true }
-    };
-
-    private static WomenEmpowermentContent GetMockWomen() => new()
-    {
-        Id = 1,
-        IntroTitle = "Women in the Gem & Jewellery Sector",
-        IntroBody = "KPGJA is committed to creating equal opportunities for women artisans, designers and entrepreneurs across Khyber Pakhtunkhwa.",
-        HighlightTitle = "Training 500+ Women by 2027",
-        HighlightBody = "Through partnerships with international organizations, KPGJA runs skill development programs focused on jewellery design, gemstone cutting and digital commerce.",
-        LastUpdated = DateTime.UtcNow.AddDays(-5)
-    };
-
-    private static List<WomenFeature> GetMockWomenFeatures() => new()
-    {
-        new WomenFeature { Id=1, Title="Skill Training", Body="Hands-on jewellery design and gemstone cutting workshops.", IconClass="bi-mortarboard", DisplayOrder=1, IsActive=true },
-        new WomenFeature { Id=2, Title="Financial Support", Body="Micro-grants and interest-free loans for women entrepreneurs.", IconClass="bi-cash-coin", DisplayOrder=2, IsActive=true },
-        new WomenFeature { Id=3, Title="Digital Commerce", Body="Training on e-commerce, social media and international marketplaces.", IconClass="bi-globe2", DisplayOrder=3, IsActive=true },
-        new WomenFeature { Id=4, Title="Mentorship", Body="Pairing emerging artisans with established industry leaders.", IconClass="bi-person-hearts", DisplayOrder=4, IsActive=true }
-    };
-
-    private static List<IndustryArea> GetMockIndustryAreas() => new()
-    {
-        new IndustryArea { Id=1, Title="Mining & Extraction", Description="Sustainable extraction of gemstones from KP's rich deposits.", IconClass="bi-gem", DisplayOrder=1, IsActive=true },
-        new IndustryArea { Id=2, Title="Gemstone Processing", Description="Cutting, polishing and certification of raw gemstones.", IconClass="bi-scissors", DisplayOrder=2, IsActive=true },
-        new IndustryArea { Id=3, Title="Jewellery Manufacturing", Description="Design and handcrafting of fine jewellery.", IconClass="bi-award", DisplayOrder=3, IsActive=true },
-        new IndustryArea { Id=4, Title="Digital Commerce", Description="E-commerce and international export channels.", IconClass="bi-globe", DisplayOrder=4, IsActive=true }
-    };
-
-    private static List<ContactInquiry> GetMockContactInquiries() => new()
-    {
-        new ContactInquiry { Id=1, FullName="Ahmed Raza", Email="ahmed@example.com", Phone="0300-1112223", Subject="Membership Inquiry", Message="I would like to know the procedure to become a member of KPGJA.", SubmittedAt=DateTime.UtcNow.AddHours(-3), IsRead=false },
-        new ContactInquiry { Id=2, FullName="Sara Khan", Email="sara@jewels.pk", Phone="0333-4445556", Subject="Partnership Proposal", Message="Our company would like to explore a partnership for the upcoming expo.", SubmittedAt=DateTime.UtcNow.AddDays(-1), IsRead=true, IsReplied=true },
-        new ContactInquiry { Id=3, FullName="Bilal Ahmad", Email="bilal@tradeco.pk", Phone="0345-7778889", Subject="Export Documentation", Message="Need guidance on export documentation for gemstones to UAE.", SubmittedAt=DateTime.UtcNow.AddDays(-2), IsRead=true },
-        new ContactInquiry { Id=4, FullName="Hina Malik", Email="hina@artisan.pk", Phone="0311-2223334", Subject="Women Program Inquiry", Message="I am interested in the women artisan training program. How can I apply?", SubmittedAt=DateTime.UtcNow.AddHours(-6), IsRead=false },
-        new ContactInquiry { Id=5, FullName="Kashif Ali", Email="kashif@gems.com", Phone="0301-5556667", Subject="General Question", Message="What are the office timings of KPGJA?", SubmittedAt=DateTime.UtcNow.AddDays(-4), IsRead=true, IsReplied=true }
-    };
     // ==================== HOME CONTENT ====================
     public IActionResult HomeContent(
         bool showSlideForm = false,
@@ -392,107 +267,1087 @@ public class AdminController : Controller
         ViewBag.ShowQuickLinkForm = showQuickLinkForm;
         ViewBag.ShowCtaForm = showCtaForm;
 
-        var slides = GetMockHeroSlides();
-        var objectives = GetMockHomeSections("objectives");
-        var quickLinks = GetMockHomeSections("quicklinks");
+        var slides = _db.HeroSlides.AsNoTracking().OrderBy(s => s.DisplayOrder).ToList();
+        var objectives = _db.HomeSections.AsNoTracking()
+            .Where(s => s.SectionKey == "objectives").OrderBy(s => s.DisplayOrder).ToList();
+        var quickLinks = _db.HomeSections.AsNoTracking()
+            .Where(s => s.SectionKey == "quicklinks").OrderBy(s => s.DisplayOrder).ToList();
 
         ViewBag.Slides = slides;
         ViewBag.Objectives = objectives;
         ViewBag.QuickLinks = quickLinks;
 
         ViewBag.CurrentSlide = id.HasValue && showSlideForm
-            ? slides.FirstOrDefault(s => s.Id == id.Value)
-            : null;
+            ? slides.FirstOrDefault(s => s.Id == id.Value) : null;
 
         ViewBag.CurrentObjective = id.HasValue && showObjectiveForm
-            ? objectives.FirstOrDefault(o => o.Id == id.Value)
-            : null;
+            ? objectives.FirstOrDefault(o => o.Id == id.Value) : null;
 
         ViewBag.CurrentQuickLink = id.HasValue && showQuickLinkForm
-            ? quickLinks.FirstOrDefault(q => q.Id == id.Value)
-            : null;
+            ? quickLinks.FirstOrDefault(q => q.Id == id.Value) : null;
+
+        ViewBag.Cta = _db.HomeCtas.AsNoTracking().FirstOrDefault() ?? new HomeCta();
+        ViewBag.Blocks = _db.HomeBlocks.AsNoTracking().ToList();
 
         return View();
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult HomeSlideSave(HeroSlide model)
+    public async Task<IActionResult> HomeSlideSave(HeroSlide model, IFormFile? ImageFile)
     {
-        TempData["Success"] = model.Id > 0
-            ? $"Slide \"{model.Title}\" updated (preview only)."
-            : $"Slide \"{model.Title}\" added (preview only).";
-        return RedirectToAction(nameof(HomeContent));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult HomeSlideDelete(int id)
-    {
-        TempData["Success"] = $"Slide #{id} deleted (preview only).";
-        return RedirectToAction(nameof(HomeContent));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult HomeObjectiveSave(HomeSection model)
-    {
-        TempData["Success"] = model.Id > 0
-            ? $"Objective \"{model.Title}\" updated (preview only)."
-            : $"Objective \"{model.Title}\" added (preview only).";
-        return RedirectToAction(nameof(HomeContent));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult HomeObjectiveDelete(int id)
-    {
-        TempData["Success"] = $"Objective #{id} deleted (preview only).";
-        return RedirectToAction(nameof(HomeContent));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult HomeQuickLinkSave(HomeSection model)
-    {
-        TempData["Success"] = model.Id > 0
-            ? $"Quick link \"{model.Title}\" updated (preview only)."
-            : $"Quick link \"{model.Title}\" added (preview only).";
-        return RedirectToAction(nameof(HomeContent));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult HomeQuickLinkDelete(int id)
-    {
-        TempData["Success"] = $"Quick link #{id} deleted (preview only).";
-        return RedirectToAction(nameof(HomeContent));
-    }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public IActionResult HomeCtaSave()
-    {
-        TempData["Success"] = "Membership CTA banner saved (preview only).";
-        return RedirectToAction(nameof(HomeContent));
-    }
-
-    // Mock data helpers for HomeSections
-    private static List<HomeSection> GetMockHomeSections(string sectionKey) => sectionKey switch
-    {
-        "objectives" => new()
+        if (ImageFile != null && ImageFile.Length > 0)
         {
-            new HomeSection { Id=1, SectionKey="objectives", Title="Promote Industry",    Body="Promote the gem and jewellery sector across KP.", IconClass="bi-gem",         DisplayOrder=1, IsActive=true },
-            new HomeSection { Id=2, SectionKey="objectives", Title="Skill Development",   Body="Training and mentorship for artisans.",          IconClass="bi-mortarboard", DisplayOrder=2, IsActive=true },
-            new HomeSection { Id=3, SectionKey="objectives", Title="Market Access",       Body="Connect members with domestic and international markets.", IconClass="bi-globe",    DisplayOrder=3, IsActive=true },
-            new HomeSection { Id=4, SectionKey="objectives", Title="Policy Advocacy",     Body="Represent the industry to government bodies.",   IconClass="bi-megaphone",   DisplayOrder=4, IsActive=true }
-        },
-        "quicklinks" => new()
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "slider");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    ImageFile.CopyTo(stream);
+                model.ImagePath = $"/assets/img/slider/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
         {
-            new HomeSection { Id=1, SectionKey="quicklinks", Title="Membership", Body="/Member/Register", IconClass="bi-person-plus",    DisplayOrder=1, IsActive=true },
-            new HomeSection { Id=2, SectionKey="quicklinks", Title="Events",     Body="/Home/Events",     IconClass="bi-calendar-event", DisplayOrder=2, IsActive=true },
-            new HomeSection { Id=3, SectionKey="quicklinks", Title="News",       Body="/Home/News",       IconClass="bi-newspaper",      DisplayOrder=3, IsActive=true },
-            new HomeSection { Id=4, SectionKey="quicklinks", Title="Contact",    Body="/Home/Contact",    IconClass="bi-envelope",       DisplayOrder=4, IsActive=true }
-        },
-        _ => new()
-    };
-    private static List<HeroSlide> GetMockHeroSlides() => new()
+            var existing = _db.HeroSlides.AsNoTracking().FirstOrDefault(s => s.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.ImagePath))
+                model.ImagePath = existing.ImagePath;
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.HeroSlides.Update(model);
+            TempData["Success"] = $"Slide \"{model.Title}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.HeroSlides.Add(model);
+            TempData["Success"] = $"Slide \"{model.Title}\" added.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "HeroSlide", model.Id, $"Title: {model.Title}");
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HomeSlideDelete(int id)
     {
-        new HeroSlide { Id=1, Title="Empowering Pakistan's Gem & Jewellery Industry", Subtitle="Uniting stakeholders across Khyber Pakhtunkhwa", CtaText="Become a Member", CtaLink="/Member/Register", DisplayOrder=1, IsActive=true },
-        new HeroSlide { Id=2, Title="From Mines to Markets",                         Subtitle="Supporting the full gemstone value chain",       CtaText="Learn More",      CtaLink="/Home/About",      DisplayOrder=2, IsActive=true },
-        new HeroSlide { Id=3, Title="Women Leading the Craft",                       Subtitle="Championing women artisans across KP",          CtaText="Explore Program", CtaLink="/Home/Women",      DisplayOrder=3, IsActive=false }
+        var s = _db.HeroSlides.Find(id);
+        if (s != null)
+        {
+            _db.HeroSlides.Remove(s);
+            _db.SaveChanges();
+            await _logger.LogAsync("Deleted", "HeroSlide", id, $"Title: {s.Title}");
+        }
+        TempData["Success"] = "Slide deleted.";
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HomeObjectiveSave(HomeSection model, IFormFile? ImageFile)
+    {
+        model.SectionKey = "objectives";
+
+        try
+        {
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+                var ext = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
+                if (allowed.Contains(ext))
+                {
+                    var folder = Path.Combine("wwwroot", "assets", "img", "home");
+                    Directory.CreateDirectory(folder);
+                    var fileName = $"{Guid.NewGuid():N}{ext}";
+                    using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                        ImageFile.CopyTo(stream);
+                    model.ImagePath = $"/assets/img/home/{fileName}";
+                }
+            }
+            else if (model.Id > 0)
+            {
+                var existing = _db.HomeSections.AsNoTracking().FirstOrDefault(s => s.Id == model.Id);
+                if (existing != null && string.IsNullOrEmpty(model.ImagePath))
+                    model.ImagePath = existing.ImagePath;
+            }
+
+            string action;
+            if (model.Id > 0)
+            {
+                _db.HomeSections.Update(model);
+                TempData["Success"] = $"Objective \"{model.Title}\" updated.";
+                action = "Updated";
+            }
+            else
+            {
+                _db.HomeSections.Add(model);
+                TempData["Success"] = $"Objective \"{model.Title}\" added.";
+                action = "Created";
+            }
+            _db.SaveChanges();
+
+            await _logger.LogAsync(action, "HomeSection", model.Id, $"Title: {model.Title}");
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Save failed: {ex.InnerException?.Message ?? ex.Message}";
+        }
+
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HomeObjectiveDelete(int id)
+    {
+        var s = _db.HomeSections.Find(id);
+        if (s != null)
+        {
+            _db.HomeSections.Remove(s);
+            _db.SaveChanges();
+            await _logger.LogAsync("Deleted", "HomeSection", id, $"Title: {s.Title}");
+        }
+        TempData["Success"] = "Objective deleted.";
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HomeQuickLinkSave(HomeSection model)
+    {
+        model.SectionKey = "quicklinks";
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.HomeSections.Update(model);
+            TempData["Success"] = $"Quick link \"{model.Title}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.HomeSections.Add(model);
+            TempData["Success"] = $"Quick link \"{model.Title}\" added.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "QuickLink", model.Id, $"Title: {model.Title}");
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HomeQuickLinkDelete(int id)
+    {
+        var s = _db.HomeSections.Find(id);
+        if (s != null)
+        {
+            _db.HomeSections.Remove(s);
+            _db.SaveChanges();
+            await _logger.LogAsync("Deleted", "QuickLink", id, $"Title: {s.Title}");
+        }
+        TempData["Success"] = "Quick link deleted.";
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HomeCtaSave(HomeCta model)
+    {
+        var existing = _db.HomeCtas.FirstOrDefault();
+        if (existing == null)
+        {
+            model.LastUpdated = DateTime.UtcNow;
+            _db.HomeCtas.Add(model);
+            TempData["Success"] = "CTA banner created.";
+        }
+        else
+        {
+            existing.Heading = model.Heading;
+            existing.Body = model.Body;
+            existing.CtaText = model.CtaText;
+            existing.CtaLink = model.CtaLink;
+            existing.LastUpdated = DateTime.UtcNow;
+            TempData["Success"] = "CTA banner saved.";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync("Saved", "HomeCta", 0, $"Heading: {model.Heading}");
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    // ==================== HOME BLOCKS ====================
+    public IActionResult HomeBlockEdit(string key)
+    {
+        var block = _db.HomeBlocks.FirstOrDefault(b => b.Key == key)
+                    ?? new HomeBlock { Key = key };
+
+        ViewBag.BlockKey = key;
+        ViewBag.BlockLabel = key switch
+        {
+            "intro" => "Introduction Section",
+            "president" => "President's Message",
+            "women" => "Women Empowerment Section",
+            "contact-cta" => "Contact CTA Banner",
+            _ => key
+        };
+        return View(block);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> HomeBlockSave(HomeBlock model, IFormFile? ImageFile)
+    {
+        if (ImageFile != null && ImageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "home");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    ImageFile.CopyTo(stream);
+                model.ImagePath = $"/assets/img/home/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
+        {
+            var existing = _db.HomeBlocks.AsNoTracking().FirstOrDefault(b => b.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.ImagePath))
+                model.ImagePath = existing.ImagePath;
+        }
+
+        var existingBlock = _db.HomeBlocks.FirstOrDefault(b => b.Key == model.Key);
+
+        string action;
+        if (existingBlock == null)
+        {
+            model.LastUpdated = DateTime.UtcNow;
+            _db.HomeBlocks.Add(model);
+            TempData["Success"] = $"{model.Key} block created.";
+            action = "Created";
+        }
+        else
+        {
+            existingBlock.Title = model.Title;
+            existingBlock.Subtitle = model.Subtitle;
+            existingBlock.Body = model.Body;
+            existingBlock.Body2 = model.Body2;
+            existingBlock.ImagePath = model.ImagePath;
+            existingBlock.PersonName = model.PersonName;
+            existingBlock.PersonTitle = model.PersonTitle;
+            existingBlock.CtaText = model.CtaText;
+            existingBlock.CtaLink = model.CtaLink;
+            existingBlock.IsActive = model.IsActive;
+            existingBlock.LastUpdated = DateTime.UtcNow;
+            TempData["Success"] = $"{model.Key} block saved.";
+            action = "Updated";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "HomeBlock", model.Id, $"Key: {model.Key}");
+        return RedirectToAction(nameof(HomeContent));
+    }
+
+    // ==================== NEWS ====================
+    public IActionResult News(bool showForm = false, int? id = null)
+    {
+        ViewBag.ShowForm = showForm;
+        ViewBag.CurrentArticle = id.HasValue
+            ? _db.NewsArticles.FirstOrDefault(n => n.Id == id.Value) : null;
+        return View(_db.NewsArticles.OrderByDescending(n => n.PublishedDate).ToList());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> NewsSave(NewsArticle model, IFormFile? imageFile)
+    {
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "news");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                model.ImagePath = $"/assets/img/news/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
+        {
+            var existing = _db.NewsArticles.AsNoTracking().FirstOrDefault(n => n.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.ImagePath))
+                model.ImagePath = existing.ImagePath;
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.NewsArticles.Update(model);
+            TempData["Success"] = $"\"{model.Title}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.NewsArticles.Add(model);
+            TempData["Success"] = $"\"{model.Title}\" published.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "NewsArticle", model.Id, $"Title: {model.Title}");
+        return RedirectToAction(nameof(News));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> NewsDelete(int id)
+    {
+        var article = _db.NewsArticles.Find(id);
+        if (article != null)
+        {
+            _db.NewsArticles.Remove(article);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{article.Title}\" deleted.";
+            await _logger.LogAsync("Deleted", "NewsArticle", id, $"Title: {article.Title}");
+        }
+        return RedirectToAction(nameof(News));
+    }
+
+    // ==================== EVENTS ====================
+    public IActionResult Events(bool showForm = false, int? id = null)
+    {
+        ViewBag.ShowForm = showForm;
+        ViewBag.CurrentEvent = id.HasValue
+            ? _db.Events.FirstOrDefault(e => e.Id == id.Value) : null;
+        return View(_db.Events.OrderByDescending(e => e.StartDate).ToList());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EventSave(EventItem model, IFormFile? imageFile)
+    {
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "events");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                model.CoverImagePath = $"/assets/img/events/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
+        {
+            var existing = _db.Events.AsNoTracking().FirstOrDefault(e => e.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.CoverImagePath))
+                model.CoverImagePath = existing.CoverImagePath;
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.Events.Update(model);
+            TempData["Success"] = $"\"{model.Title}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.Events.Add(model);
+            TempData["Success"] = $"\"{model.Title}\" created.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "EventItem", model.Id, $"Title: {model.Title}");
+        return RedirectToAction(nameof(Events));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EventDelete(int id)
+    {
+        var ev = _db.Events.Find(id);
+        if (ev != null)
+        {
+            _db.Events.Remove(ev);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{ev.Title}\" deleted.";
+            await _logger.LogAsync("Deleted", "EventItem", id, $"Title: {ev.Title}");
+        }
+        return RedirectToAction(nameof(Events));
+    }
+
+    // ==================== COMMITTEE ====================
+    public IActionResult Committee(bool showForm = false, int? id = null)
+    {
+        ViewBag.ShowForm = showForm;
+        ViewBag.CurrentMember = id.HasValue
+            ? _db.CommitteeMembers.FirstOrDefault(m => m.Id == id.Value) : null;
+        return View(_db.CommitteeMembers.OrderBy(m => m.DisplayOrder).ToList());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CommitteeSave(CommitteeMember model, IFormFile? imageFile)
+    {
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "committee");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                model.PhotoPath = $"/assets/img/committee/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
+        {
+            var existing = _db.CommitteeMembers.AsNoTracking().FirstOrDefault(m => m.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.PhotoPath))
+                model.PhotoPath = existing.PhotoPath;
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.CommitteeMembers.Update(model);
+            TempData["Success"] = $"\"{model.FullName}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.CommitteeMembers.Add(model);
+            TempData["Success"] = $"\"{model.FullName}\" added.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "CommitteeMember", model.Id, $"Name: {model.FullName}");
+        return RedirectToAction(nameof(Committee));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CommitteeDelete(int id)
+    {
+        var m = _db.CommitteeMembers.Find(id);
+        if (m != null)
+        {
+            _db.CommitteeMembers.Remove(m);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{m.FullName}\" removed.";
+            await _logger.LogAsync("Deleted", "CommitteeMember", id, $"Name: {m.FullName}");
+        }
+        return RedirectToAction(nameof(Committee));
+    }
+
+    // ==================== ABOUT ====================
+    public IActionResult About(bool showForm = false, int? id = null)
+    {
+        ViewBag.ShowForm = showForm;
+        ViewBag.CurrentSection = id.HasValue
+            ? _db.AboutSections.AsNoTracking().FirstOrDefault(s => s.Id == id.Value) : null;
+        ViewBag.Sections = _db.AboutSections.AsNoTracking().OrderBy(s => s.DisplayOrder).ToList();
+        return View();
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AboutSectionSave(AboutSection model, IFormFile? imageFile)
+    {
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "about");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                model.ImagePath = $"/assets/img/about/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
+        {
+            var existing = _db.AboutSections.AsNoTracking().FirstOrDefault(s => s.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.ImagePath))
+                model.ImagePath = existing.ImagePath;
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.AboutSections.Update(model);
+            TempData["Success"] = $"\"{model.Title}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.AboutSections.Add(model);
+            TempData["Success"] = $"\"{model.Title}\" added.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "AboutSection", model.Id, $"Title: {model.Title}");
+        return RedirectToAction(nameof(About));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> AboutSectionDelete(int id)
+    {
+        var s = _db.AboutSections.Find(id);
+        if (s != null)
+        {
+            _db.AboutSections.Remove(s);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{s.Title}\" removed.";
+            await _logger.LogAsync("Deleted", "AboutSection", id, $"Title: {s.Title}");
+        }
+        return RedirectToAction(nameof(About));
+    }
+
+    // ==================== WOMEN ====================
+    public IActionResult Women(bool showForm = false, bool showIntroForm = false,
+                              bool showMiniForm = false, int? id = null, int? miniId = null)
+    {
+        ViewBag.ShowForm = showForm;
+        ViewBag.ShowIntroForm = showIntroForm;
+        ViewBag.ShowMiniForm = showMiniForm;
+
+        var features = _db.WomenFeatures.AsNoTracking().OrderBy(f => f.DisplayOrder).ToList();
+        ViewBag.Features = features;
+        ViewBag.CurrentFeature = id.HasValue
+            ? features.FirstOrDefault(f => f.Id == id.Value) : null;
+
+        var minis = _db.WomenMiniFeatures.AsNoTracking().OrderBy(m => m.DisplayOrder).ToList();
+        ViewBag.MiniFeatures = minis;
+        ViewBag.CurrentMini = miniId.HasValue
+            ? minis.FirstOrDefault(m => m.Id == miniId.Value) : null;
+
+        var content = _db.WomenEmpowermentContents.AsNoTracking().FirstOrDefault()
+                      ?? new WomenEmpowermentContent();
+        return View(content);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> WomenCombinedSave(
+        string Title,
+        string? Body,
+        IFormFile? imageFile,
+        string? MiniIconClass,
+        string? MiniLabel,
+        string? MiniLink,
+        int DisplayOrder = 1,
+        bool IsActive = true)
+    {
+        var main = new WomenFeature
+        {
+            Title = Title ?? "",
+            Body = Body ?? "",
+            DisplayOrder = DisplayOrder,
+            IsActive = IsActive
+        };
+
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "women");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                main.ImagePath = $"/assets/img/women/{fileName}";
+            }
+        }
+
+        _db.WomenFeatures.Add(main);
+
+        if (!string.IsNullOrWhiteSpace(MiniLabel))
+        {
+            var mini = new WomenMiniFeature
+            {
+                IconClass = string.IsNullOrWhiteSpace(MiniIconClass) ? "bi-star" : MiniIconClass,
+                Label = MiniLabel,
+                Link = MiniLink,
+                DisplayOrder = DisplayOrder,
+                IsActive = IsActive
+            };
+            _db.WomenMiniFeatures.Add(mini);
+        }
+
+        _db.SaveChanges();
+
+        TempData["Success"] = $"\"{Title}\" created (main + mini).";
+        await _logger.LogAsync("Created", "WomenFeature", 0, $"Title: {Title}");
+        return RedirectToAction(nameof(Women));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> WomenMiniSave(WomenMiniFeature model)
+    {
+        string action;
+        if (model.Id > 0)
+        {
+            _db.WomenMiniFeatures.Update(model);
+            TempData["Success"] = $"\"{model.Label}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.WomenMiniFeatures.Add(model);
+            TempData["Success"] = $"\"{model.Label}\" added.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "WomenMiniFeature", model.Id, $"Label: {model.Label}");
+        return RedirectToAction(nameof(Women));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> WomenMiniDelete(int id)
+    {
+        var m = _db.WomenMiniFeatures.Find(id);
+        if (m != null)
+        {
+            _db.WomenMiniFeatures.Remove(m);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{m.Label}\" removed.";
+            await _logger.LogAsync("Deleted", "WomenMiniFeature", id, $"Label: {m.Label}");
+        }
+        return RedirectToAction(nameof(Women));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> WomenSave(WomenEmpowermentContent model, IFormFile? imageFile)
+    {
+        var existing = _db.WomenEmpowermentContents.FirstOrDefault();
+
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "women");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                model.CoverImagePath = $"/assets/img/women/{fileName}";
+            }
+        }
+        else if (existing != null)
+        {
+            if (string.IsNullOrEmpty(model.CoverImagePath))
+                model.CoverImagePath = existing.CoverImagePath;
+        }
+
+        if (existing == null)
+        {
+            model.LastUpdated = DateTime.UtcNow;
+            _db.WomenEmpowermentContents.Add(model);
+            TempData["Success"] = "Women page intro created.";
+        }
+        else
+        {
+            existing.IntroTitle = model.IntroTitle;
+            existing.IntroBody = model.IntroBody;
+            existing.HighlightTitle = model.HighlightTitle;
+            existing.HighlightBody = model.HighlightBody;
+            existing.CoverImagePath = model.CoverImagePath;
+            existing.LastUpdated = DateTime.UtcNow;
+            TempData["Success"] = "Women page intro saved.";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync("Saved", "WomenContent", model.Id, $"Title: {model.IntroTitle}");
+        return RedirectToAction(nameof(Women));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> WomenFeatureSave(WomenFeature model, IFormFile? imageFile)
+    {
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "women");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                model.ImagePath = $"/assets/img/women/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
+        {
+            var existing = _db.WomenFeatures.AsNoTracking().FirstOrDefault(f => f.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.ImagePath))
+                model.ImagePath = existing.ImagePath;
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.WomenFeatures.Update(model);
+            TempData["Success"] = $"\"{model.Title}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.WomenFeatures.Add(model);
+            TempData["Success"] = $"\"{model.Title}\" added.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "WomenFeature", model.Id, $"Title: {model.Title}");
+        return RedirectToAction(nameof(Women));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> WomenFeatureDelete(int id)
+    {
+        var f = _db.WomenFeatures.Find(id);
+        if (f != null)
+        {
+            _db.WomenFeatures.Remove(f);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{f.Title}\" removed.";
+            await _logger.LogAsync("Deleted", "WomenFeature", id, $"Title: {f.Title}");
+        }
+        return RedirectToAction(nameof(Women));
+    }
+
+    // ==================== INDUSTRY ====================
+    public IActionResult Industry(bool showForm = false, int? id = null)
+    {
+        ViewBag.ShowForm = showForm;
+        ViewBag.CurrentArea = id.HasValue
+            ? _db.IndustryAreas.FirstOrDefault(a => a.Id == id.Value) : null;
+        return View(_db.IndustryAreas.OrderBy(a => a.DisplayOrder).ToList());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> IndustrySave(IndustryArea model, IFormFile? imageFile)
+    {
+        if (imageFile != null && imageFile.Length > 0)
+        {
+            var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var ext = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+            if (allowed.Contains(ext))
+            {
+                var folder = Path.Combine("wwwroot", "assets", "img", "industry");
+                Directory.CreateDirectory(folder);
+                var fileName = $"{Guid.NewGuid():N}{ext}";
+                using (var stream = System.IO.File.Create(Path.Combine(folder, fileName)))
+                    imageFile.CopyTo(stream);
+                model.ImagePath = $"/assets/img/industry/{fileName}";
+            }
+        }
+        else if (model.Id > 0)
+        {
+            var existing = _db.IndustryAreas.AsNoTracking().FirstOrDefault(a => a.Id == model.Id);
+            if (existing != null && string.IsNullOrEmpty(model.ImagePath))
+                model.ImagePath = existing.ImagePath;
+        }
+
+        var others = _db.IndustryAreas.Where(a => a.Id != model.Id).OrderBy(a => a.DisplayOrder).ToList();
+        if (model.DisplayOrder <= 0) model.DisplayOrder = others.Count + 1;
+
+        if (others.Any(o => o.DisplayOrder == model.DisplayOrder))
+        {
+            if (model.DisplayOrder > others.Count) model.DisplayOrder = others.Count + 1;
+            foreach (var o in others.Where(x => x.DisplayOrder >= model.DisplayOrder)) o.DisplayOrder++;
+        }
+
+        string action;
+        if (model.Id > 0)
+        {
+            _db.IndustryAreas.Update(model);
+            TempData["Success"] = $"\"{model.Title}\" updated.";
+            action = "Updated";
+        }
+        else
+        {
+            _db.IndustryAreas.Add(model);
+            TempData["Success"] = $"\"{model.Title}\" added.";
+            action = "Created";
+        }
+        _db.SaveChanges();
+
+        var all = _db.IndustryAreas.OrderBy(a => a.DisplayOrder).ThenBy(a => a.Id).ToList();
+        for (int i = 0; i < all.Count; i++) all[i].DisplayOrder = i + 1;
+        _db.SaveChanges();
+
+        await _logger.LogAsync(action, "IndustryArea", model.Id, $"Title: {model.Title}");
+        return RedirectToAction(nameof(Industry));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> IndustryDelete(int id)
+    {
+        var area = _db.IndustryAreas.Find(id);
+        if (area != null)
+        {
+            _db.IndustryAreas.Remove(area);
+            _db.SaveChanges();
+            TempData["Success"] = $"\"{area.Title}\" deleted.";
+            await _logger.LogAsync("Deleted", "IndustryArea", id, $"Title: {area.Title}");
+        }
+        return RedirectToAction(nameof(Industry));
+    }
+
+    // ==================== CONTACT CONTENT ====================
+    public IActionResult ContactContent(bool showForm = false)
+    {
+        ViewBag.ShowForm = showForm;
+        var model = _db.ContactContents.AsNoTracking().FirstOrDefault() ?? new ContactContent();
+        return View(model);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ContactContentSave(ContactContent model)
+    {
+        var existing = _db.ContactContents.FirstOrDefault();
+
+        if (existing == null)
+        {
+            model.LastUpdated = DateTime.UtcNow;
+            _db.ContactContents.Add(model);
+            TempData["Success"] = "Contact content created.";
+        }
+        else
+        {
+            existing.Kicker = model.Kicker;
+            existing.Heading = model.Heading;
+            existing.Intro = model.Intro;
+            existing.Address = model.Address;
+            existing.MapUrl = model.MapUrl;
+            existing.Email = model.Email;
+            existing.Phone = model.Phone;
+            existing.EmailDesc = model.EmailDesc;
+            existing.PhoneDesc = model.PhoneDesc;
+            existing.Weekdays = model.Weekdays;
+            existing.Hours = model.Hours;
+            existing.Note = model.Note;
+            existing.LastUpdated = DateTime.UtcNow;
+            TempData["Success"] = "Contact content saved.";
+        }
+        _db.SaveChanges();
+
+        await _logger.LogAsync("Saved", "ContactContent", 0, "");
+        return RedirectToAction(nameof(ContactContent));
+    }
+
+    // ==================== SYSTEM ====================
+    public async Task<IActionResult> Users()
+    {
+        var users = await _userManager.Users.ToListAsync();
+        var userList = new List<(Core.Data.ApplicationUser User, string Role)>();
+
+        foreach (var u in users)
+        {
+            var roles = await _userManager.GetRolesAsync(u);
+            userList.Add((u, roles.FirstOrDefault() ?? "Member"));
+        }
+
+        ViewBag.Users = userList;
+        return View();
+    }
+
+    public IActionResult CreateUser() => View();
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateUser(string Email, string Password, string Role)
+    {
+        if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+        {
+            TempData["Error"] = "Email and password are required.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        var existing = await _userManager.FindByEmailAsync(Email);
+        if (existing != null)
+        {
+            TempData["Error"] = $"User {Email} already exists.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        var user = new Core.Data.ApplicationUser
+        {
+            UserName = Email,
+            Email = Email,
+            EmailConfirmed = true
+        };
+
+        var result = await _userManager.CreateAsync(user, Password);
+
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = "Failed: " + string.Join(", ", result.Errors.Select(e => e.Description));
+            return RedirectToAction(nameof(Users));
+        }
+
+        if (string.IsNullOrWhiteSpace(Role)) Role = "Member";
+        if (!await _roleManager.RoleExistsAsync(Role))
+            await _roleManager.CreateAsync(new IdentityRole(Role));
+
+        await _userManager.AddToRoleAsync(user, Role);
+
+        await _logger.LogAsync("Created", "User", 0, $"Email: {Email}, Role: {Role}");
+        TempData["Success"] = $"User {Email} created with role {Role}.";
+        return RedirectToAction(nameof(Users));
+    }
+
+    public async Task<IActionResult> EditUser(string id)
+    {
+        if (string.IsNullOrEmpty(id)) return RedirectToAction(nameof(Users));
+
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null) return RedirectToAction(nameof(Users));
+
+        var roles = await _userManager.GetRolesAsync(user);
+        ViewBag.CurrentRole = roles.FirstOrDefault() ?? "Member";
+        return View(user);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditUser(string Id, string Role, string? NewPassword)
+    {
+        var user = await _userManager.FindByIdAsync(Id);
+        if (user == null)
+        {
+            TempData["Error"] = "User not found.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        await _userManager.RemoveFromRolesAsync(user, currentRoles);
+
+        if (string.IsNullOrWhiteSpace(Role)) Role = "Member";
+        if (!await _roleManager.RoleExistsAsync(Role))
+            await _roleManager.CreateAsync(new IdentityRole(Role));
+
+        await _userManager.AddToRoleAsync(user, Role);
+
+        if (!string.IsNullOrWhiteSpace(NewPassword))
+        {
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            await _userManager.ResetPasswordAsync(user, token, NewPassword);
+        }
+
+        await _logger.LogAsync("Updated", "User", 0, $"Email: {user.Email}, Role: {Role}");
+        TempData["Success"] = $"User {user.Email} updated.";
+        return RedirectToAction(nameof(Users));
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteUser(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            TempData["Error"] = "User not found.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        var email = user.Email;
+        await _userManager.DeleteAsync(user);
+
+        await _logger.LogAsync("Deleted", "User", 0, $"Email: {email}");
+        TempData["Success"] = $"User {email} deleted.";
+        return RedirectToAction(nameof(Users));
+    }
+
+    // ==================== PROFILE ====================
+    public async Task<IActionResult> Profile()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return RedirectToAction(nameof(Login));
+
+        var roles = await _userManager.GetRolesAsync(user);
+        ViewBag.Role = roles.FirstOrDefault() ?? "Admin";
+
+        return View(user);
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> ProfileSave(
+        string? PhoneNumber,
+        string? CurrentPassword,
+        string? NewPassword,
+        string? ConfirmPassword)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null) return RedirectToAction(nameof(Login));
+
+        if (PhoneNumber != user.PhoneNumber)
+        {
+            user.PhoneNumber = PhoneNumber;
+            await _userManager.UpdateAsync(user);
+        }
+
+        if (!string.IsNullOrWhiteSpace(CurrentPassword) &&
+            !string.IsNullOrWhiteSpace(NewPassword) &&
+            !string.IsNullOrWhiteSpace(ConfirmPassword))
+        {
+            if (NewPassword != ConfirmPassword)
+            {
+                TempData["Error"] = "New password and confirm password do not match.";
+                return RedirectToAction(nameof(Profile));
+            }
+
+            var result = await _userManager.ChangePasswordAsync(user, CurrentPassword, NewPassword);
+            if (!result.Succeeded)
+            {
+                TempData["Error"] = string.Join(", ", result.Errors.Select(e => e.Description));
+                return RedirectToAction(nameof(Profile));
+            }
+
+            await _logger.LogAsync("Updated", "User", 0, $"Password changed: {user.Email}");
+        }
+
+        await _logger.LogAsync("Updated", "User", 0, $"Profile: {user.Email}");
+        TempData["Success"] = "Profile updated successfully.";
+        return RedirectToAction(nameof(Profile));
+    }
+
+    // ==================== ACTIVITY LOG ====================
+    public IActionResult ActivityLog()
+    {
+        var logs = _db.ActivityLogEntries
+            .OrderByDescending(l => l.Timestamp)
+            .Take(500)
+            .ToList();
+        return View(logs);
+    }
+
+    // ==================== MOCK DATA ====================
+    private static List<MembershipApplication> GetMockApplications() => new()
+    {
+        new MembershipApplication { Id=1, FullName="Ali Khan", FatherHusbandName="Muhammad Khan", Cnic="17301-1234567-1", BusinessName="Peshawar Gems & Co.", Designation="Owner", NatureOfBusiness="Gemstone Trading", MobileNo="0300-1234567", Email="ali.khan@example.com", CityDistrict="Peshawar", MembershipCategory="Ordinary Member", MembershipFee=1000m, BusinessAddress="Namak Mandi, Peshawar", BusinessTypes="Gemstone, Jewellery", Status="Pending Review", ApplicationDate=DateTime.UtcNow.AddDays(-2) },
+        new MembershipApplication { Id=2, FullName="Hamza Ahmad", FatherHusbandName="Rashid Ahmad", Cnic="15402-7654321-3", BusinessName="Swat Jewellers", Designation="CEO", NatureOfBusiness="Jewellery Manufacturing", MobileNo="0333-9876543", Email="hamza@swatjewellers.pk", CityDistrict="Swat", MembershipCategory="Associate Member", MembershipFee=2500m, BusinessAddress="Mingora Bazaar, Swat", BusinessTypes="Jewellery, Retail", Status="Approved for Payment", ApplicationDate=DateTime.UtcNow.AddDays(-5) },
+        new MembershipApplication { Id=3, FullName="Fatima Bibi", FatherHusbandName="Abdul Wali", Cnic="17301-1112223-4", BusinessName="Fatima Handcrafted Jewels", Designation="Founder", NatureOfBusiness="Handmade Jewellery", MobileNo="0345-1112223", Email="fatima@handcrafted.pk", CityDistrict="Peshawar", MembershipCategory="Ordinary Member", MembershipFee=1000m, BusinessAddress="University Road, Peshawar", BusinessTypes="Handmade, Artisan", Status="Active Member", ApplicationDate=DateTime.UtcNow.AddDays(-30), MembershipNo="KPG-2026-0003", FeeReceived=1000m, PaymentReference="TRX-99323" },
+        new MembershipApplication { Id=4, FullName="Zubair Shah", FatherHusbandName="Naeem Shah", Cnic="14302-3334445-5", BusinessName="Shah Gemstones", Designation="Partner", NatureOfBusiness="Wholesale", MobileNo="0311-3334445", Email="zubair@shahgems.com", CityDistrict="Mardan", MembershipCategory="Honorary Member", MembershipFee=3500m, BusinessAddress="Main Bazaar, Mardan", BusinessTypes="Wholesale, Export", Status="Rejected", ApplicationDate=DateTime.UtcNow.AddDays(-10) },
+        new MembershipApplication { Id=5, FullName="Ayesha Tariq", FatherHusbandName="Tariq Mehmood", Cnic="17301-5556667-6", BusinessName="Ayesha Silver Arts", Designation="Director", NatureOfBusiness="Silver Jewellery", MobileNo="0301-5556667", Email="ayesha@silverarts.pk", CityDistrict="Peshawar", MembershipCategory="Associate Member", MembershipFee=2500m, BusinessAddress="Saddar, Peshawar", BusinessTypes="Silver, Retail", Status="Payment Submitted", ApplicationDate=DateTime.UtcNow.AddDays(-3), FeeReceived=2500m, PaymentReference="TRX-88123" }
     };
 }

@@ -1,380 +1,188 @@
-@{ ViewData["Title"] = "Executive Committee | KPGJA"; }
+@model List<Entities.Entities.CommitteeMember>
+@{
+    ViewData["Title"] = "Executive Committee | KPGJA";
+    var members = Model ?? new();
+}
+
+<!-- ============ HERO ============ -->
+<section class="page-hero">
+    <div class="container">
+        <span class="section-kicker text-warning">LEADERSHIP</span>
+        <h1>Executive Committee</h1>
+        <p class="lead text-white-50 mb-0">
+            Meet the leadership representing the Khyber Pakhtunkhwa Gems &amp; Jewellery Association.
+        </p>
+    </div>
+</section>
+
+<main>
+
+    <section class="py-5">
+        <div class="container">
+
+            @if (members.Any())
+            {
+                <div class="row g-4 justify-content-center">
+                    @{
+                        int n = 0;
+                    }
+                    @foreach (var m in members.OrderBy(x => x.DisplayOrder))
+                    {
+                        n++;
+                        var num = n.ToString("D2"); // 01, 02, 03...
+
+                        <div class="col-sm-6 col-md-4 col-lg-3">
+                            <div class="committee-card-pro">
+
+                                <!-- NUMBER BADGE -->
+                                <div class="committee-number">@num</div>
+
+                                <!-- PHOTO -->
+                                <div class="committee-photo">
+                                    @if (!string.IsNullOrEmpty(m.PhotoPath))
+                                    {
+                                        <img src="@m.PhotoPath" alt="@m.FullName">
+                                    }
+                                    else
+                                    {
+                                        <div class="committee-photo-placeholder">
+                                            <i class="bi bi-person"></i>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- NAME + DIVIDER + DESIGNATION -->
+                                <div class="committee-meta">
+                                    <h4>@m.FullName</h4>
+                                    <div class="committee-divider"></div>
+                                    <span>@m.Designation</span>
+                                </div>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <p class="text-muted">No committee members published yet.</p>
+                </div>
+            }
+
+        </div>
+    </section>
+
+</main>
 
 @section Styles {
 <style>
+    /* ============ COMMITTEE CARD — PROFESSIONAL ============ */
+    .committee-card-pro {
+        background: #fff;
+        border: 1px solid #e9eaed;
+        border-radius: 18px;
+        padding: 20px 20px 24px;
+        position: relative;
+        transition: .25s ease;
+        text-align: center;
+    }
 
+    .committee-card-pro:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,.09);
+        border-color: #d6a84f;
+    }
+
+    /* Number badge — top-right */
+    .committee-number {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 36px;
+        height: 36px;
+        background: #172033;
+        color: #fff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        z-index: 2;
+    }
+
+    /* Photo — fixed aspect ratio 3:4 */
+    .committee-photo {
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        background: #f5f1e7;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .committee-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+        display: block;
+    }
+
+    .committee-photo-placeholder {
+        font-size: 60px;
+        color: #d6a84f;
+        opacity: .35;
+    }
+
+    /* Meta */
+    .committee-meta h4 {
+        font-family: "Playfair Display", serif;
+        font-size: 19px;
+        font-weight: 600;
+        color: #172033;
+        margin-bottom: 12px;
+        line-height: 1.3;
+        min-height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .committee-divider {
+        width: 40px;
+        height: 2px;
+        background: #d6a84f;
+        margin: 0 auto 12px;
+        border-radius: 2px;
+    }
+
+    .committee-meta span {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #d6a84f;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    @@media (max-width: 575px) {
+        .committee-card-pro {
+            padding: 16px 16px 20px;
+        }
+        .committee-meta h4 {
+            font-size: 17px;
+        }
+        .committee-number {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
+        }
+    }
 </style>
 }
-
-<!-- TOP BAR -->
-
-
-
-
-<!-- PAGE HERO -->
-
-<section class="page-hero">
-
-    <div class="container">
-
-        <span class="section-kicker text-warning">
-            KPGJA LEADERSHIP
-        </span>
-
-        <h1>
-            Executive Committee
-        </h1>
-
-        <p class="lead text-white-50 mb-0">
-            Leadership and representation of the KPGJA community.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- INTRO -->
-
-<section class="py-5">
-
-    <div class="container">
-
-        <div class="text-center leadership-intro mb-5">
-
-            <span class="section-kicker">
-                OUR LEADERSHIP
-            </span>
-
-            <h2 class="section-heading">
-                Executive Committee Members
-            </h2>
-
-            <p class="section-description">
-                The Executive Committee represents the interests of
-                businesses, professionals and stakeholders within the
-                gems and jewellery sector of Khyber Pakhtunkhwa.
-            </p>
-
-        </div>
-
-
-        <!-- MEMBERS -->
-
-        <div class="row g-4 justify-content-center">
-
-
-            <!-- 1 -->
-
-            <div class="col-sm-6 col-lg-4">
-
-                <div class="executive-card">
-
-                    <div class="executive-photo">
-
-                        <span class="executive-number">
-                            01
-                        </span>
-
-                      <img src="/assets/img/President.png"
-     alt="Muhammad Salman Niazi - President"
-     class="executive-member-image">
-
-                    </div>
-
-
-                    <div class="executive-body">
-
-                        <h5>
-                            Muhammad Salman Niazi
-                        </h5>
-
-                        <div class="executive-divider"></div>
-
-                        <div class="executive-role">
-                        President 
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- 2 -->
-
-            <div class="col-sm-6 col-lg-4">
-
-                <div class="executive-card">
-
-                    <div class="executive-photo">
-
-                        <span class="executive-number">
-                            02
-                        </span>
-<img src="/assets/img/VicePresident.jpeg"
-     alt="Salman Younas - Vice President"
-     class="executive-member-image">
-
-                    </div>
-
-
-                    <div class="executive-body">
-
-                        <h5>
-                            Salman Younas
-                        </h5>
-
-                        <div class="executive-divider"></div>
-
-                        <div class="executive-role">
-                            Vice President
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-             <div class="col-sm-6 col-lg-4">
-
-                <div class="executive-card">
-
-                      <div class="executive-photo">
-
-                        <span class="executive-number">
-                            03
-                        </span>
-<img src="/assets/img/SecretaryChairman.png"
-     alt="Tahseen Ullah - Office Secretary"
-     class="executive-member-image">
-
-                    </div>
-
-
-                    <div class="executive-body">
-
-                        <h5>
-                           Noshad Ahmad Chisti
-                        </h5>
-
-                        <div class="executive-divider"></div>
-
-                        <div class="executive-role">
-                            Executive Committee Member
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-            <div class="col-sm-6 col-lg-4">
-
-                <div class="executive-card">
-
-                      <div class="executive-photo">
-
-                        <span class="executive-number">
-                            04
-                        </span>
-<img src="/assets/img/YouthSecretary.png"
-     alt="Tahseen Ullah - Office Secretary"
-     class="executive-member-image">
-
-                    </div>
-
-
-                    <div class="executive-body">
-
-                        <h5>
-                            Zain Ul Abeedin Niazi
-                        </h5>
-
-                        <div class="executive-divider"></div>
-
-                        <div class="executive-role">
-                            Youth Secretary
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- 3 -->
-
-            <div class="col-sm-6 col-lg-4">
-
-                <div class="executive-card">
-
-                    <div class="executive-photo">
-
-                        <span class="executive-number">
-                            05
-                        </span>
-<img src="/assets/img/OfficeSecretary.jpeg"
-     alt="Tahseen Ullah - Office Secretary"
-     class="executive-member-image">
-
-                    </div>
-
-
-                    <div class="executive-body">
-
-                        <h5>
-                        Tahseen Ullah
-                        </h5>
-
-                        <div class="executive-divider"></div>
-
-                        <div class="executive-role">
-                            Office Secretary
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- 4 -->
-
-            
-
-            <!-- 5 -->
-
-            <div class="col-sm-6 col-lg-4">
-
-                <div class="executive-card">
-
-                      <div class="executive-photo">
-
-                        <span class="executive-number">
-                            06
-                        </span>
-<img src="/assets/img/FinanceSecretary.png"
-     alt="Tahseen Ullah - Office Secretary"
-     class="executive-member-image">
-
-                    </div>
-
-
-                    <div class="executive-body">
-
-                        <h5>
-                            Ayaz Khan
-                        </h5>
-
-                        <div class="executive-divider"></div>
-
-                        <div class="executive-role">
-                            Executive Committee Member
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- 7 -->
-
-            <div class="col-sm-6 col-lg-4">
-
-                <div class="executive-card">
-
-                   <div class="executive-photo">
-
-                        <span class="executive-number">
-                            07
-                        </span>
-<img src="/assets/img/YouthSecretary.png"
-     alt="Tahseen Ullah - Office Secretary"
-     class="executive-member-image">
-
-                    </div>
-
-
-                    <div class="executive-body">
-
-                        <h5>
-                            Member 7
-                        </h5>
-
-                        <div class="executive-divider"></div>
-
-                        <div class="executive-role">
-                            Executive Committee Member
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- COMMITTEE MESSAGE -->
-
-<section class="pb-5">
-
-    <div class="container">
-
-        <div class="committee-note">
-
-            <div class="row align-items-center g-4">
-
-                <div class="col-lg-8">
-
-                    <span class="section-kicker text-warning">
-                        KPGJA
-                    </span>
-
-                    <h2 class="text-white">
-                        Working Together for the Industry
-                    </h2>
-
-                    <p class="mb-0">
-                        The Executive Committee works to represent
-                        members, encourage collaboration, support
-                        industry development and promote opportunities
-                        across Khyber Pakhtunkhwa's gems and jewellery sector.
-                    </p>
-
-                </div>
-
-
-                <div class="col-lg-4 text-lg-end">
-
-                    <a href="/Home/Membership"
-                       class="btn btn-gold">
-
-                        Become a Member
-                        <i class="bi bi-arrow-right ms-1"></i>
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- FOOTER -->

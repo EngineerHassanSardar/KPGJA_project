@@ -1,0 +1,42 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@(ViewData["Title"] ?? "Admin") | KPGJA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="/assets/css/style.css?v=@DateTime.Now.Ticks" rel="stylesheet">
+</head>
+<body class="admin-login-body">
+
+    <div class="admin-login-wrapper">
+        <div class="admin-login-card">
+
+            <div class="admin-login-brand">
+                <div class="brand-mark"><i class="bi bi-gem"></i></div>
+                <div>
+                    <div class="brand-name">KPGJA</div>
+                    <div class="brand-sub">Admin Console</div>
+                </div>
+            </div>
+
+            <div class="admin-login-header">
+                <h1>Admin Sign In</h1>
+                <p>Enter your admin credentials to access the console.</p>
+            </div>
+
+            @RenderBody()
+
+            <div class="admin-login-footer">
+                <a href="/">← Back to Website</a>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

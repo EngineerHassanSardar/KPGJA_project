@@ -1,4 +1,4 @@
-﻿@model List<KPGJA.Web.Models.MembershipApplication>
+@model List<Entities.Entities.MembershipApplication>
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Payments";
@@ -89,7 +89,7 @@
                             </td>
                             <td>@m.BusinessName</td>
                             <td class="fw-semibold">PKR @m.MembershipFee.ToString("N0")</td>
-                            <td class="text-muted">@(string.IsNullOrEmpty(m.PaymentReference) ? "—" : m.PaymentReference)</td>
+                            <td class="text-muted">@(string.IsNullOrEmpty(m.PaymentReference) ? "�" : m.PaymentReference)</td>
                             <td><span class="status-badge @statusClass">@m.Status</span></td>
                             <td class="text-end">
                                 <a class="btn btn-sm btn-outline-dark" style="border-radius:8px;" href="/Admin/Details/@m.Id">

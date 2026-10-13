@@ -1,5 +1,9 @@
 @{
     var title = ViewData["Title"] as string ?? "KPGJA";
+
+    var facebookUrl = "https://www.facebook.com/kpgjaofficial/";
+    var instagramUrl = "https://www.instagram.com/kpgjaofficial";
+    var youtubeUrl = "https://youtube.com/@kpgjaofficial";
 }
 <!doctype html>
 <html lang="en">
@@ -10,8 +14,7 @@
 
     <title>@title | KPGJA</title>
 
-    <!-- Browser Tab Logo / Favicon -->
-    <link rel="icon" type="image/png" href="/assets/img/logo.png">
+    <link rel="icon" type="image/png" href="/assets/img/New Logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
@@ -26,90 +29,157 @@
     @RenderSection("Styles", required: false)
 </head>
 <body>
-<div class="topbar">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-            <div><i class="bi bi-building me-1"></i> Government of Khyber Pakhtunkhwa</div>
-            <div><i class="bi bi-geo-alt me-1"></i> Peshawar, Khyber Pakhtunkhwa, Pakistan</div>
-        </div>
-    </div>
-</div>
-
-<header class="brand-header">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center gap-4">
-            <a href="/" class="brand d-flex align-items-center gap-3 text-decoration-none">
-                <div class="brand-logo-wrapper"><img src="/assets/img/logo.png" alt="KPGJA Logo" class="brand-logo"></div>
-                <div>
-                    <div class="brand-title">Khyber Pakhtunkhwa<br>Gems & Jewellery Association</div>
-                    <div class="brand-short">KPGJA</div>
+    <div class="topbar">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div><i class="bi bi-building me-1"></i> Government of Khyber Pakhtunkhwa</div>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="tel:0913050030" class="text-white text-decoration-none">
+                        <i class="bi bi-telephone me-1"></i> 0913 050030
+                    </a>
+                    <span class="d-none d-md-inline"><i class="bi bi-geo-alt me-1"></i> Namak Mandi, Peshawar, KP</span>
                 </div>
-            </a>
-            <div class="brand-office text-end d-none d-lg-block">
-                <div class="small text-uppercase text-muted">Head Office</div>
-                <strong>Hamza Market, Namak Mandi</strong>
-                <div class="small text-muted">Peshawar, Khyber Pakhtunkhwa</div>
             </div>
         </div>
     </div>
-</header>
 
-<nav class="navbar navbar-expand-lg navbar-dark main-navbar sticky-top">
-    <div class="container">
-        <a class="navbar-brand d-lg-none fw-bold" href="/">KPGJA</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="mainNav">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Home/About">About Us</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Home/Executive">Executive Committee</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Home/Women">Women Empowerment</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Home/Industry">Industry</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Home/Events">Events</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Home/News">News & Updates</a></li>
-                <li class="nav-item"><a class="nav-link" href="/Home/Contact">Contact</a></li>
-            </ul>
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <a href="/Member/Dashboard" class="btn btn-outline-light me-2"><i class="bi bi-person me-1"></i> My Portal</a>
-            }
-            else
-            {
-                <a href="/Member/Register" class="btn btn-gold"><i class="bi bi-person-plus me-1"></i> Become a Member</a>
-            }
+    <header class="brand-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center gap-4">
+                <a href="/" class="brand d-flex align-items-center gap-3 text-decoration-none">
+                    <div class="brand-logo-wrapper"><img src="/assets/img/New logo.png" alt="KPGJA Logo" class="brand-logo"></div>
+                    <div>
+                        <div class="brand-title">Khyber Pakhtunkhwa<br>Gems & Jewellery Association</div>
+                        <div class="brand-short">KPGJA</div>
+                    </div>
+                </a>
+                <div class="brand-office text-end d-none d-lg-block">
+                    <div class="small text-uppercase text-muted">Head Office</div>
+                    <strong>Office B13, 1st Floor, Hamza Market</strong>
+                    <div class="small text-muted">Shah Qabool Street, Namak Mandi, Peshawar</div>
+                    <div class="small mt-1">
+                        <a href="tel:0913050030" class="text-decoration-none text-dark">
+                            <i class="bi bi-telephone me-1"></i> 0913 050030
+                        </a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-</nav>
+    </header>
 
-@RenderBody()
+    <nav class="navbar navbar-expand-lg navbar-dark main-navbar sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-lg-none fw-bold" href="/">KPGJA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/About">About Us</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Executive">Executive Committee</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Women">Women Empowerment</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Industry">Industry</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Events">Events</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/News">News & Updates</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Home/Contact">Contact</a></li>
+                </ul>
 
-<footer class="footer">
-  <div class="container py-5">
-    <div class="row g-5">
-      <div class="col-lg-5">
-        <h5 class="text-white">Khyber Pakhtunkhwa<br>Gems & Jewellery Association</h5>
-        <p>Uniting stakeholders, promoting skills, employment, trade, digital opportunities and sustainable development across KP's gems and jewellery sector.</p>
-      </div>
-      <div class="col-6 col-lg-2">
-        <h6 class="text-white">Quick Links</h6>
-        <a href="/">Home</a><a href="/Home/About">About Us</a><a href="/Home/Membership">Membership</a><a href="/Home/Events">Events</a>
-      </div>
-      <div class="col-6 col-lg-2">
-        <h6 class="text-white">Resources</h6>
-        <a href="/Home/News">News</a><a href="/Home/Industry">Industry</a><a href="/Home/Women">Women Empowerment</a><a href="/Home/Contact">Contact</a>
-      </div>
-      <div class="col-lg-3">
-        <h6 class="text-white">Follow Us</h6>
-        <div class="social-links"><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-linkedin"></i></a><a href="#"><i class="bi bi-youtube"></i></a></div>
-      </div>
-    </div>
-  </div>
-  <div class="footer-bottom"><div class="container"><div class="d-flex justify-content-between flex-wrap gap-2"><span>© <span data-year></span> KPGJA. All Rights Reserved.</span><span>Unity · Skill · Service · Employment · Development</span></div></div></div>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/assets/js/site.js"></script>
-@RenderSection("Scripts", required: false)
+                <div class="d-flex align-items-center gap-2 flex-nowrap">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        if (User.IsInRole("Admin"))
+                        {
+                            <a href="/Admin" class="btn btn-gold btn-sm text-nowrap">
+                                <i class="bi bi-speedometer2 me-1"></i> Admin
+                            </a>
+                        }
+
+                        <form asp-controller="Member" asp-action="Logout" method="post" class="d-inline m-0">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-light btn-sm text-nowrap">
+                                <i class="bi bi-box-arrow-right"></i>
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a href="/Admin/Login" class="btn btn-outline-light btn-sm text-nowrap">
+                            <i class="bi bi-shield-lock me-1"></i> Admin
+                        </a>
+                        <a href="/Home/Membership" class="btn btn-gold btn-sm text-nowrap">
+                            <i class="bi bi-person-plus me-1"></i> Become a Member
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    @RenderBody()
+
+    <footer class="footer">
+        <div class="container py-5">
+            <div class="row g-5">
+                <div class="col-lg-5">
+                    <h5 class="text-white">Khyber Pakhtunkhwa<br>Gems & Jewellery Association</h5>
+                    <p>Uniting stakeholders, promoting skills, employment, trade, digital opportunities and sustainable development across KP's gems and jewellery sector.</p>
+
+                    <div class="footer-contact mt-3">
+                        <div class="d-flex align-items-start gap-2 mb-2">
+                            <i class="bi bi-geo-alt mt-1"></i>
+                            <span>Office B13, 1st Floor, Hamza Market, Shah Qabool Street, Namak Mandi, Peshawar, Pakistan</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="bi bi-telephone"></i>
+                            <a href="tel:0913050030" class="text-decoration-none">0913 050030</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white">Quick Links</h6>
+                    <a href="/">Home</a>
+                    <a href="/Home/About">About Us</a>
+                    <a href="/Home/Membership">Membership</a>
+                    <a href="/Home/Events">Events</a>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h6 class="text-white">Resources</h6>
+                    <a href="/Home/News">News</a>
+                    <a href="/Home/Industry">Industry</a>
+                    <a href="/Home/Women">Women Empowerment</a>
+                    <a href="/Home/Contact">Contact</a>
+                </div>
+                <div class="col-lg-3">
+                    <h6 class="text-white">Follow Us</h6>
+                    <div class="social-links">
+                        <a href="@facebookUrl" target="_blank" rel="noopener" aria-label="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="@instagramUrl" target="_blank" rel="noopener" aria-label="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="@youtubeUrl" target="_blank" rel="noopener" aria-label="YouTube">
+                            <i class="bi bi-youtube"></i>
+                        </a>
+                    </div>
+                    <h6 class="text-white mt-4">Admin</h6>
+                    <a href="/Admin/Login">Admin Login</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="d-flex justify-content-between flex-wrap gap-2">
+                    <span>© <span data-year></span> KPGJA. All Rights Reserved.</span>
+                    <span>Unity · Skill · Service · Employment · Development</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/site.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

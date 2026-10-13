@@ -1,4 +1,4 @@
-﻿@model KPGJA.Web.Models.ContactInquiry
+@model Entities.Entities.ContactInquiry
 @{ Layout = "_AdminLayout"; ViewData["Title"] = "Inquiry Details"; }
 
 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -55,7 +55,7 @@
                 <div class="mb-2"><div class="text-muted">Email</div><div class="fw-semibold">@Model.Email</div></div>
                 <div class="mb-2"><div class="text-muted">Phone</div><div class="fw-semibold">@Model.Phone</div></div>
                 <div class="mb-2"><div class="text-muted">Received</div><div class="fw-semibold">@Model.SubmittedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</div></div>
-            </div>
+            </div>\\
         </div>
     </div>
 </div>

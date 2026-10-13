@@ -1,0 +1,60 @@
+﻿@model Core.Data.ApplicationUser
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Edit User";
+    var currentRole = ViewBag.CurrentRole as string ?? "Member";
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">System</div>
+        <h1>Edit User</h1>
+        <p>Update role or reset password for @Model.Email.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/Users" class="btn-cancel">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<form method="post" asp-action="EditUser">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+        <div class="p-4">
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label small fw-semibold">Email</label>
+                    <input value="@Model.Email" class="form-control" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Role</label>
+                    <select name="Role" class="form-select">
+                        <option value="Admin" selected="@(currentRole == "Admin")">Admin</option>
+                        <option value="Member" selected="@(currentRole == "Member")">Member</option>
+                        <option value="Editor" selected="@(currentRole == "Editor")">Editor</option>
+                        <option value="Reviewer" selected="@(currentRole == "Reviewer")">Reviewer</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">New Password (leave empty to keep current)</label>
+                    <input name="NewPassword" type="password" class="form-control" placeholder="Optional">
+                </div>
+            </div>
+        </div>
+        <div class="p-4 pt-0 d-flex justify-content-between gap-2">
+            <button type="submit" formaction="/Admin/DeleteUser" class="btn-cancel text-danger"
+                    onclick="return confirm('Delete this user?');">
+                <i class="bi bi-trash"></i> Delete User
+            </button>
+            <div class="d-flex gap-2">
+                <a href="/Admin/Users" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add">
+                    <i class="bi bi-check2"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</form>

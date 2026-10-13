@@ -1,4 +1,4 @@
-using KPGJA.Web.Models;
+using Entities.Entities;
 
 namespace KPGJA.Web.ViewModels;
 

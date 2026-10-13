@@ -1,9 +1,9 @@
-﻿@model List<KPGJA.Web.Models.CommitteeMember>
+@model List<Entities.Entities.CommitteeMember>
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Executive Committee";
     bool showForm = ViewBag.ShowForm == true;
-    var current = ViewBag.CurrentMember as KPGJA.Web.Models.CommitteeMember ?? new KPGJA.Web.Models.CommitteeMember();
+    var current = ViewBag.CurrentMember as Entities.Entities.CommitteeMember ?? new Entities.Entities.CommitteeMember();
 }
 
 @if (TempData["Success"] is string s)
@@ -109,7 +109,7 @@
                                 </a>
                                 <form method="post" action="/Admin/CommitteeDelete" style="display:inline;">
                                     @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@m.Id" />
+                                    <input type="hidden" name="PhotoPath" value="@current.PhotoPath" />
                                     <button type="submit" class="icon-btn delete" title="Delete"
                                             onclick="return confirm('Remove this member?');">
                                         <i class="bi bi-trash"></i>
@@ -126,7 +126,7 @@
 
 @if (showForm)
 {
-    <form method="post" asp-action="CommitteeSave">
+    <form method="post" asp-action="CommitteeSave" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@current.Id" />
 
@@ -149,7 +149,7 @@
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Full Name <span class="text-danger">*</span></label>
                         <input name="FullName" class="form-control" value="@current.FullName"
-                               placeholder="e.g. Muhammad Aslam" required>
+                               placeholder="e.g.Full Name  " required>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Designation <span class="text-danger">*</span></label>
@@ -161,6 +161,19 @@
                         <textarea name="Bio" class="form-control" rows="3"
                                   placeholder="Brief biography...">@current.Bio</textarea>
                     </div>
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Photo</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(current.PhotoPath))
+                            {
+                                <img src="@current.PhotoPath" alt="Current photo"
+                                     style="width:60px;height:60px;object-fit:cover;border-radius:50%;border:1px solid #ecebe6;">
+                            }
+                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                        </div>
+                        <div class="small text-muted mt-1" style="font-size:10.5px;">Square image recommended (400×400px).</div>
+                    </div>
+                    <input type="hidden" name="PhotoPath" value="@current.PhotoPath" />
                     <div class="col-md-4">
                         <label class="form-label small fw-semibold">Display Order</label>
                         <input type="number" name="DisplayOrder" class="form-control"

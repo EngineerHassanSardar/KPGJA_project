@@ -1,0 +1,181 @@
+﻿@model Entities.Entities.HomeBlock
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = ViewBag.BlockLabel as string ?? "Edit Block";
+    string key = ViewBag.BlockKey as string ?? "";
+}
+
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">Home Content</div>
+        <h1>@ViewData["Title"]</h1>
+        <p>Edit the content shown on the homepage for this block.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/HomeContent" class="btn-cancel">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<form method="post" asp-action="HomeBlockSave" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+    <input type="hidden" name="Key" value="@Model.Key" />
+    <input type="hidden" name="ImagePath" value="@Model.ImagePath" />
+
+    <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+        <div class="p-4">
+            <div class="row g-3">
+
+                @if (key == "intro")
+                {
+                    <div class="col-md-12">
+                        <label class="form-label small fw-semibold">Heading</label>
+                        <input name="Title" class="form-control" value="@Model.Title">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">First Paragraph</label>
+                        <textarea name="Body" class="form-control" rows="4">@Model.Body</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Second Paragraph</label>
+                        <textarea name="Body2" class="form-control" rows="4">@Model.Body2</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Image</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(Model.ImagePath))
+                            {
+                                <img src="@Model.ImagePath" style="width:80px;height:60px;object-fit:cover;border-radius:8px;">
+                            }
+                            <input type="file" name="ImageFile" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Button Text</label>
+                        <input name="CtaText" class="form-control" value="@Model.CtaText">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Button Link</label>
+                        <input name="CtaLink" class="form-control" value="@Model.CtaLink">
+                    </div>
+                }
+                else if (key == "president")
+                {
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Heading</label>
+                        <input name="Title" class="form-control" value="@Model.Title">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Photo</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(Model.ImagePath))
+                            {
+                                <img src="@Model.ImagePath" style="width:80px;height:60px;object-fit:cover;border-radius:8px;">
+                            }
+                            <input type="file" name="ImageFile" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">First Paragraph</label>
+                        <textarea name="Body" class="form-control" rows="4">@Model.Body</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Second Paragraph</label>
+                        <textarea name="Body2" class="form-control" rows="4">@Model.Body2</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Name</label>
+                        <input name="PersonName" class="form-control" value="@Model.PersonName">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Title</label>
+                        <input name="PersonTitle" class="form-control" value="@Model.PersonTitle">
+                    </div>
+
+                    @* ⚠️ BUTTON FIELDS — NEW *@
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Text</label>
+                        <input name="CtaText" class="form-control" value="@Model.CtaText" placeholder="Meet the Executive Committee">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Link</label>
+                        <input name="CtaLink" class="form-control" value="@Model.CtaLink" placeholder="/Home/Executive">
+                    </div>
+                }
+                else if (key == "women")
+                {
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Heading</label>
+                        <input name="Title" class="form-control" value="@Model.Title">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Image</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(Model.ImagePath))
+                            {
+                                <img src="@Model.ImagePath" style="width:80px;height:60px;object-fit:cover;border-radius:8px;">
+                            }
+                            <input type="file" name="ImageFile" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3">@Model.Body</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Text</label>
+                        <input name="CtaText" class="form-control" value="@Model.CtaText">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Link</label>
+                        <input name="CtaLink" class="form-control" value="@Model.CtaLink">
+                    </div>
+                }
+                else if (key == "contact-cta")
+                {
+                    <div class="col-md-12">
+                        <label class="form-label small fw-semibold">Heading</label>
+                        <input name="Title" class="form-control" value="@Model.Title">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3">@Model.Body</textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Text</label>
+                        <input name="CtaText" class="form-control" value="@Model.CtaText">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Button Link</label>
+                        <input name="CtaLink" class="form-control" value="@Model.CtaLink">
+                    </div>
+                }
+
+                <div class="col-12 d-flex justify-content-end">
+                    <div class="form-check form-switch">
+                        <input name="IsActive" class="form-check-input" type="checkbox" value="true"
+                               @(Model.Id == 0 || Model.IsActive ? "checked" : null)>
+                        <label class="form-check-label small">Show on homepage</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+            <a href="/Admin/HomeContent" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-add">
+                <i class="bi bi-check2"></i> Save Block
+            </button>
+        </div>
+    </div>
+</form>

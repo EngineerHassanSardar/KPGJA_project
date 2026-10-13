@@ -1,3 +1,4 @@
+@model List<Entities.Entities.IndustryArea>
 @{
     ViewData["Title"] = "Industry | KPGJA";
 }
@@ -384,148 +385,44 @@
                  FOUR INDUSTRIES
             ================================================== -->
 
-            <div class="row g-4 mt-4">
+                       <div class="row g-4 mt-4">
 
-                <!-- 01 -->
-                <div class="col-md-6">
+                @{ int num = 0; }
+                @foreach (var area in Model)
+                {
+                    num++;
+                    <div class="col-md-6">
 
-                    <div class="industry-card">
+                        <div class="industry-card">
 
-                        <img src="~/assets/img/industry/ecommerce.png"
-                             alt="Gems and Jewellery E-Commerce Industry"
-                             loading="lazy">
+                            @if (!string.IsNullOrEmpty(area.ImagePath))
+                            {
+                                <img src="@area.ImagePath"
+                                     alt="@area.Title"
+                                     loading="lazy">
+                            }
 
-                        <div class="industry-number">
-                            01
-                        </div>
-
-                        <div class="industry-content">
-
-                           
-                            <h4>
-                                Gems & Jewellery E-Commerce Industry
-                            </h4>
-
-                            <p>
-                                Digital platforms, online stores and
-                                e-commerce businesses connecting gems
-                                and jewellery products with customers
-                                in local and international markets.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- 02 -->
-                <div class="col-md-6">
-
-                    <div class="industry-card">
-
-                        <img src="~/assets/img/industry/lapidary.png"
-                             alt="Gemstone Lapidary Industry"
-                             loading="lazy">
-
-                        <div class="industry-number">
-                            02
-                        </div>
-
-                        <div class="industry-content">
-
-                          
-                            <h4>
-                                Gemstone Lapidary Industry
-                            </h4>
-
-                            <p>
-                                Cutting, shaping, polishing and finishing
-                                gemstones to improve their quality,
-                                appearance and commercial value.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- 03 -->
-                <div class="col-md-6">
-
-                    <div class="industry-card">
-
-                        <img src="~/assets/img/industry/mines.png"
-                             alt="Mines Industry"
-                             loading="lazy">
-
-                        <div class="industry-number">
-                            03
-                        </div>
-
-                        <div class="industry-content">
-
-                         
-                            <h4>
-                                Mines Industry
-                            </h4>
-
-                            <p>
-                                Mining, extraction and sourcing of
-                                gemstones and mineral resources from
-                                mineral-rich areas of the region.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <!-- 04 -->
-                <div class="col-md-6">
-
-                    <div class="industry-card">
-
-                        <img src="~/assets/img/industry/jewellery.png"
-                             alt="Jewellery Industry"
-                             loading="lazy">
-
-                     
-                        <div class="industry-content">
-
-                            <div class="industry-icon">
-                                <i class="bi bi-stars"></i>
+                            <div class="industry-number">
+                                @num.ToString("D2")
                             </div>
 
-                            <h4>
-                                Jewellery Industry
-                            </h4>
+                            <div class="industry-content">
 
-                            <p>
-                                Jewellery businesses, craftsmen, designers,
-                                manufacturers and retailers working with
-                                gold, silver, gemstones and contemporary
-                                jewellery.
-                            </p>
+                               
+
+                                <h4>@area.Title</h4>
+
+                                <p>@area.Description</p>
+
+                            </div>
 
                         </div>
 
                     </div>
-
-                </div>
+                }
 
             </div>
-
-
-        </div>
-
-    </section>
-
+            </section>
 
    
 

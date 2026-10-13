@@ -1,7 +1,9 @@
-ï»¿@{
+@model Entities.Entities.ContactContent
+@{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Contact Content";
     bool showForm = ViewBag.ShowForm == true;
+    var m = Model ?? new Entities.Entities.ContactContent();
 }
 
 @if (TempData["Success"] is string s)
@@ -46,6 +48,7 @@
 {
     <form method="post" asp-action="ContactContentSave">
         @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@m.Id" />
 
         <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
             <div class="list-card-head">
@@ -58,15 +61,15 @@
                 <div class="row g-3">
                     <div class="col-md-4">
                         <label class="form-label small fw-semibold">Kicker</label>
-                        <input name="Kicker" class="form-control" value="WE ARE HERE TO HELP">
+                        <input name="Kicker" class="form-control" value="@m.Kicker">
                     </div>
                     <div class="col-md-8">
                         <label class="form-label small fw-semibold">Main Heading</label>
-                        <input name="Heading" class="form-control" value="Let's connect with the industry">
+                        <input name="Heading" class="form-control" value="@m.Heading">
                     </div>
                     <div class="col-12">
                         <label class="form-label small fw-semibold">Intro Paragraph</label>
-                        <textarea name="Intro" class="form-control" rows="3">Whether you are interested in membership, business networking, industry activities, events or association information, contact KPGJA through the channels below.</textarea>
+                        <textarea name="Intro" class="form-control" rows="3">@m.Intro</textarea>
                     </div>
                 </div>
             </div>
@@ -83,11 +86,11 @@
                 <div class="row g-3">
                     <div class="col-md-8">
                         <label class="form-label small fw-semibold">Address</label>
-                        <textarea name="Address" class="form-control" rows="3">Hamza Market, 1st Floor, Office # B13, Shah Qabool Street, Namak Mandi, Peshawar, Pakistan</textarea>
+                        <textarea name="Address" class="form-control" rows="3">@m.Address</textarea>
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-semibold">Google Map Embed URL</label>
-                        <input name="MapUrl" class="form-control" placeholder="https://maps.google.com/...">
+                        <input name="MapUrl" class="form-control" value="@m.MapUrl" placeholder="https://maps.google.com/...">
                     </div>
                 </div>
             </div>
@@ -104,19 +107,19 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Email</label>
-                        <input name="Email" type="email" class="form-control" value="info@kpgja.org">
+                        <input name="Email" type="email" class="form-control" value="@m.Email">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Phone</label>
-                        <input name="Phone" class="form-control" value="+92 XXX XXXXXXX">
+                        <input name="Phone" class="form-control" value="@m.Phone">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Email Description</label>
-                        <input name="EmailDesc" class="form-control" value="General inquiries and association communication.">
+                        <input name="EmailDesc" class="form-control" value="@m.EmailDesc">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Phone Description</label>
-                        <input name="PhoneDesc" class="form-control" value="Contact the KPGJA office during official working hours.">
+                        <input name="PhoneDesc" class="form-control" value="@m.PhoneDesc">
                     </div>
                 </div>
             </div>
@@ -133,15 +136,15 @@
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Weekdays</label>
-                        <input name="Weekdays" class="form-control" value="Monday â€“ Friday">
+                        <input name="Weekdays" class="form-control" value="@m.Weekdays">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Hours</label>
-                        <input name="Hours" class="form-control" value="9:00 AM â€“ 5:00 PM">
+                        <input name="Hours" class="form-control" value="@m.Hours">
                     </div>
                     <div class="col-12">
                         <label class="form-label small fw-semibold">Note</label>
-                        <input name="Note" class="form-control" value="Office timings may vary on public holidays.">
+                        <input name="Note" class="form-control" value="@m.Note">
                     </div>
                 </div>
             </div>
@@ -168,31 +171,31 @@ else
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Kicker</div>
-                    <div class="fw-semibold">WE ARE HERE TO HELP</div>
+                    <div class="fw-semibold">@(string.IsNullOrEmpty(m.Kicker) ? "—" : m.Kicker)</div>
                 </div>
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Heading</div>
-                    <div class="fw-semibold">Let's connect with the industry</div>
+                    <div class="fw-semibold">@(string.IsNullOrEmpty(m.Heading) ? "—" : m.Heading)</div>
                 </div>
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Email</div>
-                    <div class="fw-semibold">info@kpgja.org</div>
+                    <div class="fw-semibold">@(string.IsNullOrEmpty(m.Email) ? "—" : m.Email)</div>
                 </div>
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Phone</div>
-                    <div class="fw-semibold">+92 XXX XXXXXXX</div>
+                    <div class="fw-semibold">@(string.IsNullOrEmpty(m.Phone) ? "—" : m.Phone)</div>
                 </div>
                 <div class="col-12">
                     <div class="small text-muted mb-1">Address</div>
-                    <div class="fw-semibold">Hamza Market, 1st Floor, Office # B13, Shah Qabool Street, Namak Mandi, Peshawar, Pakistan</div>
+                    <div class="fw-semibold">@(string.IsNullOrEmpty(m.Address) ? "—" : m.Address)</div>
                 </div>
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Weekdays</div>
-                    <div class="fw-semibold">Monday â€“ Friday</div>
+                    <div class="fw-semibold">@(string.IsNullOrEmpty(m.Weekdays) ? "—" : m.Weekdays)</div>
                 </div>
                 <div class="col-md-6">
                     <div class="small text-muted mb-1">Hours</div>
-                    <div class="fw-semibold">9:00 AM â€“ 5:00 PM</div>
+                    <div class="fw-semibold">@(string.IsNullOrEmpty(m.Hours) ? "—" : m.Hours)</div>
                 </div>
             </div>
         </div>

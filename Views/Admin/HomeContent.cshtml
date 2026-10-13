@@ -1,33 +1,33 @@
-﻿@{
+@{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Home Content";
-    bool showSlideForm    = ViewBag.ShowSlideForm == true;
+    bool showSlideForm     = ViewBag.ShowSlideForm == true;
     bool showObjectiveForm = ViewBag.ShowObjectiveForm == true;
     bool showQuickLinkForm = ViewBag.ShowQuickLinkForm == true;
-    bool showCtaForm      = ViewBag.ShowCtaForm == true;
+    bool showCtaForm       = ViewBag.ShowCtaForm == true;
 
-    var slides = ViewBag.Slides as List<KPGJA.Web.Models.HeroSlide> ?? new();
-    var objectives = ViewBag.Objectives as List<KPGJA.Web.Models.HomeSection> ?? new();
-    var quickLinks = ViewBag.QuickLinks as List<KPGJA.Web.Models.HomeSection> ?? new();
-    var currentSlide = ViewBag.CurrentSlide as KPGJA.Web.Models.HeroSlide ?? new KPGJA.Web.Models.HeroSlide();
-    var currentObjective = ViewBag.CurrentObjective as KPGJA.Web.Models.HomeSection ?? new KPGJA.Web.Models.HomeSection();
-    var currentQuickLink = ViewBag.CurrentQuickLink as KPGJA.Web.Models.HomeSection ?? new KPGJA.Web.Models.HomeSection();
+    var slides           = ViewBag.Slides as List<Entities.Entities.HeroSlide> ?? new();
+    var objectives       = ViewBag.Objectives as List<Entities.Entities.HomeSection> ?? new();
+    var quickLinks       = ViewBag.QuickLinks as List<Entities.Entities.HomeSection> ?? new();
+    var currentSlide     = ViewBag.CurrentSlide as Entities.Entities.HeroSlide ?? new Entities.Entities.HeroSlide();
+    var currentObjective = ViewBag.CurrentObjective as Entities.Entities.HomeSection ?? new Entities.Entities.HomeSection();
+    var currentQuickLink = ViewBag.CurrentQuickLink as Entities.Entities.HomeSection ?? new Entities.Entities.HomeSection();
+    var cta              = ViewBag.Cta as Entities.Entities.HomeCta ?? new Entities.Entities.HomeCta();
 }
 
-@if (TempData["Success"] is string s)
+@if (TempData["Error"] is string err)
 {
-    <div class="alert alert-success alert-dismissible fade show py-2">
-        <i class="bi bi-check-circle me-1"></i> @s
+    <div class="alert alert-danger alert-dismissible fade show py-2">
+        <i class="bi bi-exclamation-triangle me-1"></i> @err
         <button class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 }
 
-<!-- PAGE HEADER -->
 <div class="page-head">
     <div class="page-head-left">
         <div class="kicker">Content</div>
         <h1>Home Content</h1>
-        <p>Manage the homepage hero slider, objectives, membership CTA and quick links.</p>
+        <p>Manage the homepage hero slider, objectives, membership CTA, page blocks and quick links.</p>
     </div>
     <div class="page-head-actions">
         <a href="/Admin/HomeContent?showCtaForm=true" class="btn-outline-brand">
@@ -39,21 +39,55 @@
     </div>
 </div>
 
-<!-- INFO BANNER -->
 <div class="info-banner">
     <i class="bi bi-info-circle-fill"></i>
     <div>
         <strong>Homepage</strong>
-        <p>Changes made here are reflected on the public <code>/Home</code> page. Each section below (Women, Industry, News, Events, Contact) has its own editor.</p>
+        <p>Changes made here are reflected on the public <code>/Home</code> page.</p>
+    </div>
+</div>
+
+<!-- ========== 0. PAGE BLOCKS ========== -->
+<div class="list-card mb-3">
+    <div class="list-card-head">
+        <div>
+            <h2><i class="bi bi-layers"></i> Page Blocks</h2>
+            <p class="list-card-sub">Edit content blocks shown on the homepage.</p>
+        </div>
+    </div>
+    <div class="p-4">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <a href="/Admin/HomeBlockEdit?key=intro" class="btn btn-outline-brand w-100">
+                    <i class="bi bi-info-circle"></i> Introduction
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="/Admin/HomeBlockEdit?key=president" class="btn btn-outline-brand w-100">
+                    <i class="bi bi-person-badge"></i> President's Message
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="/Admin/HomeBlockEdit?key=women" class="btn btn-outline-brand w-100">
+                    <i class="bi bi-gender-female"></i> Women Section
+                </a>
+            </div>
+            <div class="col-md-3">
+                <a href="/Admin/HomeBlockEdit?key=contact-cta" class="btn btn-outline-brand w-100">
+                    <i class="bi bi-envelope"></i> Contact CTA
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
 <!-- ========== 1. HERO SLIDER FORM ========== -->
 @if (showSlideForm)
 {
-    <form method="post" asp-action="HomeSlideSave">
+    <form method="post" asp-action="HomeSlideSave" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@currentSlide.Id" />
+        <input type="hidden" name="ImagePath" value="@currentSlide.ImagePath" />
 
         <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
             <div class="list-card-head">
@@ -80,20 +114,39 @@
                                value="@(currentSlide.DisplayOrder == 0 ? (slides.Count + 1) : currentSlide.DisplayOrder)" min="0">
                     </div>
                     <div class="col-12">
-                        <label class="form-label small fw-semibold">Subtitle</label>
-                        <input name="Subtitle" class="form-control" value="@currentSlide.Subtitle" placeholder="Short supporting line">
+                        <label class="form-label small fw-semibold">Kicker (small line above title)</label>
+                        <input name="Subtitle" class="form-control" value="@currentSlide.Subtitle" placeholder="KHYBER PAKHUNKHWA · PAKISTAN">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Description (paragraph below title)</label>
+                        <textarea name="Description" class="form-control" rows="3" placeholder="Building stronger connections...">@currentSlide.Description</textarea>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Button Text</label>
+                        <label class="form-label small fw-semibold">Primary Button Text</label>
                         <input name="CtaText" class="form-control" value="@currentSlide.CtaText" placeholder="Become a Member">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Button Link</label>
+                        <label class="form-label small fw-semibold">Primary Button Link</label>
                         <input name="CtaLink" class="form-control" value="@currentSlide.CtaLink" placeholder="/Member/Register">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Secondary Button Text (optional)</label>
+                        <input name="CtaText2" class="form-control" value="@currentSlide.CtaText2" placeholder="Discover KPGJA">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small fw-semibold">Secondary Button Link (optional)</label>
+                        <input name="CtaLink2" class="form-control" value="@currentSlide.CtaLink2" placeholder="/Home/About">
                     </div>
                     <div class="col-md-8">
                         <label class="form-label small fw-semibold">Background Image</label>
-                        <input type="file" name="ImageFile" class="form-control form-control-sm" accept="image/*">
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(currentSlide.ImagePath))
+                            {
+                                <img src="@currentSlide.ImagePath" alt="Current"
+                                     style="width:100px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #ecebe6;">
+                            }
+                            <input type="file" name="ImageFile" class="form-control form-control-sm" accept="image/*">
+                        </div>
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
                         <div class="form-check form-switch">
@@ -143,8 +196,8 @@
             <thead>
                 <tr>
                     <th style="width:40px;">#</th>
+                    <th style="width:80px;">Image</th>
                     <th>Title</th>
-                    <th style="width:200px;">Subtitle</th>
                     <th style="width:160px;">CTA Button</th>
                     <th class="center" style="width:80px;">Order</th>
                     <th class="center" style="width:100px;">Status</th>
@@ -159,10 +212,20 @@
                     <tr>
                         <td class="row-num">@n</td>
                         <td>
+                            @if (!string.IsNullOrEmpty(sl.ImagePath))
+                            {
+                                <img src="@sl.ImagePath" alt="@sl.Title"
+                                     style="width:60px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #ecebe6;">
+                            }
+                            else
+                            {
+                                <div class="thumb"><i class="bi bi-image"></i></div>
+                            }
+                        </td>
+                        <td>
                             <div class="strong">@sl.Title</div>
                             <div class="desc-cell" style="margin-top:2px;">@sl.Subtitle</div>
                         </td>
-                        <td class="text-muted">@sl.Subtitle</td>
                         <td class="text-muted"><span style="color:var(--kpgja-gold);font-weight:600;">@sl.CtaText</span></td>
                         <td class="center text-muted">@sl.DisplayOrder</td>
                         <td class="center">
@@ -200,10 +263,11 @@
 <!-- ========== 2. OBJECTIVES ========== -->
 @if (showObjectiveForm)
 {
-    <form method="post" asp-action="HomeObjectiveSave">
+    <form method="post" asp-action="HomeObjectiveSave" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@currentObjective.Id" />
         <input type="hidden" name="SectionKey" value="objectives" />
+        <input type="hidden" name="ImagePath" value="@currentObjective.ImagePath" />
 
         <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
             <div class="list-card-head">
@@ -233,12 +297,23 @@
                         <label class="form-label small fw-semibold">Body</label>
                         <textarea name="Body" class="form-control" rows="3" placeholder="Short description...">@currentObjective.Body</textarea>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <label class="form-label small fw-semibold">Icon</label>
-                        <input name="IconClass" class="form-control"
-                               value="@(string.IsNullOrEmpty(currentObjective.IconClass) ? "bi-bullseye" : currentObjective.IconClass)" placeholder="bi-bullseye">
+                        <div class="d-flex gap-2">
+                            <input name="IconClass" id="iconClassInput"
+                                   class="form-control"
+                                   value="@(string.IsNullOrEmpty(currentObjective.IconClass) ? "bi-globe" : currentObjective.IconClass)"
+                                   placeholder="e.g. bi-globe" readonly>
+                            <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#iconPickerModal">
+                                <i class="bi bi-grid"></i> Pick
+                            </button>
+                            <div class="form-control d-flex align-items-center justify-content-center" style="width:60px;">
+                                <i class="bi @(string.IsNullOrEmpty(currentObjective.IconClass) ? "bi-globe" : currentObjective.IconClass)" id="iconPreview" style="font-size:20px;"></i>
+                            </div>
+                        </div>
+                        <div class="small text-muted mt-1" style="font-size:10.5px;">Click "Pick" to choose from all Bootstrap icons.</div>
                     </div>
-                    <div class="col-md-6 d-flex align-items-end">
+                    <div class="col-md-4 d-flex align-items-end">
                         <div class="form-check form-switch">
                             <input name="IsActive" class="form-check-input" type="checkbox" value="true"
                                    @(currentObjective.Id == 0 || currentObjective.IsActive ? "checked" : null)>
@@ -369,15 +444,10 @@
                                value="@(currentQuickLink.DisplayOrder == 0 ? (quickLinks.Count + 1) : currentQuickLink.DisplayOrder)" min="0">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Icon</label>
-                        <input name="IconClass" class="form-control"
-                               value="@(string.IsNullOrEmpty(currentQuickLink.IconClass) ? "bi-link-45deg" : currentQuickLink.IconClass)" placeholder="bi-link-45deg">
-                    </div>
-                    <div class="col-md-6">
                         <label class="form-label small fw-semibold">Link URL</label>
                         <input name="Body" class="form-control" value="@currentQuickLink.Body" placeholder="/Member/Register">
                     </div>
-                    <div class="col-12 d-flex align-items-end">
+                    <div class="col-md-6 d-flex align-items-end">
                         <div class="form-check form-switch">
                             <input name="IsActive" class="form-check-input" type="checkbox" value="true"
                                    @(currentQuickLink.Id == 0 || currentQuickLink.IsActive ? "checked" : null)>
@@ -424,7 +494,6 @@
             <thead>
                 <tr>
                     <th style="width:40px;">#</th>
-                    <th style="width:60px;">Icon</th>
                     <th>Label</th>
                     <th>URL</th>
                     <th class="center" style="width:80px;">Order</th>
@@ -439,7 +508,6 @@
                     k++;
                     <tr>
                         <td class="row-num">@k</td>
-                        <td><div class="thumb"><i class="bi @ql.IconClass"></i></div></td>
                         <td class="strong">@ql.Title</td>
                         <td class="desc-cell"><code>@ql.Body</code></td>
                         <td class="center text-muted">@ql.DisplayOrder</td>
@@ -475,11 +543,12 @@
     }
 </div>
 
-<!-- ========== 4. MEMBERSHIP CTA (single-editor) ========== -->
+<!-- ========== 4. MEMBERSHIP CTA ========== -->
 @if (showCtaForm)
 {
     <form method="post" asp-action="HomeCtaSave">
         @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@cta.Id" />
 
         <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
             <div class="list-card-head">
@@ -495,19 +564,19 @@
                 <div class="row g-3">
                     <div class="col-md-8">
                         <label class="form-label small fw-semibold">Heading</label>
-                        <input name="Heading" class="form-control" value="Become a Member Today">
+                        <input name="Heading" class="form-control" value="@cta.Heading">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-semibold">Button Text</label>
-                        <input name="CtaText" class="form-control" value="Apply Now">
+                        <input name="CtaText" class="form-control" value="@cta.CtaText">
                     </div>
                     <div class="col-12">
                         <label class="form-label small fw-semibold">Body</label>
-                        <textarea name="Body" class="form-control" rows="3">Join KP's leading network of gem and jewellery professionals.</textarea>
+                        <textarea name="Body" class="form-control" rows="3">@cta.Body</textarea>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label small fw-semibold">Button Link</label>
-                        <input name="CtaLink" class="form-control" value="/Member/Register">
+                        <input name="CtaLink" class="form-control" value="@cta.CtaLink">
                     </div>
                 </div>
             </div>
@@ -520,10 +589,27 @@
         </div>
     </form>
 }
+<!-- ========== ICON PICKER MODAL ========== -->
+<div class="modal fade" id="iconPickerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-grid"></i> Pick an Icon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="iconSearch" class="form-control mb-3"
+                       placeholder="Search icons (e.g. globe, arrow, people, gem)">
 
+                <div id="iconGrid" class="icon-grid">
+                    <!-- JS will fill this -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
-        // Scroll to form if any is open
         @if (showSlideForm || showObjectiveForm || showQuickLinkForm || showCtaForm)
         {
             <text>
@@ -531,5 +617,72 @@
                 if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
             </text>
         }
+            // Icon picker
+            (function() {
+                const icons = [
+                    "bi-globe", "bi-globe2", "bi-globe-americas", "bi-globe-asia-australia", "bi-globe-central-south-asia", "bi-globe-europe-africa",
+                    "bi-graph-up", "bi-graph-up-arrow", "bi-graph-down", "bi-bar-chart", "bi-bar-chart-line", "bi-pie-chart",
+                    "bi-mortarboard", "bi-book", "bi-bookmark", "bi-journal", "bi-lightbulb",
+                    "bi-people", "bi-person", "bi-person-badge", "bi-person-circle", "bi-people-fill",
+                    "bi-gem", "bi-award", "bi-award-fill", "bi-trophy", "bi-star", "bi-star-fill",
+                    "bi-tools", "bi-gear", "bi-wrench", "bi-hammer", "bi-hammer-screw",
+                    "bi-shop", "bi-cart", "bi-bag", "bi-basket",
+                    "bi-bank", "bi-building", "bi-briefcase", "bi-house", "bi-house-door",
+                    "bi-envelope", "bi-telephone", "bi-chat", "bi-chat-dots", "bi-send",
+                    "bi-calendar", "bi-calendar-event", "bi-clock", "bi-hourglass",
+                    "bi-cash", "bi-cash-coin", "bi-currency-dollar", "bi-credit-card", "bi-wallet",
+                    "bi-hand-thumbs-up", "bi-handshake", "bi-shield-check", "bi-shield-lock",
+                    "bi-truck", "bi-box", "bi-archive", "bi-box-seam",
+                    "bi-pencil", "bi-pencil-square", "bi-pen", "bi-eyedropper",
+                    "bi-megaphone", "bi-bullseye", "bi-target", "bi-cpu",
+                    "bi-map", "bi-geo-alt", "bi-pin-map", "bi-compass",
+                    "bi-heart", "bi-heart-fill", "bi-emoji-smile", "bi-hand-index",
+                    "bi-check-circle", "bi-check2-circle", "bi-x-circle", "bi-exclamation-circle",
+                    "bi-info-circle", "bi-question-circle", "bi-plus-circle", "bi-dash-circle",
+                    "bi-arrow-right", "bi-arrow-left", "bi-arrow-up", "bi-arrow-down",
+                    "bi-search", "bi-filter", "bi-funnel", "bi-sliders", "bi-list",
+                    "bi-image", "bi-camera", "bi-file-earmark", "bi-file-text", "bi-folder",
+                    "bi-wifi", "bi-cloud", "bi-sun", "bi-moon", "bi-stars",
+                    "bi-diamond", "bi-suit-diamond", "bi-heart-pulse", "bi-activity",
+                    "bi-boxes", "bi-layers", "bi-grid", "bi-grid-1x2", "bi-columns-gap",
+                    "bi-tag", "bi-tags", "bi-bookmark-star", "bi-pin-angle",
+                    "bi-tree", "bi-flower1", "bi-water", "bi-fire", "bi-snow",
+                    "bi-palette", "bi-brush", "bi-easel", "bi-crop",
+                    "bi-key", "bi-lock", "bi-unlock", "bi-fingerprint",
+                    "bi-file-code", "bi-terminal", "bi-braces", "bi-code-slash",
+                    "bi-eye", "bi-eye-slash", "bi-broadcast", "bi-rss"
+                ];
+
+                const grid = document.getElementById('iconGrid');
+                const search = document.getElementById('iconSearch');
+                const input = document.getElementById('iconClassInput');
+                const preview = document.getElementById('iconPreview');
+
+                if (!grid) return;
+
+                function render(filter = "") {
+                    const f = filter.toLowerCase();
+                    const filtered = icons.filter(i => i.includes(f));
+                    grid.innerHTML = filtered.map(i =>
+                        `<div class="icon-item" data-icon="${i}">
+                        <i class="bi ${i}"></i>
+                        <span>${i.replace('bi-', '')}</span>
+                    </div>`
+                    ).join('');
+                }
+
+                render();
+
+                search?.addEventListener('input', e => render(e.target.value));
+
+                grid.addEventListener('click', e => {
+                    const item = e.target.closest('.icon-item');
+                    if (!item) return;
+                    const icon = item.dataset.icon;
+                    input.value = icon;
+                    preview.className = 'bi ' + icon;
+                    bootstrap.Modal.getInstance(document.getElementById('iconPickerModal')).hide();
+                });
+            })();
     </script>
 }

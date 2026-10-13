@@ -1,969 +1,398 @@
-@{ ViewData["Title"] = "About Us | KPGJA"; }
-
-@section Styles {
-<style>
-
-  .mission-list { margin: 20px 0 0; padding-left: 20px; } .mission-list li { color: #5f6673; font-size: 15px; line-height: 1.7; margin-bottom: 10px; padding-left: 5px; } .mission-list li::marker { color: #b88a2d; }
-
-</style>
+@{
+    ViewData["Title"] = "About Us | KPGJA";
 }
 
-<!-- =========================================================
-     TOP BAR
-========================================================= -->
-
-
-
-
-<!-- =========================================================
-     PAGE HERO
-========================================================= -->
-
-<section class="page-hero about-page-hero">
-
+<!-- ============ HERO ============ -->
+<section class="page-hero">
     <div class="container">
-
-        <div class="row align-items-center">
-
-            <div class="col-lg-8">
-
-                <span class="section-kicker text-warning">
-                    ABOUT KPGJA
-                </span>
-
-                <h1>
-                    Building a stronger
-                    gems & jewellery industry.
-                </h1>
-
-                <p class="lead text-white-50 mt-3">
-
-                    Connecting businesses, professionals,
-                    entrepreneurs and stakeholders across
-                    Khyber Pakhtunkhwa.
-
-                </p>
-
-            </div>
-
-        </div>
-
+        <span class="section-kicker text-warning">ABOUT KPGJA</span>
+        <h1>About Us</h1>
+        <p class="lead text-white-50 mb-0">Uniting the gems and jewellery community of Khyber Pakhtunkhwa.</p>
     </div>
-
 </section>
-
 
 <main>
 
+    <!-- ============ 1. WHO WE ARE ============ -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="section-kicker">WHO WE ARE</span>
+                    <h2 class="section-heading mt-2">A platform for connection, development and opportunity.</h2>
 
-<!-- =========================================================
-     INTRODUCTION
-========================================================= -->
+                    <p class="text-secondary" style="line-height:1.85;">
+                        The Khyber Pakhtunkhwa Gems &amp; Jewellery Association (KPGJA) is a representative
+                        organization dedicated to the development, promotion, and strengthening of the gems
+                        and jewellery sector in Khyber Pakhtunkhwa, Pakistan.
+                    </p>
+                    <p class="text-secondary" style="line-height:1.85;">
+                        The Association works to bring together gemstone traders, jewellery businesses,
+                        lapidaries, artisans, miners, exporters, e-commerce professionals, and other
+                        stakeholders connected with the gems and jewellery industry.
+                    </p>
+                    <p class="text-secondary" style="line-height:1.85;">
+                        KPGJA aims to promote skill development, employment, value addition, digital
+                        transformation, e-commerce, women's participation, responsible business practices,
+                        and international market access for the sector.
+                    </p>
+                    <p class="text-secondary" style="line-height:1.85;">
+                        The Association also seeks to create stronger connections between local businesses
+                        and national and international markets, while highlighting the rich gemstone resources
+                        and craftsmanship of Khyber Pakhtunkhwa.
+                    </p>
+                </div>
+                <div class="col-lg-6">
+                    <img src="/assets/img/about-home.jpg" alt="KPGJA"
+                         style="width:100%; height:auto; min-height:480px; max-height:600px; object-fit:cover; border-radius:20px; box-shadow:0 15px 40px rgba(0,0,0,.08); display:block;">
+                </div>
+            </div>
+        </div>
+    </section>
 
-<section class="py-5">
+    <!-- ============ 2. VISION & MISSION ============ -->
+    <section class="py-5" style="background:#f7f5ef;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">OUR DIRECTION</span>
+                <h2 class="section-heading mt-2">Vision &amp; Mission</h2>
+            </div>
 
-    <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="soft-card p-4 h-100">
+                        <div class="objective-icon mb-3" style="background:#f5f1e7;">
+                            <i class="bi bi-eye"></i>
+                        </div>
+                        <h4 class="mb-3" style="font-family:'Playfair Display',serif;">Our Vision</h4>
+                        <p class="text-secondary mb-0" style="line-height:1.85;">
+                            To build a strong, skilled, transparent, and internationally connected gems and
+                            jewellery sector in Khyber Pakhtunkhwa that creates employment, supports
+                            entrepreneurship, promotes value addition, and contributes to sustainable
+                            economic development.
+                        </p>
+                    </div>
+                </div>
 
-        <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="soft-card p-4 h-100">
+                        <div class="objective-icon mb-3" style="background:#f5f1e7;">
+                            <i class="bi bi-bullseye"></i>
+                        </div>
+                        <h4 class="mb-3" style="font-family:'Playfair Display',serif;">Our Mission</h4>
+                        <ul class="list-unstyled mb-0">
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Promote the gems and jewellery sector of Khyber Pakhtunkhwa.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Support gemstone traders, jewellery businesses, artisans, and other industry stakeholders.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Encourage modern cutting, polishing, grading, finishing, and value-addition practices.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Promote e-commerce and digital business opportunities.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Facilitate access to national and international markets.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Support skills development, training, and employment opportunities.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Encourage greater participation of women and youth in the sector.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Represent the interests of the gems and jewellery community before relevant institutions and organizations.</span></li>
+                            <li class="d-flex gap-2 mb-2 small text-secondary"><i class="bi bi-check-circle-fill" style="color:#d6a84f; margin-top:3px;"></i><span>Promote cooperation, transparency, professionalism, and long-term business relationships.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-
-            <div class="col-lg-6">
-
-                <span class="section-kicker">
-                    WHO WE ARE
-                </span>
-
-                <h2 class="section-heading">
-                    A platform for connection,
-                    development and opportunity.
-                </h2>
-
-
-                <p class="text-secondary">
-
-                    The Khyber Pakhtunkhwa Gems & Jewelry Association (KPGJA) is a representative organization
-dedicated to the development, promotion, and strengthening of the gems and jewelry sector in
-Khyber Pakhtunkhwa, Pakistan.
-
+    <!-- ============ 3. OBJECTIVES ============ -->
+    <section class="py-5">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">OUR OBJECTIVES</span>
+                <h2 class="section-heading mt-2">Areas we aim to support</h2>
+                <p class="text-secondary mx-auto" style="max-width:700px;">
+                    KPGJA's objectives cover industry development, skills, trade, employment, entrepreneurship and collaboration.
                 </p>
+            </div>
 
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-graph-up-arrow"></i></div>
+                        <h4 style="font-size:19px;">Industry Development</h4>
+                        <p>Supporting professional development, innovation and stronger industry practices.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-globe2"></i></div>
+                        <h4 style="font-size:19px;">Trade &amp; Export</h4>
+                        <p>Encouraging market access and opportunities for domestic and international trade.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-mortarboard"></i></div>
+                        <h4 style="font-size:19px;">Skills &amp; Training</h4>
+                        <p>Promoting technical skills, capacity building, training and value addition.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-briefcase"></i></div>
+                        <h4 style="font-size:19px;">Employment &amp; Enterprise</h4>
+                        <p>Supporting entrepreneurship, employment and business development opportunities.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-people"></i></div>
+                        <h4 style="font-size:19px;">Collaboration</h4>
+                        <p>Creating opportunities for stakeholders to connect, cooperate and exchange knowledge.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-lightbulb"></i></div>
+                        <h4 style="font-size:19px;">Innovation &amp; Digitalization</h4>
+                        <p>Encouraging digital opportunities, modern business practices and innovation across the sector.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <p class="text-secondary">
-
-                  The Association works to bring together gemstone traders, jewelry businesses, lapidaries, artisans,
-miners, exporters, e-commerce professionals, and other stakeholders connected with the gems and
-jewelry industry.
-
+    <!-- ============ 4. ACTIVITIES & INITIATIVES ============ -->
+    <section class="py-5" style="background:#f7f5ef;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <span class="section-kicker">OUR WORK</span>
+                <h2 class="section-heading mt-2">Activities &amp; Initiatives</h2>
+                <p class="text-secondary mx-auto" style="max-width:700px;">
+                    The Association may facilitate and publish activities, programs and initiatives supporting the development of the sector.
                 </p>
-
-
-                <p class="text-secondary">
-
-                    KPGJA aims to promote skill development, employment, value addition, digital transformation,
-e-commerce, women’s participation, responsible business practices, and international market
-access for the sector.
-
-                </p>
-                        <p class="text-secondary">
-
-                  The Association also seeks to create stronger connections between local businesses and national
-and international markets, while highlighting the rich gemstone resources and craftsmanship of
-Khyber Pakhtunkhwa.
-                </p>
-
             </div>
 
-
-            <div class="col-lg-6">
-
-                <div class="intro-image-wrapper">
-
-                    <img src="/assets/img/about-home.jpg"
-                         alt="Gems and jewellery professionals"
-                         class="img-fluid">
-
-                    <div class="intro-badge">
-
-                        <i class="bi bi-gem"></i>
-
-                        <span>
-
-                            Gems & Jewellery
-
-                            <small>
-                                Khyber Pakhtunkhwa
-                            </small>
-
-                        </span>
-
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-mortarboard"></i></div>
+                        <h4 style="font-size:19px;">Training &amp; Capacity Building</h4>
+                        <p>Supporting training programs, technical skills and professional development.</p>
                     </div>
-
                 </div>
-
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-calendar-event"></i></div>
+                        <h4 style="font-size:19px;">Events &amp; Networking</h4>
+                        <p>Facilitating exhibitions, meetings, networking activities and industry events.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-globe2"></i></div>
+                        <h4 style="font-size:19px;">Market Access</h4>
+                        <p>Promoting opportunities for businesses to access wider domestic and international markets.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-people"></i></div>
+                        <h4 style="font-size:19px;">Women Empowerment</h4>
+                        <p>Supporting initiatives that encourage women's participation and entrepreneurship.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-laptop"></i></div>
+                        <h4 style="font-size:19px;">Digital Opportunities</h4>
+                        <p>Encouraging digital commerce, technology adoption and modern business practices.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="objective-card h-100">
+                        <div class="objective-icon"><i class="bi bi-diagram-3"></i></div>
+                        <h4 style="font-size:19px;">Industry Collaboration</h4>
+                        <p>Creating opportunities for stakeholders to collaborate and share knowledge.</p>
+                    </div>
+                </div>
             </div>
-
         </div>
+    </section>
 
-    </div>
+    <!-- ============ 5. ASSOCIATION PROFILE / STAKEHOLDERS ============ -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row align-items-center g-5">
 
-</section>
+                <!-- IMAGE LEFT -->
+                <div class="col-lg-6">
+                    <img src="/assets/img/association-profile.jpg"
+                         alt="Association Profile"
+                         style="width:100%; height:auto; min-height:420px; max-height:520px; object-fit:cover; border-radius:20px; box-shadow:0 15px 40px rgba(0,0,0,.10); display:block;">
+                </div>
 
+                <!-- CONTENT RIGHT -->
+                <div class="col-lg-6">
+                    <span class="section-kicker">ASSOCIATION PROFILE</span>
+                    <h2 class="section-heading mt-2">Connecting stakeholders across the value chain.</h2>
+                    <p class="text-secondary" style="line-height:1.85;">
+                        The gems and jewellery sector brings together a wide range of businesses,
+                        skilled professionals and supporting stakeholders.
+                    </p>
 
-<!-- =========================================================
-     VISION & MISSION
-========================================================= -->
+                    <div class="row g-3 mt-3">
+                        <div class="col-sm-6">
+                            <div class="stakeholder-chip"><i class="bi bi-gem"></i><span>Gemstone Traders</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="stakeholder-chip"><i class="bi bi-award"></i><span>Jewellers</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="stakeholder-chip"><i class="bi bi-scissors"></i><span>Lapidaries</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="stakeholder-chip"><i class="bi bi-palette"></i><span>Designers</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="stakeholder-chip"><i class="bi bi-tools"></i><span>Manufacturers</span></div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="stakeholder-chip"><i class="bi bi-globe2"></i><span>Exporters</span></div>
+                        </div>
+                    </div>
+                </div>
 
-<section class="objectives-section py-5">
-
-    <div class="container">
-
-        <div class="text-center mb-5">
-
-            <span class="section-kicker">
-                OUR DIRECTION
-            </span>
-
-            <h2 class="section-heading">
-                Vision & Mission
-            </h2>
-
+            </div>
         </div>
+    </section>
 
-
-        <div class="row g-4">
-
-
-            <!-- Vision -->
-
-            <div class="col-lg-6">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-eye"></i>
-
-                    </div>
-
-                    <h3>
-                        Our Vision
-                    </h3>
-
-                    <p>
-
-                     To build a strong, skilled, transparent, and internationally connected gems and jewelry sector in
-Khyber Pakhtunkhwa that creates employment, supports entrepreneurship, promotes value addition,
-and contributes to sustainable economic development.
-
+    <!-- ============ 6. ORGANIZATIONAL CTA ============ -->
+    <section class="py-5" style="background:#f7f5ef;">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <span class="section-kicker">ORGANIZATIONAL INFORMATION</span>
+                    <h2 class="section-heading mt-2">A platform built around industry stakeholders.</h2>
+                    <p class="text-secondary" style="line-height:1.85;">
+                        KPGJA provides a public platform for information about the Association, its leadership,
+                        activities, industry initiatives and membership opportunities.
+                    </p>
+                    <p class="text-secondary" style="line-height:1.85;">
+                        The website and membership platform will provide members with access to relevant information
+                        and allow authorized administrators to manage Association content and membership records.
                     </p>
 
-                </div>
-
-            </div>
-
-
-            <!-- Mission -->
-
-            <div class="col-lg-6">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-bullseye"></i>
-
+                    <div class="row g-2 mt-3">
+                        <div class="col-sm-6">
+                            <a href="/Home/Membership" class="chip-item"><i class="bi bi-people"></i><span>Membership</span></a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="/Home/News" class="chip-item"><i class="bi bi-info-circle"></i><span>Public Information</span></a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="/Home/Events" class="chip-item"><i class="bi bi-calendar-event"></i><span>Events</span></a>
+                        </div>
+                        <div class="col-sm-6">
+                            <a href="/Home/News" class="chip-item"><i class="bi bi-newspaper"></i><span>News &amp; Updates</span></a>
+                        </div>
                     </div>
-
-                    <h3>
-                        Our Mission
-                    </h3>
-
-                    <ul class="mission-list"> <li>Promote the gems and jewellery sector of Khyber Pakhtunkhwa.</li> <li>Support gemstone traders, jewellery businesses, artisans, and other industry stakeholders.</li> <li>Encourage modern cutting, polishing, grading, finishing, and value-addition practices.</li> <li>Promote e-commerce and digital business opportunities.</li> <li>Facilitate access to national and international markets.</li> <li>Support skills development, training, and employment opportunities.</li> <li>Encourage greater participation of women and youth in the sector.</li> <li>Represent the interests of the gems and jewellery community before relevant institutions and organizations.</li> <li>Promote cooperation, transparency, professionalism, and long-term business relationships.</li> </ul>
-
                 </div>
 
+                <div class="col-lg-5">
+                    <div class="president-message p-5" style="border-radius:20px;">
+                        <span class="section-kicker text-warning">JOIN KPGJA</span>
+                        <h3 style="font-family:'Playfair Display',serif; font-size:26px; line-height:1.3; color:#fff;" class="mt-2 mb-3">
+                            Become part of the community.
+                        </h3>
+                        <p style="color:rgba(255,255,255,.72); font-size:14px; line-height:1.75;">
+                            Businesses and professionals can apply for membership through the online membership system.
+                        </p>
+                        <a href="/Home/Membership" class="btn btn-gold mt-2">
+                            Apply for Membership <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
             </div>
-
         </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     OBJECTIVES
-========================================================= -->
-
-<section class="py-5">
-
-    <div class="container">
-
-
-        <div class="text-center mb-5">
-
-            <span class="section-kicker">
-                OUR OBJECTIVES
-            </span>
-
-            <h2 class="section-heading">
-                Areas we aim to support
-            </h2>
-
-            <p class="text-secondary mx-auto section-description">
-
-                KPGJA's objectives cover industry development,
-                skills, trade, employment, entrepreneurship
-                and collaboration.
-
-            </p>
-
-        </div>
-
-
-        <div class="row g-4">
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-graph-up-arrow"></i>
-
-                    </div>
-
-                    <h4>
-                        Industry Development
-                    </h4>
-
-                    <p>
-                        Supporting professional development,
-                        innovation and stronger industry
-                        practices.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-globe2"></i>
-
-                    </div>
-
-                    <h4>
-                        Trade & Export
-                    </h4>
-
-                    <p>
-                        Encouraging market access and
-                        opportunities for domestic and
-                        international trade.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-mortarboard"></i>
-
-                    </div>
-
-                    <h4>
-                        Skills & Training
-                    </h4>
-
-                    <p>
-                        Promoting technical skills,
-                        capacity building, training and
-                        value addition.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-briefcase"></i>
-
-                    </div>
-
-                    <h4>
-                        Employment & Enterprise
-                    </h4>
-
-                    <p>
-                        Supporting entrepreneurship,
-                        employment and business development
-                        opportunities.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-people"></i>
-
-                    </div>
-
-                    <h4>
-                        Collaboration
-                    </h4>
-
-                    <p>
-                        Creating opportunities for
-                        stakeholders to connect, cooperate
-                        and exchange knowledge.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="objective-card h-100">
-
-                    <div class="objective-icon">
-
-                        <i class="bi bi-lightbulb"></i>
-
-                    </div>
-
-                    <h4>
-                        Innovation & Digitalization
-                    </h4>
-
-                    <p>
-                        Encouraging digital opportunities,
-                        modern business practices and
-                        innovation across the sector.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     ASSOCIATION PROFILE
-========================================================= -->
-
-<section class="women-section py-5">
-
-    <div class="container">
-
-        <div class="row align-items-center g-5">
-
-
-            <div class="col-lg-6">
-
-                <img src="/assets/img/association-profile.jpg"
-                     alt="KPGJA industry activities"
-                     class="img-fluid rounded-4 shadow">
-
-            </div>
-
-
-            <div class="col-lg-6">
-
-                <span class="section-kicker">
-                    ASSOCIATION PROFILE
-                </span>
-
-                <h2 class="section-heading">
-                    Connecting stakeholders
-                    across the value chain.
-                </h2>
-
-
-                <p class="text-secondary">
-
-                    The gems and jewellery sector brings
-                    together a wide range of businesses,
-                    skilled professionals and supporting
-                    stakeholders.
-
-                </p>
-
-
-                <div class="row g-3 mt-3">
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-gem"></i>
-
-                            <strong>
-                                Gemstone Traders
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-award"></i>
-
-                            <strong>
-                                Jewellers
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-tools"></i>
-
-                            <strong>
-                                Lapidaries
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-palette"></i>
-
-                            <strong>
-                                Designers
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-shop"></i>
-
-                            <strong>
-                                Manufacturers
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-globe2"></i>
-
-                            <strong>
-                                Exporters
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     ACTIVITIES & INITIATIVES
-========================================================= -->
-
-<section class="py-5">
-
-    <div class="container">
-
-
-        <div class="text-center mb-5">
-
-            <span class="section-kicker">
-                OUR WORK
-            </span>
-
-            <h2 class="section-heading">
-                Activities & Initiatives
-            </h2>
-
-            <p class="text-secondary mx-auto section-description">
-
-                The Association may facilitate and publish
-                activities, programs and initiatives supporting
-                the development of the sector.
-
-            </p>
-
-        </div>
-
-
-        <div class="row g-4">
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card text-start">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-mortarboard"></i>
-
-                    </div>
-
-                    <h5>
-                        Training & Capacity Building
-                    </h5>
-
-                    <p>
-                        Supporting training programs,
-                        technical skills and professional
-                        development.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card text-start">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-calendar-event"></i>
-
-                    </div>
-
-                    <h5>
-                        Events & Networking
-                    </h5>
-
-                    <p>
-                        Facilitating exhibitions, meetings,
-                        networking activities and industry
-                        events.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card text-start">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-globe2"></i>
-
-                    </div>
-
-                    <h5>
-                        Market Access
-                    </h5>
-
-                    <p>
-                        Promoting opportunities for businesses
-                        to access wider domestic and
-                        international markets.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card text-start">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-person-hearts"></i>
-
-                    </div>
-
-                    <h5>
-                        Women Empowerment
-                    </h5>
-
-                    <p>
-                        Supporting initiatives that encourage
-                        women's participation and
-                        entrepreneurship.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card text-start">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-laptop"></i>
-
-                    </div>
-
-                    <h5>
-                        Digital Opportunities
-                    </h5>
-
-                    <p>
-                        Encouraging digital commerce,
-                        technology adoption and modern
-                        business practices.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-md-6 col-lg-4">
-
-                <div class="industry-card text-start">
-
-                    <div class="industry-icon">
-
-                        <i class="bi bi-people"></i>
-
-                    </div>
-
-                    <h5>
-                        Industry Collaboration
-                    </h5>
-
-                    <p>
-                        Creating opportunities for stakeholders
-                        to collaborate and share knowledge.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     ORGANIZATIONAL INFORMATION
-========================================================= -->
-
-<section class="objectives-section py-5">
-
-    <div class="container">
-
-        <div class="row g-5 align-items-center">
-
-
-            <div class="col-lg-7">
-
-                <span class="section-kicker">
-                    ORGANIZATIONAL INFORMATION
-                </span>
-
-                <h2 class="section-heading">
-                    A platform built around
-                    industry stakeholders.
-                </h2>
-
-
-                <p class="text-secondary">
-
-                    KPGJA provides a public platform for
-                    information about the Association,
-                    its leadership, activities, industry
-                    initiatives and membership opportunities.
-
-                </p>
-
-
-                <p class="text-secondary">
-
-                    The website and membership platform will
-                    provide members with access to relevant
-                    information and allow authorized
-                    administrators to manage Association
-                    content and membership records.
-
-                </p>
-
-
-                <div class="row g-3 mt-3">
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-person-check"></i>
-
-                            <strong>
-                                Membership
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-megaphone"></i>
-
-                            <strong>
-                                Public Information
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-calendar-event"></i>
-
-                            <strong>
-                                Events
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="col-sm-6">
-
-                        <div class="mini-feature">
-
-                            <i class="bi bi-newspaper"></i>
-
-                            <strong>
-                                News & Updates
-                            </strong>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="col-lg-5">
-
-                <div class="membership-box">
-
-                    <span class="section-kicker text-warning">
-                        JOIN KPGJA
-                    </span>
-
-                    <h2>
-                        Become part of the community.
+    </section>
+
+    <!-- ============ 7. CTA BANNER ============ -->
+    <section class="py-5" style="background:#0d4b3d;">
+        <div class="container">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <span class="section-kicker text-warning">CONNECT WITH KPGJA</span>
+                    <h2 style="font-family:'Playfair Display',serif; color:#fff; font-size:36px; margin-top:12px;">
+                        Learn more about the Association.
                     </h2>
-
-                    <p>
-                        Businesses and professionals can
-                        apply for membership through the
-                        online membership system.
+                    <p style="color:rgba(255,255,255,.72); font-size:15px; margin-bottom:0;">
+                        Explore membership, industry information, events, initiatives and other resources.
                     </p>
-
-                    <a href="/Member/Register"
-                       class="btn btn-gold">
-
-                        Apply for Membership
-
-                        <i class="bi bi-arrow-right ms-1"></i>
-
-                    </a>
-
                 </div>
-
+                <div class="col-lg-4 text-lg-end">
+                    <a href="/Home/Contact" class="btn btn-gold btn-lg">
+                        Contact Us <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
             </div>
-
         </div>
-
-    </div>
-
-</section>
-
-
-<!-- =========================================================
-     CTA
-========================================================= -->
-
-<section class="contact-cta py-5">
-
-    <div class="container">
-
-        <div class="row align-items-center g-4">
-
-
-            <div class="col-lg-8">
-
-                <span class="section-kicker text-warning">
-                    CONNECT WITH KPGJA
-                </span>
-
-                <h2>
-                    Learn more about the
-                    Association.
-                </h2>
-
-                <p>
-                    Explore membership, industry information,
-                    events, initiatives and other resources.
-                </p>
-
-            </div>
-
-
-            <div class="col-lg-4 text-lg-end">
-
-                <a href="/Home/Contact"
-                   class="btn btn-gold btn-lg">
-
-                    Contact Us
-
-                    <i class="bi bi-arrow-right"></i>
-
-                </a>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
+    </section>
 
 </main>
 
+@section Styles {
+    <style>
+        .chip-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #fff;
+            border: 1px solid #e9eaed;
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #172033;
+            text-decoration: none;
+            transition: all .2s ease;
+        }
 
-<!-- =========================================================
-     FOOTER
-========================================================= -->
+            .chip-item:hover {
+                border-color: #d6a84f;
+                color: #172033;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0,0,0,.06);
+            }
 
+            .chip-item i {
+                color: #d6a84f;
+                font-size: 18px;
+            }
 
+        .stakeholder-chip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border: 1px solid #e9eaed;
+            border-radius: 14px;
+            padding: 16px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #172033;
+            transition: all .2s ease;
+        }
 
+            .stakeholder-chip:hover {
+                border-color: #d6a84f;
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(0,0,0,.06);
+            }
 
-<!-- Bootstrap JS -->
+            .stakeholder-chip i {
+                color: #d6a84f;
+                font-size: 20px;
+            }
 
-
-
-<!-- Site JS -->
+        .soft-card {
+            background: #fff;
+            border: 1px solid #ecebe6;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0,0,0,.05);
+        }
+    </style>
+}

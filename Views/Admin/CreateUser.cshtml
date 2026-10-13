@@ -1,0 +1,60 @@
+﻿@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Create User";
+}
+
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">System</div>
+        <h1>Create New User</h1>
+        <p>Add a new admin or member account.</p>
+    </div>
+    <div class="page-head-actions">
+        <a href="/Admin/Users" class="btn-cancel">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show py-2">
+        <i class="bi bi-exclamation-triangle me-1"></i> @err
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<form method="post" asp-action="CreateUser">
+    @Html.AntiForgeryToken()
+
+    <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+        <div class="p-4">
+            <div class="row g-3">
+                <div class="col-md-12">
+                    <label class="form-label small fw-semibold">Email <span class="text-danger">*</span></label>
+                    <input name="Email" type="email" class="form-control" required placeholder="user@kpgja.org">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Password <span class="text-danger">*</span></label>
+                    <input name="Password" type="password" class="form-control" required
+                           placeholder="Min 6 chars, 1 uppercase, 1 digit">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label small fw-semibold">Role</label>
+                    <select name="Role" class="form-select">
+                        <option value="Admin">Admin</option>
+                        <option value="Member" selected>Member</option>
+                        <option value="Editor">Editor</option>
+                        <option value="Reviewer">Reviewer</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+            <a href="/Admin/Users" class="btn-cancel">Cancel</a>
+            <button type="submit" class="btn-add">
+                <i class="bi bi-check2"></i> Create User
+            </button>
+        </div>
+    </div>
+</form>

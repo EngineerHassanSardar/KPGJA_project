@@ -1,41 +1,76 @@
-﻿@{ Layout = "_AdminLayout"; ViewData["Title"] = "Activity Log"; }
+@model List<Entities.Entities.ActivityLogEntry>
+@{
+    Layout = "_AdminLayout";
+    ViewData["Title"] = "Activity Log";
+}
 
-<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <p class="text-secondary mb-0">Audit trail of all actions performed in the admin panel.</p>
+<div class="page-head">
+    <div class="page-head-left">
+        <div class="kicker">System</div>
+        <h1>Activity Log</h1>
+        <p>Audit trail of all actions performed in the admin panel.</p>
+    </div>
 </div>
 
-<div class="admin-table-card">
-    <div class="table-responsive">
-        <table class="table admin-table">
+@if (TempData["Success"] is string s)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2">
+        <i class="bi bi-check-circle me-1"></i> @s
+        <button class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="list-card">
+    <div class="list-card-head">
+        <div>
+            <h2>
+                <i class="bi bi-clock-history"></i> Recent Activity
+                <span class="count-badge">@(Model?.Count ?? 0)</span>
+            </h2>
+            <p class="list-card-sub">Every admin action is recorded with who, what, and when.</p>
+        </div>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-clock-history"></i></div>
+            <h3>No activity yet</h3>
+            <p>Actions you take in the admin panel will appear here.</p>
+        </div>
+    }
+    else
+    {
+        <table class="data-table">
             <thead>
                 <tr>
-                    <th>Actor</th>
-                    <th>Action</th>
-                    <th>Target</th>
-                    <th>IP Address</th>
-                    <th>Time</th>
+                    <th style="width:40px;">#</th>
+                    <th style="width:180px;">When</th>
+                    <th style="width:220px;">Who</th>
+                    <th style="width:120px;">Action</th>
+                    <th style="width:200px;">Entity</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var log in new[] {
-                    ("Administrator", "Approved application", "Fatima Bibi (#3)", "192.168.1.1", "2 hours ago"),
-                    ("Administrator", "Rejected application", "Zubair Shah (#4)", "192.168.1.1", "2 days ago"),
-                    ("Sarah Iqbal", "Published article", "Gem & Jewellery Expo 2026", "192.168.1.5", "3 days ago"),
-                    ("Administrator", "Updated settings", "Membership Fees", "192.168.1.1", "5 days ago"),
-                    ("Rafiq Ahmed", "Logged in", "—", "192.168.1.9", "1 week ago"),
-                    ("Administrator", "Created event", "Women Artisans Workshop", "192.168.1.1", "1 week ago"),
-                    ("Sarah Iqbal", "Edited article", "Export Compliance Guidelines", "192.168.1.5", "2 weeks ago")
-                })
+                @{ int n = 0; }
+                @foreach (var log in Model.OrderByDescending(l => l.Timestamp))
                 {
+                    n++;
                     <tr>
-                        <td><div class="member-name">@log.Item1</div></td>
-                        <td>@log.Item2</td>
-                        <td class="text-muted">@log.Item3</td>
-                        <td class="text-muted"><code style="font-size:10.5px;">@log.Item4</code></td>
-                        <td class="text-muted">@log.Item5</td>
+                        <td class="row-num">@n</td>
+                        <td class="text-muted">@log.Timestamp.ToLocalTime().ToString("dd MMM yyyy HH:mm")</td>
+                        <td class="strong">@log.UserEmail</td>
+                        <td>
+                            <span class="pill @(log.Action == "Deleted" ? "inactive" : "active")">
+                                @log.Action
+                            </span>
+                        </td>
+                        <td class="text-muted">@log.EntityType #@log.EntityId</td>
+                        <td class="desc-cell">@log.Details</td>
                     </tr>
                 }
             </tbody>
         </table>
-    </div>
+    }
 </div>

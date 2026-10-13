@@ -1,12 +1,18 @@
-﻿@model KPGJA.Web.Models.WomenEmpowermentContent
+@model Entities.Entities.WomenEmpowermentContent
 @{
     Layout = "_AdminLayout";
     ViewData["Title"] = "Women Empowerment";
-    var features = ViewBag.Features as List<KPGJA.Web.Models.WomenFeature> ?? new();
-    var current = ViewBag.CurrentFeature as KPGJA.Web.Models.WomenFeature ?? new KPGJA.Web.Models.WomenFeature();
+
+    var features = ViewBag.Features as List<Entities.Entities.WomenFeature> ?? new();
+    var minis = ViewBag.MiniFeatures as List<Entities.Entities.WomenMiniFeature> ?? new();
+    var currentMini = ViewBag.CurrentMini as Entities.Entities.WomenMiniFeature ?? new Entities.Entities.WomenMiniFeature();
+    var current = ViewBag.CurrentFeature as Entities.Entities.WomenFeature ?? new Entities.Entities.WomenFeature();
+
+    bool showMiniForm = ViewBag.ShowMiniForm == true;
     bool showForm = ViewBag.ShowForm == true;
     bool showIntroForm = ViewBag.ShowIntroForm == true;
     bool editMode = current.Id > 0;
+    bool editMiniMode = currentMini.Id > 0;
 }
 
 @if (TempData["Success"] is string s)
@@ -17,18 +23,19 @@
     </div>
 }
 
+<!-- PAGE HEADER -->
 <div class="page-head">
     <div class="page-head-left">
         <div class="kicker">Content</div>
         <h1>Women Empowerment</h1>
-        <p>Manage the Women Empowerment page intro, highlight and feature cards.</p>
+        <p>Manage the hero, mini features (chips), and main features (cards).</p>
     </div>
     <div class="page-head-actions">
         <a href="/Admin/Women?showIntroForm=true" class="btn-outline-brand">
-            <i class="bi bi-pencil"></i> Edit Intro
+            <i class="bi bi-pencil"></i> Edit Hero
         </a>
         <a href="/Admin/Women?showForm=true" class="btn-add">
-            <i class="bi bi-plus-lg"></i> Add Feature
+            <i class="bi bi-plus-lg"></i> Add Feature (Mini + Main)
         </a>
     </div>
 </div>
@@ -37,82 +44,270 @@
     <i class="bi bi-info-circle-fill"></i>
     <div>
         <strong>Women Page</strong>
-        <p>Changes made here are reflected on the public <code>/Home/Women</code> page.</p>
+        <p>
+            <b>Mini features</b> = small chips in the hero (Training, Entrepreneurship, etc.).
+            <b>Main features</b> = big cards below the hero.
+            Changes made here appear on <code>/Home/Women</code>.
+        </p>
     </div>
 </div>
 
+@* ============= HERO FORM ============= *@
 @if (showIntroForm)
 {
-    <form method="post" asp-action="WomenSave">
+    <form method="post" asp-action="WomenSave" enctype="multipart/form-data">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@Model?.Id" />
+        <input type="hidden" name="CoverImagePath" value="@Model?.CoverImagePath" />
 
         <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
             <div class="list-card-head">
                 <div>
-                    <h2><i class="bi bi-pencil-square"></i> Edit Page Intro</h2>
-                    <p class="list-card-sub">Top-of-page intro and highlight block.</p>
+                    <h2><i class="bi bi-pencil-square"></i> Edit Hero Section</h2>
+                    <p class="list-card-sub">Top hero: title, body, image.</p>
                 </div>
-                <a href="/Admin/Women" class="btn-cancel">
-                    <i class="bi bi-x-lg"></i> Cancel
-                </a>
+                <a href="/Admin/Women" class="btn-cancel"><i class="bi bi-x-lg"></i> Cancel</a>
             </div>
-
             <div class="p-4">
                 <div class="row g-3">
                     <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Intro Title</label>
+                        <label class="form-label small fw-semibold">Hero Title</label>
                         <input name="IntroTitle" class="form-control" value="@Model?.IntroTitle">
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Cover Image</label>
-                        <input type="file" class="form-control form-control-sm" accept="image/*">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Intro Body</label>
-                        <textarea name="IntroBody" class="form-control" rows="3">@Model?.IntroBody</textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Highlight Title</label>
-                        <input name="HighlightTitle" class="form-control" value="@Model?.HighlightTitle">
+                        <label class="form-label small fw-semibold">Hero Image</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(Model?.CoverImagePath))
+                            {
+                                <img src="@Model.CoverImagePath" style="width:80px;height:60px;object-fit:cover;border-radius:8px;">
+                            }
+                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                        </div>
                     </div>
                     <div class="col-12">
-                        <label class="form-label small fw-semibold">Highlight Body</label>
-                        <textarea name="HighlightBody" class="form-control" rows="3">@Model?.HighlightBody</textarea>
+                        <label class="form-label small fw-semibold">Hero Body</label>
+                        <textarea name="IntroBody" class="form-control" rows="3">@Model?.IntroBody</textarea>
                     </div>
                 </div>
+            </div>
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/Women" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add"><i class="bi bi-check2"></i> Save Hero</button>
+            </div>
+        </div>
+    </form>
+}
+
+@* ============= UNIFIED COMBINED FORM (Create both at once) ============= *@
+@if (showForm || showMiniForm)
+{
+    <form method="post" asp-action="WomenCombinedSave" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2><i class="bi bi-plus-circle"></i> Add Feature (Mini + Main)</h2>
+                    <p class="list-card-sub">One form creates both a mini chip and a main feature card.</p>
+                </div>
+                <a href="/Admin/Women" class="btn-cancel"><i class="bi bi-x-lg"></i> Cancel</a>
+            </div>
+
+            <div class="p-4">
+
+                <!-- MAIN FEATURE -->
+                <h6 class="text-uppercase small text-muted mb-3" style="letter-spacing:1px;">
+                    <i class="bi bi-card-image"></i> Main Feature Card
+                </h6>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" required placeholder="e.g. Skills Training">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control" value="@(features.Count + 1)" min="1">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3"
+                                  placeholder="Feature description shown on the big card..."></textarea>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Main Card Image</label>
+                        <input type="file" name="imageFile" class="form-control" accept="image/*">
+                    </div>
+                </div>
+
+                <!-- MINI FEATURE -->
+                <hr style="border-color:#ecebe6;">
+
+                <h6 class="text-uppercase small text-muted mb-3" style="letter-spacing:1px;">
+                    <i class="bi bi-grid-3x3-gap"></i> Mini Feature Chip <span class="text-muted">(optional)</span>
+                </h6>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Icon Class</label>
+                        <input name="MiniIconClass" class="form-control" value="bi-lightbulb"
+                               placeholder="bi-lightbulb">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Mini Label</label>
+                        <input name="MiniLabel" class="form-control"
+                               placeholder="e.g. Training (leave empty to skip)">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Mini Link (optional)</label>
+                        <input name="MiniLink" class="form-control" placeholder="/Home/Women">
+                    </div>
+                </div>
+
+                <!-- SHARED -->
+                <hr style="border-color:#ecebe6;">
+
+                <div class="form-check form-switch">
+                    <input name="IsActive" class="form-check-input" type="checkbox" value="true" checked>
+                    <label class="form-check-label small">Show on public site</label>
+                </div>
+
             </div>
 
             <div class="p-4 pt-0 d-flex justify-content-end gap-2">
                 <a href="/Admin/Women" class="btn-cancel">Cancel</a>
                 <button type="submit" class="btn-add">
-                    <i class="bi bi-check2"></i> Save Intro
+                    <i class="bi bi-check2"></i> Save Feature (Mini + Main)
                 </button>
             </div>
         </div>
     </form>
 }
 
+@* ============= SEPARATE EDIT FORMS ============= *@
+@if (showMiniForm && editMiniMode)
+{
+    <form method="post" asp-action="WomenMiniSave">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@currentMini.Id" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2><i class="bi bi-pencil-square"></i> Edit Mini Feature</h2>
+                    <p class="list-card-sub">Small chip shown inside the hero.</p>
+                </div>
+                <a href="/Admin/Women" class="btn-cancel"><i class="bi bi-x-lg"></i> Cancel</a>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Icon Class</label>
+                        <input name="IconClass" class="form-control" value="@currentMini.IconClass">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Label <span class="text-danger">*</span></label>
+                        <input name="Label" class="form-control" value="@currentMini.Label" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Link (optional)</label>
+                        <input name="Link" class="form-control" value="@currentMini.Link">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control" value="@currentMini.DisplayOrder">
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" value="true"
+                            @(currentMini.IsActive ? "checked" : null)>
+                            <label class="form-check-label small">Show on public site</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/Women" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add"><i class="bi bi-check2"></i> Update Mini Feature</button>
+            </div>
+        </div>
+    </form>
+}
+
+@if (showForm && editMode)
+{
+    <form method="post" asp-action="WomenFeatureSave" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@current.Id" />
+        <input type="hidden" name="ImagePath" value="@current.ImagePath" />
+
+        <div class="list-card mb-3" style="border:2px solid var(--kpgja-gold);">
+            <div class="list-card-head">
+                <div>
+                    <h2><i class="bi bi-pencil-square"></i> Edit Main Feature</h2>
+                    <p class="list-card-sub">Big card shown below the hero.</p>
+                </div>
+                <a href="/Admin/Women" class="btn-cancel"><i class="bi bi-x-lg"></i> Cancel</a>
+            </div>
+            <div class="p-4">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input name="Title" class="form-control" value="@current.Title" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-semibold">Display Order</label>
+                        <input type="number" name="DisplayOrder" class="form-control" value="@current.DisplayOrder">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-semibold">Body</label>
+                        <textarea name="Body" class="form-control" rows="3">@current.Body</textarea>
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label small fw-semibold">Image</label>
+                        <div class="d-flex gap-3 align-items-center">
+                            @if (!string.IsNullOrEmpty(current.ImagePath))
+                            {
+                                <img src="@current.ImagePath" style="width:80px;height:60px;object-fit:cover;border-radius:8px;">
+                            }
+                            <input type="file" name="imageFile" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check form-switch">
+                            <input name="IsActive" class="form-check-input" type="checkbox" value="true"
+                            @(current.IsActive ? "checked" : null)>
+                            <label class="form-check-label small">Show on public site</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
+                <a href="/Admin/Women" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-add"><i class="bi bi-check2"></i> Update Main Feature</button>
+            </div>
+        </div>
+    </form>
+}
+
+@* ============= COMBINED TABLE ============= *@
 <div class="list-card">
     <div class="list-card-head">
         <div>
             <h2>
-                <i class="bi bi-grid"></i> All Features
-                <span class="count-badge">@(features?.Count ?? 0)</span>
+                <i class="bi bi-list-ul"></i> All Features
+                <span class="count-badge">@(minis.Count + features.Count)</span>
             </h2>
-            <p class="list-card-sub">Each feature appears as a card on the Women Empowerment page.</p>
+            <p class="list-card-sub">Mini chips and main cards combined.</p>
         </div>
     </div>
 
-    @if (features == null || !features.Any())
+    @if (minis.Count + features.Count == 0)
     {
         <div class="empty-state">
-            <div class="empty-icon"><i class="bi bi-grid"></i></div>
+            <div class="empty-icon"><i class="bi bi-list-ul"></i></div>
             <h3>No features yet</h3>
-            <p>Click "Add Feature" to create your first feature card.</p>
-            <a href="/Admin/Women?showForm=true" class="btn-add">
-                <i class="bi bi-plus-lg"></i> Add First Feature
-            </a>
+            <p>Click "Add Feature (Mini + Main)" to start.</p>
         </div>
     }
     else
@@ -121,128 +316,116 @@
             <thead>
                 <tr>
                     <th style="width:40px;">#</th>
-                    <th style="width:60px;">Icon</th>
-                    <th>Title</th>
-                    <th>Body</th>
+                    <th style="width:70px;">Type</th>
+                    <th style="width:70px;">Icon/Image</th>
+                    <th>Title / Label</th>
+                    <th>Body / Link</th>
                     <th class="center" style="width:80px;">Order</th>
                     <th class="center" style="width:100px;">Status</th>
                     <th class="right" style="width:120px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                @{ int n = 0; }
-                @foreach (var f in features.OrderBy(x => x.DisplayOrder))
-                {
-                    n++;
-                    <tr>
-                        <td class="row-num">@n</td>
-                        <td><div class="thumb"><i class="bi @f.IconClass"></i></div></td>
-                        <td class="strong">@f.Title</td>
-                        <td class="desc-cell">@f.Body</td>
-                        <td class="center text-muted">@f.DisplayOrder</td>
-                        <td class="center">
-                            @if (f.IsActive)
-                            {
-                                <span class="pill active">Active</span>
-                            }
-                            else
-                            {
-                                <span class="pill inactive">Inactive</span>
-                            }
-                        </td>
-                        <td class="right">
-                            <div class="row-actions">
-                                <a href="/Admin/Women?showForm=true&id=@f.Id" class="icon-btn edit" title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form method="post" action="/Admin/WomenFeatureDelete" style="display:inline;">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@f.Id" />
-                                    <button type="submit" class="icon-btn delete" title="Delete"
-                                            onclick="return confirm('Delete this feature?');">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
+                @{
+                    int n = 0;
+                    foreach (var m in minis.OrderBy(x => x.DisplayOrder))
+                    {
+                        n++;
+                        <tr>
+                            <td class="row-num">@n</td>
+                            <td><span class="pill" style="background:#e3f2fd;color:#0d47a1;">Mini</span></td>
+                            <td><div class="thumb"><i class="bi @m.IconClass"></i></div></td>
+                            <td class="strong">@m.Label</td>
+                            <td class="desc-cell">@m.Link</td>
+                            <td class="center text-muted">@m.DisplayOrder</td>
+                            <td class="center">
+                                @if (m.IsActive)
+                                {
+                                    <span class="pill active">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="pill inactive">Inactive</span>
+                                }
+                            </td>
+                            <td class="right">
+                                <div class="row-actions">
+                                    <a href="/Admin/Women?showMiniForm=true&miniId=@m.Id" class="icon-btn edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="/Admin/WomenMiniDelete" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@m.Id" />
+                                        <button type="submit" class="icon-btn delete" title="Delete"
+                                                onclick="return confirm('Delete this mini feature?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+
+                    foreach (var f in features.OrderBy(x => x.DisplayOrder))
+                    {
+                        n++;
+                        <tr>
+                            <td class="row-num">@n</td>
+                            <td><span class="pill" style="background:#fff3e0;color:#e65100;">Main</span></td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(f.ImagePath))
+                                {
+                                    <img src="@f.ImagePath" alt="@f.Title" style="width:48px;height:48px;object-fit:cover;border-radius:8px;">
+                                }
+                                else
+                                {
+                                    <div class="thumb"><i class="bi bi-image"></i></div>
+                                }
+                            </td>
+                            <td class="strong">@f.Title</td>
+                            <td class="desc-cell">@f.Body</td>
+                            <td class="center text-muted">@f.DisplayOrder</td>
+                            <td class="center">
+                                @if (f.IsActive)
+                                {
+                                    <span class="pill active">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="pill inactive">Inactive</span>
+                                }
+                            </td>
+                            <td class="right">
+                                <div class="row-actions">
+                                    <a href="/Admin/Women?showForm=true&id=@f.Id" class="icon-btn edit" title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post" action="/Admin/WomenFeatureDelete" style="display:inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@f.Id" />
+                                        <button type="submit" class="icon-btn delete" title="Delete"
+                                                onclick="return confirm('Delete this feature?');">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
                 }
             </tbody>
         </table>
     }
 </div>
 
-@if (showForm)
-{
-    <form method="post" asp-action="WomenFeatureSave">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="Id" value="@current.Id" />
-
-        <div class="list-card mt-3" style="border:2px solid var(--kpgja-gold);">
-            <div class="list-card-head">
-                <div>
-                    <h2>
-                        <i class="bi @(editMode ? "bi-pencil-square" : "bi-plus-circle")"></i>
-                        @(editMode ? "Edit Feature" : "Add New Feature")
-                    </h2>
-                    <p class="list-card-sub">@(editMode ? "Update this feature card." : "Enter the feature information below.")</p>
-                </div>
-                <a href="/Admin/Women" class="btn-cancel">
-                    <i class="bi bi-x-lg"></i> Cancel
-                </a>
-            </div>
-
-            <div class="p-4">
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <label class="form-label small fw-semibold">Title <span class="text-danger">*</span></label>
-                        <input name="Title" class="form-control" value="@current.Title"
-                               placeholder="e.g. Skill Training" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small fw-semibold">Display Order</label>
-                        <input type="number" name="DisplayOrder" class="form-control"
-                               value="@(current.DisplayOrder == 0 ? (features.Count + 1) : current.DisplayOrder)" min="0">
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label small fw-semibold">Body</label>
-                        <textarea name="Body" class="form-control" rows="3"
-                                  placeholder="Feature description...">@current.Body</textarea>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label small fw-semibold">Icon</label>
-                        <input name="IconClass" class="form-control"
-                               value="@(string.IsNullOrEmpty(current.IconClass) ? "bi-star" : current.IconClass)"
-                               placeholder="bi-star">
-                    </div>
-                    <div class="col-md-6 d-flex align-items-end">
-                        <div class="form-check form-switch">
-                            <input name="IsActive" class="form-check-input" type="checkbox" id="activeSwitch"
-                                   value="true" @(current.Id == 0 || current.IsActive ? "checked" : null)>
-                            <label class="form-check-label small" for="activeSwitch">Show on public site</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="p-4 pt-0 d-flex justify-content-end gap-2">
-                <a href="/Admin/Women" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-add">
-                    <i class="bi bi-check2"></i> @(editMode ? "Update Feature" : "Save Feature")
-                </button>
-            </div>
-        </div>
-    </form>
-}
-
 @section Scripts {
     <script>
-        @if (showForm || showIntroForm)
+        @if (showForm || showIntroForm || showMiniForm)
         {
-            <text>
-                const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
-                if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            </text>
+                <text>
+                        const form = document.querySelector('.list-card[style*="var(--kpgja-gold)"]');
+                        if (form) form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                </text>
         }
     </script>
 }
