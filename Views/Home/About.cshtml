@@ -1,5 +1,13 @@
+@model List<Entities.Entities.AboutSection>
 @{
     ViewData["Title"] = "About Us | KPGJA";
+
+    // Pull the first (and typically only) About section from the DB
+    var whoWeAre = (Model ?? new()).OrderBy(s => s.DisplayOrder).FirstOrDefault();
+
+    var whoTitle   = whoWeAre?.Title ?? "A platform for connection, development and opportunity.";
+    var whoBody    = whoWeAre?.Body  ?? "The Khyber Pakhtunkhwa Gems & Jewellery Association (KPGJA) is a representative organization dedicated to the development, promotion, and strengthening of the gems and jewellery sector in Khyber Pakhtunkhwa, Pakistan.";
+    var whoImage   = whoWeAre?.ImagePath ?? "/assets/img/about-home.jpg";
 }
 
 <!-- ============ HERO ============ -->
@@ -13,44 +21,31 @@
 
 <main>
 
-    <!-- ============ 1. WHO WE ARE ============ -->
+    <!-- ============ 1. WHO WE ARE (DYNAMIC) ============ -->
     <section class="py-5">
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <span class="section-kicker">WHO WE ARE</span>
-                    <h2 class="section-heading mt-2">A platform for connection, development and opportunity.</h2>
+                    <h2 class="section-heading mt-2">@whoTitle</h2>
 
-                    <p class="text-secondary" style="line-height:1.85;">
-                        The Khyber Pakhtunkhwa Gems &amp; Jewellery Association (KPGJA) is a representative
-                        organization dedicated to the development, promotion, and strengthening of the gems
-                        and jewellery sector in Khyber Pakhtunkhwa, Pakistan.
-                    </p>
-                    <p class="text-secondary" style="line-height:1.85;">
-                        The Association works to bring together gemstone traders, jewellery businesses,
-                        lapidaries, artisans, miners, exporters, e-commerce professionals, and other
-                        stakeholders connected with the gems and jewellery industry.
-                    </p>
-                    <p class="text-secondary" style="line-height:1.85;">
-                        KPGJA aims to promote skill development, employment, value addition, digital
-                        transformation, e-commerce, women's participation, responsible business practices,
-                        and international market access for the sector.
-                    </p>
-                    <p class="text-secondary" style="line-height:1.85;">
-                        The Association also seeks to create stronger connections between local businesses
-                        and national and international markets, while highlighting the rich gemstone resources
-                        and craftsmanship of Khyber Pakhtunkhwa.
-                    </p>
+                    @if (!string.IsNullOrWhiteSpace(whoBody))
+                    {
+                        foreach (var para in whoBody.Split(new[] { "\r\n\r\n", "\n\n" }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            <p class="text-secondary" style="line-height:1.85;">@para.Trim()</p>
+                        }
+                    }
                 </div>
                 <div class="col-lg-6">
-                    <img src="/assets/img/about-home.jpg" alt="KPGJA"
+                    <img src="@whoImage" alt="KPGJA"
                          style="width:100%; height:auto; min-height:480px; max-height:600px; object-fit:cover; border-radius:20px; box-shadow:0 15px 40px rgba(0,0,0,.08); display:block;">
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ============ 2. VISION & MISSION ============ -->
+    <!-- ============ 2. VISION & MISSION (hardcoded) ============ -->
     <section class="py-5" style="background:#f7f5ef;">
         <div class="container">
             <div class="text-center mb-5">
@@ -97,7 +92,7 @@
         </div>
     </section>
 
-    <!-- ============ 3. OBJECTIVES ============ -->
+    <!-- ============ 3. OBJECTIVES (hardcoded) ============ -->
     <section class="py-5">
         <div class="container">
             <div class="text-center mb-5">
@@ -155,7 +150,7 @@
         </div>
     </section>
 
-    <!-- ============ 4. ACTIVITIES & INITIATIVES ============ -->
+    <!-- ============ 4. ACTIVITIES & INITIATIVES (hardcoded) ============ -->
     <section class="py-5" style="background:#f7f5ef;">
         <div class="container">
             <div class="text-center mb-5">
@@ -213,19 +208,17 @@
         </div>
     </section>
 
-    <!-- ============ 5. ASSOCIATION PROFILE / STAKEHOLDERS ============ -->
+    <!-- ============ 5. ASSOCIATION PROFILE / STAKEHOLDERS (hardcoded) ============ -->
     <section class="py-5">
         <div class="container">
             <div class="row align-items-center g-5">
 
-                <!-- IMAGE LEFT -->
                 <div class="col-lg-6">
                     <img src="/assets/img/association-profile.jpg"
                          alt="Association Profile"
                          style="width:100%; height:auto; min-height:420px; max-height:520px; object-fit:cover; border-radius:20px; box-shadow:0 15px 40px rgba(0,0,0,.10); display:block;">
                 </div>
 
-                <!-- CONTENT RIGHT -->
                 <div class="col-lg-6">
                     <span class="section-kicker">ASSOCIATION PROFILE</span>
                     <h2 class="section-heading mt-2">Connecting stakeholders across the value chain.</h2>
@@ -260,7 +253,7 @@
         </div>
     </section>
 
-    <!-- ============ 6. ORGANIZATIONAL CTA ============ -->
+    <!-- ============ 6. ORGANIZATIONAL CTA (hardcoded) ============ -->
     <section class="py-5" style="background:#f7f5ef;">
         <div class="container">
             <div class="row align-items-center g-5">
@@ -310,7 +303,7 @@
         </div>
     </section>
 
-    <!-- ============ 7. CTA BANNER ============ -->
+    <!-- ============ 7. CTA BANNER (hardcoded) ============ -->
     <section class="py-5" style="background:#0d4b3d;">
         <div class="container">
             <div class="row align-items-center g-4">
